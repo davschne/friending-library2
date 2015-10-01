@@ -1,12 +1,62 @@
-Waffle
+Schemas
+-------
 
 User
-  -email (_id) : primary key? enforce uniqueness
-  -first name
-  -last name
-  -books (Books)
-  -friends (other Users)
+----
+uID          : string PRIMARY KEY
+displayName  : string
+access_token : string
+
+Friend
+------
+uID1 : string FOREIGN KEY references User(uID)
+uID2 : string FOREIGN KEY references User(uID)
 
 Book
-  -ISBN (primary key)
-  -
+----
+ISBN          : string PRIMARY KEY
+title         : string
+subtitle      : string
+publisher     : string
+publishedDate : date
+description   : string
+pageCount     : number
+language      : string
+imageLink     : string
+
+Category
+--------
+
+
+Author
+------
+aID  : string PRIMARY KEY
+name : string
+
+Wrote
+-----
+aID  : string FOREIGN KEY references Author(aID)
+ISBN : string FOREIGN KEY references Book(ISBN)
+
+Copy
+----
+cID  : string PRIMARY KEY
+ISBN : string FOREIGN KEY references Book(ISBN)
+uID  : string FOREIGN KEY references User(uID) - owner
+
+Borrowing
+---------
+uID          : string FOREIGN KEY references User(uID) - borrower
+cID          : string FOREIGN KEY references Copy(cID)
+checkoutDate :
+
+BookRequest
+-----------
+uID  : string FOREIGN KEY references User(uID) - requester
+cID  : string FOREIGN KEY references Copy(cID)
+date :
+
+FriendRequest
+-------------
+requester : string FOREIGN KEY references User(uID)
+recipient : string FOREIGN KEY references User(uID)
