@@ -1,17 +1,17 @@
 BEGIN;
 
-CREATE TABLE User(
+CREATE TABLE Users (
   uID serial PRIMARY KEY,
   displayName varchar,
   access_token varchar
 );
 
-CREATE TABLE Friend(
-  uID1 integer REFERENCES User (uID),
-  uID2 integer REFERENCES User (uID)
+CREATE TABLE Friendship (
+  uID1 integer REFERENCES Users (uID) ON DELETE CASCADE,
+  uID2 integer REFERENCES Users (uID) ON DELETE CASCADE
 );
 
-CREATE TABLE Book(
+CREATE TABLE Books (
   ISBN integer PRIMARY KEY,
   title varchar,
   subtitle varchar,
@@ -23,32 +23,32 @@ CREATE TABLE Book(
   imageLink varchar
 );
 
-CREATE TABLE Author(
+CREATE TABLE Authors (
   aID serial PRIMARY KEY,
   aName varchar
 );
 
-CREATE TABLE Wrote(
-  aID integer REFERENCES Author,
-  ISBN integer REFERENCES Book
+CREATE TABLE Wrote (
+  aID integer REFERENCES Authors ON DELETE CASCADE,
+  ISBN integer REFERENCES Books ON DELETE CASCADE
 );
 
-CREATE TABLE Copy(
+CREATE TABLE Copies (
   cID serial PRIMARY KEY,
-  ISBN integer REFERENCES Book,
-  uID integer REFERENCES User
+  ISBN integer REFERENCES Books ON DELETE CASCADE,
+  uID integer REFERENCES Users ON DELETE CASCADE
 );
 
-CREATE TABLE Borrowing(
-  uID integer REFERENCES User,
-  cID integer REFERENCES Copy,
-  -- checkoutDate
+CREATE TABLE Borrowing (
+  uID integer REFERENCES Users ON DELETE RESTRICT,
+  cID integer REFERENCES Copies ON DELETE CASCADE,
+  checkoutDate timestamp with time zone
 );
 
-CREATE TABLE BookRequest(
-  uID integer REFERENCES User,
-  cID integer REFERENCES Copy,
-  -- date
+CREATE TABLE BookRequests (
+  uID integer REFERENCES Users ON DELETE CASCADE,
+  cID integer REFERENCES Copies ON DELETE CASCADE,
+  requestDate timestamp with time zone
 );
 
 COMMIT;
