@@ -3,60 +3,59 @@ Schemas
 
 User
 ----
-uID          : string PRIMARY KEY
-displayName  : string
-access_token : string
+uID          : varchar PRIMARY KEY
+displayName  : varchar
+access_token : varchar
 
 Friend
 ------
-uID1 : string FOREIGN KEY references User(uID)
-uID2 : string FOREIGN KEY references User(uID)
+uID1 : varchar references User(uID)
+uID2 : varchar references User(uID)
 
 Book
 ----
-ISBN          : string PRIMARY KEY
-title         : string
-subtitle      : string
-publisher     : string
-publishedDate : date
-description   : string
-pageCount     : number
-language      : string
-imageLink     : string
-
-Category
---------
-
+ISBN          : integer PRIMARY KEY
+title         : varchar
+subtitle      : varchar
+publisher     : varchar
+publishedDate : integer
+description   : varchar
+pageCount     : integer
+language      : varchar
+imageLink     : varchar
 
 Author
 ------
-aID  : string PRIMARY KEY
-name : string
+aID  : serial PRIMARY KEY
+name : varchar
 
 Wrote
 -----
-aID  : string FOREIGN KEY references Author(aID)
-ISBN : string FOREIGN KEY references Book(ISBN)
+aID  : integer references Author(aID)
+ISBN : integer references Book(ISBN)
 
 Copy
 ----
-cID  : string PRIMARY KEY
-ISBN : string FOREIGN KEY references Book(ISBN)
-uID  : string FOREIGN KEY references User(uID) - owner
+cID  : integer PRIMARY KEY
+ISBN : integer references Book(ISBN)
+uID  : integer references User(uID) - owner
 
 Borrowing
 ---------
-uID          : string FOREIGN KEY references User(uID) - borrower
-cID          : string FOREIGN KEY references Copy(cID)
+uID          : integer references User(uID) - borrower
+cID          : integer references Copy(cID)
 checkoutDate :
 
 BookRequest
 -----------
-uID  : string FOREIGN KEY references User(uID) - requester
-cID  : string FOREIGN KEY references Copy(cID)
+uID  : integer references User(uID) - requester
+cID  : integer references Copy(cID)
 date :
+
+Category
+--------
 
 FriendRequest
 -------------
-requester : string FOREIGN KEY references User(uID)
-recipient : string FOREIGN KEY references User(uID)
+requester : integer references User(uID)
+recipient : integer references User(uID)
