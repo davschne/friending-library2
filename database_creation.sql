@@ -54,31 +54,32 @@ CREATE TABLE Wrote (
 );
 
 CREATE TABLE Copies (
-  cID serial,
+  copyID serial,
   ISBN integer REFERENCES Books ON DELETE CASCADE,
-  uIDOwner integer REFERENCES Users ON DELETE CASCADE,
-  PRIMARY KEY pk (uIDOwner, ISBN, cID)
+  ownerID integer REFERENCES Users ON DELETE CASCADE,
+  PRIMARY KEY pk (ownerID, ISBN, copyID)
 );
 
 CREATE TABLE Borrowing (
-  uIDBorrower integer REFERENCES Users ON DELETE RESTRICT,
-  cID integer REFERENCES Copies ON DELETE CASCADE,
+  borrowerID integer REFERENCES Users ON DELETE RESTRICT,
+  copyID integer REFERENCES Copies ON DELETE CASCADE,
   checkoutDate TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY pk (uID, cID)
+  PRIMARY KEY pk (borrowerID, copyID)
 );
 
 CREATE TABLE BookRequests (
-  uIDRequester integer REFERENCES Users ON DELETE CASCADE,
-  cID integer REFERENCES Copies ON DELETE CASCADE,
+  requesterID integer REFERENCES Users ON DELETE CASCADE,
+  copyID integer REFERENCES Copies ON DELETE CASCADE,
   requestDate TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY pk (uIDRequester, cID) -- optimized for requester's view
-  -- optimize
+  PRIMARY KEY pk (requesterID, copyID)
+  -- optimized for requester's view ; possible to optimize for book owner?
 );
 
 CREATE TABLE FriendRequests (
-  uIDRequester integer REFERENCES Users ON DELETE CASCADE,
-  uIDInvitee integer REFERENCES Users ON DELETE CASCADE,
-  PRIMARY KEY pk (uIDRequester, uIDInvitee) -- optimized for requester's view
+  requesterID integer REFERENCES Users ON DELETE CASCADE,
+  inviteeID integer REFERENCES Users ON DELETE CASCADE,
+  PRIMARY KEY pk (requesterID, inviteeID)
+  -- optimized for requester's view ; possible to optimize for invitee?
 );
 
 COMMIT;
