@@ -1,3 +1,11 @@
+-access tokens
+  -store in Redis
+  -set expiration date
+  -access Redis in authentication middleware, pass uID in request body
+
+-update or insert in Postgres? Is this behavior necessary? For which endpoints?
+
+
 Schemas
 -------
 
@@ -5,7 +13,6 @@ User
 ----
 uID          : varchar PRIMARY KEY
 displayName  : varchar
-access_token : varchar
 
 Friend
 ------

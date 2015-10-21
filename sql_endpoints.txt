@@ -1,0 +1,58 @@
+/api/trans
+
+  /request/:bookid DELETE
+
+    DELETE FROM BookRequests
+    WHERE uID = $userid
+      AND cID = $bookid;
+
+  /request         POST
+
+    INSERT INTO BookRequests (uIDRequester, cID, requestDate)
+    VALUES (
+      $uIDrequester, $copyid, CURRENT_TIME
+    )
+    -- WHERE NOT EXISTS (
+    --   SELECT uID, cID
+    --   FROM BookRequests
+    --   WHERE
+    -- )
+    ;
+
+  /deny            POST
+
+    DELETE FROM BookRequests
+    WHERE uID = $requester
+      AND cID = $copy;
+
+  /approve         POST
+
+    BEGIN;
+      DELETE FROM BookRequests
+      WHERE uID = ?
+        AND cID = ?;
+      INSERT INTO Borrowing
+      VALUES (
+        userid, copyid, CURRENT_TIME
+      );
+    COMMIT;
+
+  /returned        POST
+
+    DELETE FROM Borrowing
+    WHERE uID = ?
+      AND cID = ?;
+
+/api/books
+
+  /          POST
+
+    -- find if exists in Books
+
+  /:bookid   DELETE
+  /available GET
+
+/api/self
+  /          GET
+  /          DELETE
+  /books     GET
