@@ -17,14 +17,14 @@
 
     DELETE FROM BookRequests
     WHERE requesterID = $userID
-      AND copyID = $copyID;
+      AND copyID      = $copyID;
 
   /approve         POST
 
     BEGIN;
       DELETE FROM BookRequests
       WHERE requesterID = $uIDRequester
-        AND copyID = $copyID;
+        AND copyID      = $copyID;
 
       INSERT INTO Borrowing (borrowerID, copyID, checkout_date)
       VALUES (
@@ -36,7 +36,7 @@
 
     DELETE FROM Borrowing
     WHERE borrowerID = $borrowerID
-      AND copyID = $copyID;
+      AND copyID     = $copyID;
 
 /api/books
 
@@ -58,7 +58,7 @@
 
     DELETE FROM Copies
     WHERE ownerID = $userID
-      AND  copyID = $copyID;
+      AND copyID  = $copyID;
 
   /available GET (may return many results)
 
