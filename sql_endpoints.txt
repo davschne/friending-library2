@@ -1,14 +1,14 @@
 /api/trans
 
-  /request/:bookid DELETE
+  /request/:copyID DELETE
 
     DELETE FROM BookRequests
-    WHERE requesterID = $userid
-      AND copyID = $bookid;
+    WHERE requesterID = $userID
+      AND      copyID = $copyID;
 
   /request         POST
 
-    INSERT INTO BookRequests (requesterID, copyID, requestDate)
+    INSERT INTO BookRequests (requesterID, copyID, request_date)
     VALUES (
       $userID, $copyID, CURRENT_TIME
     );
@@ -25,9 +25,10 @@
       DELETE FROM BookRequests
       WHERE requesterID = $uIDRequester
         AND copyID = $copyID;
-      INSERT INTO Borrowing (borrowerID, copyID, checkoutDate)
+
+      INSERT INTO Borrowing (borrowerID, copyID, checkout_date)
       VALUES (
-        $userID, copyID, CURRENT_TIME
+        $userID, $copyID, CURRENT_TIME
       );
     COMMIT;
 
@@ -42,6 +43,8 @@
   /          POST
 
     -- find if exists in Books?
+    -- two separate transactions in case the book already exists and we're
+    --   simply adding a new copy?
     INSERT INTO Books
     VALUES (
 
@@ -51,16 +54,17 @@
 
     );
 
-  /:bookid   DELETE
+  /:copyID   DELETE
 
     DELETE FROM Copies
-    WHERE ownerID
+    WHERE ownerID = $userID
+      AND  copyID = $copyID;
 
-  /available GET
+  /available GET (may return many results)
 
     -- use materialized view?
 
-    SELECT * -- maybe refine this projection?
+    SELECT *                            -- maybe refine this projection?
     FROM Copies c, BookView b, Users u
     WHERE c.ownerID IN (
       SELECT uID2
@@ -74,7 +78,7 @@
 
   /          GET
 
-    SELECT * -- maybe refine this projection?
+    SELECT *              -- maybe refine this projection?
     FROM Users
     WHERE uID = $userID;
 
@@ -83,7 +87,7 @@
     DELETE FROM Users
     WHERE uID = $userID;
 
-  /books     GET
+  /books     GET    (may return many results)
 
     -- use materialized view?
 
@@ -95,7 +99,7 @@
 
 /api/friends
 
-  /          GET
+  /            GET    (may return many results)
 
     SELECT *
     FROM Users
@@ -105,5 +109,53 @@
       WHERE uID1 = $userID
     );
 
+  /:friendID   DELETE
 
+    BEGIN;
+      DELETE FROM Friends
+      WHERE uID1 = $userID
+        AND uID2 = $friendID;
 
+      DELETE FROM Friends
+      WHERE uID1 = $friendID
+        AND uID2 = $userID;
+    COMMIT;
+
+  /requests
+
+    /                    GET
+
+      SELECT *
+      FROM FriendRequests
+      WHERE requesterID
+
+    /                    POST
+
+      INSERT INTO FriendRequests (requesterID, inviteeID)
+      VALUES ($userID, $potentialfriendID);
+
+    /:inviteeID          DELETE
+
+      DELETE FROM FriendRequests
+      WHERE requesterID = $userID
+        AND inviteeID   = $inviteeID;
+
+    /deny                DELETE
+
+      DELETE FROM FriendRequests
+      WHERE inviteeID   = $userID
+        AND requesterID = $requesterID;
+
+    /approve             POST
+
+      BEGIN;
+        DELETE FROM FriendRequests
+        WHERE inviteeID   = $userID
+          AND requesterID = $requesterID;
+
+        INSERT INTO Friends (uID1, uID2)
+        VALUES ($userID, $friendID);
+
+        INSERT INTO Friends (uID1, uID2)
+        VALUES ($friendID, $userID);
+      COMMIT;

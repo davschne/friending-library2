@@ -1,24 +1,26 @@
 {
-  "name": "friending-library",
+  "name": "friending-library2",
   "version": "0.1.0",
-  "description": "",
+  "description": "Allowing users to harness the power of social media to find great books to read, Friending Library facilitates borrowing and lending books within your social circle.",
   "main": "server.js",
   "scripts": {
     "test": "gulp test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davschne/friending-library.git"
+    "url": "git+https://github.com/davschne/friending-library2.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/davschne/friending-library/issues"
+    "url": "https://github.com/davschne/friending-library2/issues"
   },
-  "homepage": "https://github.com/davschne/friending-library#readme",
+  "homepage": "https://github.com/davschne/friending-library2#readme",
   "devDependencies": {
+    "angular": "^1.4.3",
     "angular-cookies": "^1.4.3",
     "angular-mocks": "^1.4.3",
+    "angular-route": "^1.4.3",
     "chai": "^3.2.0",
     "chai-http": "^1.0.0",
     "gulp": "^3.9.0",
@@ -36,17 +38,13 @@
     "webpack": "^1.10.5"
   },
   "dependencies": {
-    "angular": "^1.4.3",
-    "angular-cookies": "^1.4.3",
-    "angular-route": "^1.4.3",
+    "bluebird": "^3.0.1",
     "body-parser": "^1.13.2",
     "express": "^4.13.1",
-    "mongoose": "^4.1.0",
-    "mongoose-deep-populate": "^1.1.0",
-    "mongoose-findorcreate": "^0.1.2",
+    "ioredis": "^1.10.0",
     "passport": "^0.2.2",
     "passport-facebook": "^2.0.0",
     "passport-http-bearer": "^1.0.1",
-    "pg": "^4.4.2"
+    "pg-promise": "^2.2.4"
   }
 }

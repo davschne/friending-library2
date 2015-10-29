@@ -1,9 +1,21 @@
+-setup
+  -create user and database : database_creation.sql
+  -log in as user and set up database : database_setup.sql
+  -configure Redis (redis.conf?)
+    -incl. auth (see http://redis.io/topics/security)
+
 -access tokens
   -store in Redis
   -set expiration date
   -access Redis in authentication middleware, pass uID in request body
 
 -update or insert in Postgres? Is this behavior necessary? For which endpoints?
+
+-friend deletion triggers:
+  -delete relevant book requests
+  -if currently borrowing:
+    -borrower can't cancel friendship
+    -loaner can (but this should probably be handled by the program)
 
 
 Schemas
