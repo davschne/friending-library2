@@ -1,0 +1,161 @@
+/api/trans
+
+  /request/:copyID DELETE
+
+    DELETE FROM BookRequests
+    WHERE requesterID = $userID
+      AND      copyID = $copyID;
+
+  /request         POST
+
+    INSERT INTO BookRequests (requesterID, copyID, request_date)
+    VALUES (
+      $userID, $copyID, CURRENT_TIME
+    );
+
+  /deny            POST
+
+    DELETE FROM BookRequests
+    WHERE requesterID = $userID
+      AND copyID      = $copyID;
+
+  /approve         POST
+
+    BEGIN;
+      DELETE FROM BookRequests
+      WHERE requesterID = $uIDRequester
+        AND copyID      = $copyID;
+
+      INSERT INTO Borrowing (borrowerID, copyID, checkout_date)
+      VALUES (
+        $userID, $copyID, CURRENT_TIME
+      );
+    COMMIT;
+
+  /returned        POST
+
+    DELETE FROM Borrowing
+    WHERE borrowerID = $borrowerID
+      AND copyID     = $copyID;
+
+/api/books
+
+  /          POST
+
+    -- find if exists in Books?
+    -- two separate transactions in case the book already exists and we're
+    --   simply adding a new copy?
+    INSERT INTO Books
+    VALUES (
+
+    );
+    INSERT INTO Copies (copyID, ISBN, ownerID)
+    VALUES (
+
+    );
+
+  /:copyID   DELETE
+
+    DELETE FROM Copies
+    WHERE ownerID = $userID
+      AND copyID  = $copyID;
+
+  /available GET (may return many results)
+
+    -- use materialized view?
+
+    SELECT *                            -- maybe refine this projection?
+    FROM Copies c, BookView b, Users u
+    WHERE c.ownerID IN (
+      SELECT uID2
+      FROM Friends
+      WHERE uID1 = $userID
+    )
+      AND b.ISBN = c.ISBN
+      AND u.uID  = c.ownerID;
+
+/api/self
+
+  /          GET
+
+    SELECT *              -- maybe refine this projection?
+    FROM Users
+    WHERE uID = $userID;
+
+  /          DELETE
+
+    DELETE FROM Users
+    WHERE uID = $userID;
+
+  /books     GET    (may return many results)
+
+    -- use materialized view?
+
+    SELECT *
+    FROM Copies JOIN BookView USING(ISBN)
+    WHERE ownerID = $userID;
+
+// extensions to the existing API:
+
+/api/friends
+
+  /            GET    (may return many results)
+
+    SELECT *
+    FROM Users
+    WHERE uID IN (
+      SELECT uID2
+      FROM Friends
+      WHERE uID1 = $userID
+    );
+
+  /:friendID   DELETE
+
+    BEGIN;
+      DELETE FROM Friends
+      WHERE uID1 = $userID
+        AND uID2 = $friendID;
+
+      DELETE FROM Friends
+      WHERE uID1 = $friendID
+        AND uID2 = $userID;
+    COMMIT;
+
+  /requests
+
+    /                    GET
+
+      SELECT *
+      FROM FriendRequests
+      WHERE requesterID
+
+    /                    POST
+
+      INSERT INTO FriendRequests (requesterID, inviteeID)
+      VALUES ($userID, $potentialfriendID);
+
+    /:inviteeID          DELETE
+
+      DELETE FROM FriendRequests
+      WHERE requesterID = $userID
+        AND inviteeID   = $inviteeID;
+
+    /deny                DELETE
+
+      DELETE FROM FriendRequests
+      WHERE inviteeID   = $userID
+        AND requesterID = $requesterID;
+
+    /approve             POST
+
+      BEGIN;
+        DELETE FROM FriendRequests
+        WHERE inviteeID   = $userID
+          AND requesterID = $requesterID;
+
+        INSERT INTO Friends (uID1, uID2)
+        VALUES ($userID, $friendID);
+
+        INSERT INTO Friends (uID1, uID2)
+        VALUES ($friendID, $userID);
+      COMMIT;

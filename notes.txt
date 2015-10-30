@@ -1,12 +1,19 @@
-Waffle
+-setup
+  -move creation tasks to a .js file (not shell scripts)
+  -create user and database : database_creation.sql
+  -log in as user and set up database : database_setup.sql
+  -configure Redis (redis.conf?)
+    -incl. auth (see http://redis.io/topics/security)
 
-User
-  -email (_id) : primary key? enforce uniqueness
-  -first name
-  -last name
-  -books (Books)
-  -friends (other Users)
+-access tokens
+  -store in Redis (key: token, value: uID)
+  -set expiration date
+  -access Redis in authentication middleware, pass uID in request body
 
-Book
-  -ISBN (primary key)
-  -
+-update or insert in Postgres? Is this behavior necessary? For which endpoints?
+
+-friend deletion triggers:
+  -delete relevant book requests
+  -if currently borrowing:
+    -borrower can't cancel friendship
+    -loaner can (but this should probably be handled by the program)
