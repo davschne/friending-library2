@@ -33,7 +33,7 @@ gulp.task('webpack', function() {
       .pipe(gulp.dest('./public/js/'));
 });
 
-gulp.task('copy', function() {
+gulp.task('copy-html', function() {
   var opts = {
     conditionals: true,
     spare: true
@@ -45,19 +45,23 @@ gulp.task('copy', function() {
     .pipe(gulp.dest('./public/'));
 });
 
-gulp.task('copy-otf', function() {
+gulp.task('copy', function() {
 
-  return gulp.src('./app/**/*.otf')
+  return gulp.src([
+    './app/**/*.otf',
+    './app/**/*.ttf',
+    './app/**/*.svg',
+    './app/**/*.png'])
     .pipe(gulp.dest('./public/'));
 });
 
-gulp.task('copy-svg', function() {
+// gulp.task('copy-svg', function() {
 
-  return gulp.src('./app/**/*.ttf')
-    .pipe(gulp.dest('./public/'));
-});
+//   return gulp.src('./app/**/*.ttf')
+//     .pipe(gulp.dest('./public/'));
+// });
 
-gulp.task('build', ['sass', 'copy', 'copy-otf', 'copy-svg', 'webpack']);
+gulp.task('build', ['sass', 'copy-html', 'copy', 'webpack']);
 
 gulp.task('default', ['build']);
 

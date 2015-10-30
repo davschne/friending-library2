@@ -20,13 +20,13 @@ module.exports = function(router, pg, redis) {
       var displayName = profile.displayName;
       pg.query({
         name: "find-or-create-user",
-        text: "INSERT INTO Users (uID, displayName)
-              SELECT $1, $2
-              WHERE NOT EXISTS (
-                SELECT uID
-                FROM Users
-                WHERE uID = $1
-              )",
+        text: "INSERT INTO Users (uID, displayName) " +
+              "SELECT $1, $2 " +
+              "WHERE NOT EXISTS ( " +
+                "SELECT uID " +
+                "FROM Users " +
+                "WHERE uID = $1 " +
+              ")",
         values: [id, displayName]
       })
       .then(function() {
