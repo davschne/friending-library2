@@ -47,7 +47,9 @@ var rootRouter  = express.Router();
 // require("./routes/trans-routes")(transRouter);
 // require("./routes/root-routes")(rootRouter);
 
-
+app.get("/test", authenticate, function(req, res) {
+    res.json({msg: "Hit test endpoint."});
+  });
 app.use("/auth", authRouter);
 app.use("/api/self", authenticate, selfRouter);
 app.use("/api/books", authenticate, booksRouter);

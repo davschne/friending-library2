@@ -4,6 +4,20 @@ var passport = require("passport");
 
 passport.use(new BearerStrategy(
   function(token, done) {
+
+    var redis = req.redis;
+    redis.get(token)
+      .then(function(userID) {
+        if (!userID) {
+          return done(null, false);
+        } else {
+          console.log(userID);
+          return done(null, userID, {scope: "all"});
+        }
+      })
+      .catch(function(err) {
+        return done(err);
+      });
     // User.findOne({access_token: token},
     //   function(err, user) {
     //     if (err) {
