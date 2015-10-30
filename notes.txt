@@ -12,6 +12,8 @@
 
 -update or insert in Postgres? Is this behavior necessary? For which endpoints?
 
+-stream results from Postgres? Use package node-pg-query-stream?
+
 -friend deletion triggers:
   -delete relevant book requests
   -if currently borrowing:

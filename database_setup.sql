@@ -1,14 +1,15 @@
 BEGIN;
 
 CREATE TABLE Users (
-  uID serial,
+  uID varchar,
   display_name varchar,
-  given_name varchar,
-  surname varchar,
+  -- given_name varchar,
+  -- surname varchar,
   PRIMARY KEY (uID)
 );
 
-CREATE INDEX UserNames ON Users (surname, given_name); -- index for user searches
+-- index for user searches
+-- CREATE INDEX UserNames ON Users (surname, given_name);
 
 -- CREATE TABLE Friendship (
 --   uID1 integer REFERENCES Users (uID) ON DELETE CASCADE,

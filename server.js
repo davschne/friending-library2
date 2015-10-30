@@ -18,7 +18,7 @@ var pg    = pgp(PG_URI);
 
 // Middleware
 var bodyParser   = require('body-parser');
-var authenticate = require('./middleware/auth-bearer');
+var authenticate = require('./middleware/auth-bearer')(redis);
 var dbs          = require('./middleware/dbs');
 
 app.use(passport.initialize());
@@ -41,15 +41,15 @@ var booksRouter = express.Router();
 var transRouter = express.Router();
 var rootRouter  = express.Router();
 
-// require("./routes/auth-routes")(authRouter);
+require("./routes/auth-routes")(authRouter, pg, redis);
 // require("./routes/self-routes")(selfRouter);
 // require("./routes/books-routes")(booksRouter);
 // require("./routes/trans-routes")(transRouter);
 // require("./routes/root-routes")(rootRouter);
 
 app.get("/test", authenticate, function(req, res) {
-    res.json({msg: "Hit test endpoint."});
-  });
+  res.json({msg: "Hit test endpoint."});
+});
 app.use("/auth", authRouter);
 app.use("/api/self", authenticate, selfRouter);
 app.use("/api/books", authenticate, booksRouter);
