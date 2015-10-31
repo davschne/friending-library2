@@ -45,7 +45,7 @@ require("./routes/auth-routes")(authRouter, pg, redis);
 // require("./routes/self-routes")(selfRouter);
 // require("./routes/books-routes")(booksRouter);
 // require("./routes/trans-routes")(transRouter);
-// require("./routes/root-routes")(rootRouter);
+require("./routes/root-routes")(rootRouter, redis);
 
 app.get("/test", authenticate, function(req, res) {
   res.json({msg: "Hit test endpoint."});

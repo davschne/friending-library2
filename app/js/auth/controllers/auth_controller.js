@@ -14,7 +14,6 @@ module.exports = function(app) {
 
         $scope.userToken = token;
       };
-      console.log('Ran grabToken');
     };
 
     grabToken();

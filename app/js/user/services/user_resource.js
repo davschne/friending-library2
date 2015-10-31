@@ -12,23 +12,23 @@ module.exports = function(app) {
   app.factory('userResource', ['$http', function($http) {
     return function() {
       return {
-        getUser: function(user, callback) {
+        getUser: function(token, callback) {
           // var token = JSON.stringify(user);
           $http({
             method: 'GET',
             url: '/api/self',
-            headers: {'Authorization': 'Bearer ' + user}
-            //white space in 'Bearer ' + user is crucial needs to be Bearer 1223142134 when sent
+            headers: {'Authorization': 'Bearer ' + token}
+            //white space in 'Bearer ' + token is crucial needs to be Bearer 1223142134 when sent
           })
           .success(callback)
           .error(handleError());
         },
 
-        getBooks: function(user, callback) {
+        getBooks: function(token, callback) {
           $http({
             method: 'GET',
             url: '/api/self/books',
-            headers: {'Authorization': 'Bearer ' + user}
+            headers: {'Authorization': 'Bearer ' + token}
           })
           .success(callback)
           .error(handleError());
@@ -43,75 +43,75 @@ module.exports = function(app) {
           .error(handleError());
         },
 
-        createBook: function(user, userData, callback) {
+        createBook: function(token, userData, callback) {
           $http({
             method: 'POST',
             url: '/api/books',
-            headers:  {'Authorization': 'Bearer ' + user},
+            headers:  {'Authorization': 'Bearer ' + token},
             data: userData
           })
           .success(callback)
           .error(handleError());
         },
 
-        removeBook: function(user, bookId, callback) {
+        removeBook: function(token, bookId, callback) {
           $http({
             method: 'DELETE',
             url: '/api/books/' + bookId,
-            headers: {'Authorization': 'Bearer ' + user},
+            headers: {'Authorization': 'Bearer ' + token},
           })
           .success(callback)
           .error(handleError());
         },
 
-        undoRequest: function(user, bookId, callback) {
+        undoRequest: function(token, bookId, callback) {
           $http({
             method: 'DELETE',
             url: '/api/trans/request/' + bookId,
-            headers: {'Authorization': 'Bearer ' + user},
+            headers: {'Authorization': 'Bearer ' + token},
           })
           .success(callback)
           .error(handleError());
         },
 
-        approveRequest: function(user, userData, callback) {
+        approveRequest: function(token, userData, callback) {
           $http({
             method: 'POST',
             url: '/api/trans/approve',
-            headers: {'Authorization': 'Bearer ' + user},
+            headers: {'Authorization': 'Bearer ' + token},
             data: userData
           })
           .success(callback)
           .error(handleError());
         },
 
-        denyRequest: function(user, userData, callback) {
+        denyRequest: function(token, userData, callback) {
           $http({
             method: 'POST',
             url: '/api/trans/deny',
-            headers: {'Authorization': 'Bearer ' + user},
+            headers: {'Authorization': 'Bearer ' + token},
             data: userData
           })
           .success(callback)
           .error(handleError());
         },
 
-        bookReturn: function(user, userData, callback) {
+        bookReturn: function(token, userData, callback) {
           $http({
             method: 'POST',
             url: '/api/trans/returned',
-            headers: {'Authorization': 'Bearer ' + user},
+            headers: {'Authorization': 'Bearer ' + token},
             data: userData
           })
           .success(callback)
           .error(handleError());
         },
 
-        logOut: function(user, callback) {
+        logOut: function(token, callback) {
           $http({
             method: 'POST',
             url: '/logout',
-            headers: {'Authorization': 'Bearer ' + user}
+            headers: {'Authorization': 'Bearer ' + token}
           })
           .success(callback)
           .error(handleError);

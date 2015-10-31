@@ -29,7 +29,7 @@ gulp.task('webpack', function() {
         filename: 'bundle.js'
       }
      }))
-      .pipe(uglify())
+      // .pipe(uglify())
       .pipe(gulp.dest('./public/js/'));
 });
 
