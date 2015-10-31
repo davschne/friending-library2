@@ -78,6 +78,20 @@
 
   /          GET
 
+    -- also need :
+    -- incoming requests (
+    --   book title,
+    --   book authors,
+    --   book categories,
+    --   requester display_name
+    -- )
+    -- book lent (
+    --   book title,
+    --   book authors,
+    --   book categories,
+    --   borrower display_name
+    -- )
+
     SELECT *              -- maybe refine this projection?
     FROM Users
     WHERE uID = $userID;

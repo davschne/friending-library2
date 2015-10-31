@@ -7,6 +7,9 @@ module.exports = function(app) {
     var Http = authResource();
 
     var grabToken = function() {
+
+      // TODO : fix naming conventions here ($scope.user, not .userToken)
+
       return function() {
         var token = {
           access_token : $cookies.get('tok')
@@ -18,11 +21,13 @@ module.exports = function(app) {
 
     grabToken();
 
-    $scope.userLogOut = function(user) {
-      Http.logOut(user, function(data) {
+    $scope.userLogOut = function(token) {
+      Http.logOut(token, function(data) {
         console.log('Logged Out');
         console.log(data);
-      })
+      });
+
+      // TODO : possible to delete the cookie?
 
       $cookies.put('tok', '');
       $location.path('/');

@@ -12,7 +12,7 @@
   <section class="form__module">
     <h1 class="form__module__header">Add A Book</h1>
     <form data-ng-submit="askGoogle(googlebook.isbn)">
-      <p class="form__module__p">Enter 10 or 13 Length ISBN</p>
+      <p class="form__module__p">Enter 10- or 13-Digit ISBN</p>
       <section class="form__module-input-button">
         <input type="text" data-ng-model="googlebook.isbn" required></input>
         <button type="submit">Find Book</button>
@@ -22,7 +22,7 @@
 </section>
 
 <section class="error__message" data-ng-if="checkResult">
-  <p class="error__message__p">Sorry we could not find that. Please Check your ISBN</p>
+  <p class="error__message__p">Sorry, we could not find that book. Please verify that the ISBN is correct.</p>
 </section>
 
 <section class="list" data-ng-if="googleData">
@@ -33,6 +33,7 @@
     <section class="book__list__subsection" data-ng-if="googleData">
       <ul>
         <li><p>Title:</p>{{googleData.title}}</li>
+        <!-- TODO : If multiple authors, show them all -->
         <li><p>Author:</p>{{googleData.author[0]}}</li>
         <li><p>Genre:</p>{{googleData.genre[0]}}</li>
       </ul>

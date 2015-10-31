@@ -1,5 +1,7 @@
 'use strict';
 
+// TODO : Is this file needed? Seems to duplicate functionality found in user_resource.
+
 module.exports = function(app) {
 
   var handleError = function(err) {

@@ -8,34 +8,37 @@ module.exports = function(app) {
 
     (function() {
 
-      if($location.search().access_token || ($cookies.get('tok').length > 3)) {
-        runResource();
-      }
+      var getToken = function() {
 
-      if($cookies.get('tok') === '' || !($cookies.get('tok'))) {
+        // check query string for token
+        var token = $location.search().access_token;
+
+        if (token) {
+          // store it in a cookie
+          $cookies.put('tok', token);
+          // reset browser address bar
+          $location.url('/success');
+        } else {
+          // check cookie for token
+          token = $cookies.get('tok');
+        }
+
+        return token;
+      };
+
+      var token = getToken();
+
+      if (token) {
+        // add token to $scope
+        $scope.user = { access_token: token };
+        // proceed
+        runResource();
+      } else {
+        // redirect to root for sign-in
         $location.path('/');
       }
 
       function runResource() {
-
-        var getToken = function() {
-          if($location.search().access_token) {
-            console.log('Ran True');
-            var userToken = $location.search();
-            $scope.user = userToken;
-            $cookies.put('tok', $scope.user.access_token);
-            $location.url('/success');
-          } else {
-            console.log('Ran Else');
-            var token = {
-              access_token : $cookies.get('tok')
-            }
-            $scope.user = token;
-          }
-        };
-
-        getToken();
-
 
         var getUserData = function(user) {
           Http.getUser(user, function(data) {
@@ -45,13 +48,13 @@ module.exports = function(app) {
             $scope.selfRequests = data.requests;
             $scope.selfBorrowing = data.borrowing;
 
-            if($scope.selfRequests.length === 0) {
+            if ($scope.selfRequests.length === 0) {
               $scope.noSelfRequests = true;
             } else {
               $scope.noSelfRequests = false;
             }
 
-            if($scope.selfBorrowing.length === 0) {
+            if ($scope.selfBorrowing.length === 0) {
               $scope.noneApproved = true;
             } else {
               $scope.noneApproved = false;
@@ -73,29 +76,28 @@ module.exports = function(app) {
             $scope.availableBooks = [];
 
             for(var i = 0; i < $scope.userBooks.length; i++) {
-              if($scope.userBooks[i].request) {
+              if ($scope.userBooks[i].request) {
                 $scope.bookRequests.push($scope.userBooks[i]);
-              }
-               else if($scope.userBooks[i].borrower) {
+              } else if ($scope.userBooks[i].borrower) {
                 $scope.borrowedBooks.push($scope.userBooks[i]);
               } else {
                 $scope.availableBooks.push($scope.userBooks[i]);
               }
             }
 
-            if($scope.availableBooks.length === 0) {
+            if ($scope.availableBooks.length === 0) {
               $scope.allRequested = true;
             } else {
               $scope.allRequested = false;
             }
 
-            if($scope.borrowedBooks.length === 0) {
+            if ($scope.borrowedBooks.length === 0) {
               $scope.noneBorrowed = true;
             } else {
               $scope.noneBorrowed = false;
             }
 
-            if($scope.bookRequests.length === 0) {
+            if ($scope.bookRequests.length === 0) {
               $scope.noRequests = true;
             } else {
               $scope.noRequests = false;

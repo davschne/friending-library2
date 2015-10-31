@@ -60,6 +60,15 @@ app.listen(PORT, function() {
   console.log("Server running on port " + PORT);
 });
 
+redis
+  .on("connect", function() {
+    console.log("Connected to Redis server");
+  })
+  .on("error", function(err) {
+    console.log("Couldn't connect to Redis server");
+    console.error(err);
+  });
+
 process.on("exit", function() {
   redis.disconnect();
   pgp.end();
