@@ -6,22 +6,31 @@ var REDIS_URI = process.env.REDIS_URI
 
 var express      = require('express');
 var promise      = require('bluebird');
-var bodyParser   = require('body-parser');
 var passport     = require('passport');
-var authenticate = require('./middleware/auth-bearer');
 var Redis        = require('ioredis');
 var pgp          = require('pg-promise')({ promiseLib: promise });
 
 var app   = express();
 
+// Create database interfaces
 var redis = new Redis(REDIS_URI);
-var db    = pgp(PG_URI);
+var pg    = pgp(PG_URI);
+
+// Middleware
+var bodyParser   = require('body-parser');
+var authenticate = require('./middleware/auth-bearer')(redis);
+var dbs          = require('./middleware/dbs');
+
+app.use(passport.initialize());
+app.use(express.static("public"));
+app.use(bodyParser.json());
+app.use(dbs(pg, redis));
 
 // redis.ping().then(function(result) {
 //   console.log(result);
 // });
 
-// db.query("select * from test").then(function(data) {
+// pg.query("select * from test").then(function(data) {
 //   console.log(data);
 // })
 // .catch(function(err) { console.log(err); });
@@ -32,16 +41,15 @@ var booksRouter = express.Router();
 var transRouter = express.Router();
 var rootRouter  = express.Router();
 
-// require("./routes/auth-routes")(authRouter);
+require("./routes/auth-routes")(authRouter, pg, redis);
 // require("./routes/self-routes")(selfRouter);
 // require("./routes/books-routes")(booksRouter);
 // require("./routes/trans-routes")(transRouter);
-// require("./routes/root-routes")(rootRouter);
+require("./routes/root-routes")(rootRouter, redis);
 
-app.use(passport.initialize());
-app.use(express.static("public"));
-app.use(bodyParser.json());
-
+app.get("/test", authenticate, function(req, res) {
+  res.json({msg: "Hit test endpoint."});
+});
 app.use("/auth", authRouter);
 app.use("/api/self", authenticate, selfRouter);
 app.use("/api/books", authenticate, booksRouter);

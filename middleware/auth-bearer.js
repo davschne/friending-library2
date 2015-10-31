@@ -1,22 +1,28 @@
 var BearerStrategy = require("passport-http-bearer").Strategy;
 var passport = require("passport");
-// var User = require("../models/User");
 
-// passport.use(new BearerStrategy(
-//   function(token, done) {
-//     User.findOne({access_token: token},
-//       function(err, user) {
-//         if (err) {
-//           return done(err);
-//         }
-//         if (!user) {
-//           return done(null, false);
-//         }
-//         else {
-//           return done(null, user, {scope: "all"});
-//         }
-//       });
-//     }
-//   ));
+var authenticate = function(redis) {
 
-module.exports = passport.authenticate("bearer", {session: false});
+  passport.use(new BearerStrategy(
+    function(token, done) {
+
+      redis.get(token)
+        .then(function(userID) {
+          if (!userID) {
+            return done(null, false);
+          } else {
+            console.log(userID);
+            return done(null, userID, {scope: "all"});
+          }
+        })
+        .catch(function(err) {
+          return done(err);
+        });
+      }
+    ));
+
+  return passport.authenticate("bearer", {session: false});
+};
+
+
+module.exports = authenticate;

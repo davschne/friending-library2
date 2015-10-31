@@ -6,4 +6,4 @@
 # current directory, and the existence of the database "friending_library" with
 # owner "friending_library_user" (created with the create_database.sh script).
 
-psql -d friending_library -U friending_library_user -f database_setup.sql
+psql -d friending_library -U friending_library_user -f sql/database_setup.sql

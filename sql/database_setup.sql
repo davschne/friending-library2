@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE TABLE Users (
-  uID varchar,
+  uID bigint,
   display_name varchar,
   -- given_name varchar,
   -- surname varchar,
@@ -12,8 +12,8 @@ CREATE TABLE Users (
 -- CREATE INDEX UserNames ON Users (surname, given_name);
 
 -- CREATE TABLE Friendship (
---   uID1 integer REFERENCES Users (uID) ON DELETE CASCADE,
---   uID2 integer REFERENCES Users (uID) ON DELETE CASCADE,
+--   uID1 bigint REFERENCES Users (uID) ON DELETE CASCADE,
+--   uID2 bigint REFERENCES Users (uID) ON DELETE CASCADE,
 --   PRIMARY KEY (uID1, uID2)
 -- );
 
@@ -57,20 +57,20 @@ CREATE MATERIALIZED VIEW BookView AS
 CREATE TABLE Copies (
   copyID serial,
   ISBN integer REFERENCES Books ON DELETE CASCADE,
-  ownerID integer REFERENCES Users (uID) ON DELETE CASCADE,
+  ownerID bigint REFERENCES Users (uID) ON DELETE CASCADE,
   PRIMARY KEY (copyID),
   UNIQUE (ownerID, ISBN, copyID)
 );
 
 CREATE TABLE Borrowing (
-  borrowerID integer REFERENCES Users (uID) ON DELETE RESTRICT,
+  borrowerID bigint REFERENCES Users (uID) ON DELETE RESTRICT,
   copyID integer REFERENCES Copies ON DELETE CASCADE,
   checkout_date TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (borrowerID, copyID)
 );
 
 CREATE TABLE BookRequests (
-  requesterID integer REFERENCES Users (uID) ON DELETE CASCADE,
+  requesterID bigint REFERENCES Users (uID) ON DELETE CASCADE,
   copyID integer REFERENCES Copies ON DELETE CASCADE,
   request_date TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (requesterID, copyID)
@@ -79,8 +79,8 @@ CREATE TABLE BookRequests (
 );
 
 -- CREATE TABLE FriendRequests (
---   requesterID integer REFERENCES Users ON DELETE CASCADE,
---   inviteeID integer REFERENCES Users ON DELETE CASCADE,
+--   requesterID bigint REFERENCES Users ON DELETE CASCADE,
+--   inviteeID bigint REFERENCES Users ON DELETE CASCADE,
 --   PRIMARY KEY (requesterID, inviteeID)
 --   -- optimized for requester's view ; possible to optimize for invitee?
 --   -- separate indexes on the columns?
