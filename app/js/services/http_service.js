@@ -17,7 +17,7 @@ module.exports = function(app) {
       $http({
         method: obj.method,
         url: obj.url,
-        headers: {'Authorization': 'Bearer ' + token}
+        headers: {'Authorization': 'Bearer ' + token},
         data: obj.data
 
         // white space in 'Bearer ' + token is crucial.

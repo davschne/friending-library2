@@ -50,7 +50,7 @@ CREATE TABLE Wrote (
 
 -- for searching books by category
 CREATE TABLE BooksToCategories (
-  category varchar REFERENCES Categories,
+  category varchar,
   ISBN integer REFERENCES Books ON DELETE CASCADE,
   PRIMARY KEY (category, ISBN)
 );

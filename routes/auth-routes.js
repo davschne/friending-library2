@@ -37,7 +37,7 @@ module.exports = function(router, pg, redis) {
       })
       .then(function() {
         // if successful, continue
-        // (access_token will be added to req object)
+        // (access_token will be added to req object as req.user)
         done(null, access_token);
       })
       .catch(function(err) {
@@ -62,6 +62,6 @@ module.exports = function(router, pg, redis) {
     passport.authenticate("facebook", {failureRedirect: "/"}),
     function(req, res) {
       // send access_token to client in query string
-      res.redirect("/#/success?access_token=" + req.access_token);
+      res.redirect("/#/?access_token=" + req.user);
     });
 };

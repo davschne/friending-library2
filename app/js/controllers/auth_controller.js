@@ -6,20 +6,37 @@ module.exports = function(app) {
 
     var http = httpService;
 
-    var grabToken = function() {
+    var getToken = function() {
 
-      // TODO : fix naming conventions here ($scope.user, not .userToken)
+      // check query string for token
+      var token = $location.search().access_token;
+      console.log("token from query string: " + token)
 
-      return function() {
-        var token = {
-          access_token : $cookies.get('tok')
-        };
+      if (token) {
+        // store it in a cookie
+        $cookies.put('tok', token);
+      } else {
+        // check cookie for token
+        token = $cookies.get('tok');
+        console.log("token from cookie: " + token);
+      }
 
-        $scope.userToken = token;
-      };
-    };
+      return token;
+    }
 
-    grabToken();
+    var token = getToken();
+
+    if (token) {
+      // add token to $scope
+      $scope.user = { access_token: token };
+      // proceed to app
+      console.log("redirecting to /available_books");
+      $location.url('/available_books');
+    } else {
+      // redirect to root for sign-in
+      console.log("redirecting to /");
+      $location.url('/');
+    }
 
     $scope.userLogOut = function(token) {
       http.logOut(token, function(data) {
@@ -27,10 +44,9 @@ module.exports = function(app) {
         console.log(data);
       });
 
-      // TODO : possible to delete the cookie?
-
-      $cookies.put('tok', '');
-      $location.path('/');
+      delete $scope.user;
+      $cookies.remove('tok');
+      $location.url('/');
     };
   }]);
 };
