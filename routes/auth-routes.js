@@ -36,13 +36,12 @@ module.exports = function(router, pg, redis) {
         return redis.set(access_token, id, 'ex', 7200);
       })
       .then(function() {
-        var user = {
-          _id: id,
-          displayName: displayName
-        };
-        done(null, user);
+        // if successful, continue
+        // (access_token will be added to req object as req.user)
+        done(null, access_token);
       })
       .catch(function(err) {
+        // if unsuccessful
         done(err);
       });
     })
@@ -62,6 +61,7 @@ module.exports = function(router, pg, redis) {
   router.get("/facebook/callback",
     passport.authenticate("facebook", {failureRedirect: "/"}),
     function(req, res) {
-      res.redirect("/#/success?access_token=" + req.user.access_token);
+      // send access_token to client in query string
+      res.redirect("/#/?access_token=" + req.user);
     });
 };

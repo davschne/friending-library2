@@ -6,12 +6,14 @@ var authenticate = function(redis) {
   passport.use(new BearerStrategy(
     function(token, done) {
 
+      // Seems to be a problem here after logging out, then back in.
+      // Cannot read property 'then' of undefined
+
       redis.get(token)
         .then(function(userID) {
           if (!userID) {
             return done(null, false);
           } else {
-            console.log(userID);
             return done(null, userID, {scope: "all"});
           }
         })

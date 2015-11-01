@@ -5,11 +5,6 @@
   -configure Redis (redis.conf?)
     -incl. auth (see http://redis.io/topics/security)
 
--access tokens
-  -store in Redis (key: token, value: uID)
-  -set expiration date
-  -access Redis in authentication middleware, pass uID in request body
-
 -update or insert in Postgres? Is this behavior necessary? For which endpoints?
 
 -stream results from Postgres? Use package node-pg-query-stream?
@@ -19,3 +14,32 @@
   -if currently borrowing:
     -borrower can't cancel friendship
     -loaner can (but this should probably be handled by the program)
+
+-revise server API:
+
+/api/trans
+
+  /request         POST   : create  outgoing book request
+  /request/:copyID DELETE : cancel  outgoing book request
+
+  /deny            POST   : deny    incoming book request
+  /checkout        POST   : approve incoming book request, loan out book
+  /checkin         POST   : lent book is returned to the user
+
+/api/books
+
+  /          POST   : add new copy (and book, if it doesn't exist)
+  /:copyID   DELETE : delete  copy
+  /available GET    : get books available to borrow
+
+/api/self
+
+  /       GET    : CHANGE OR ELIMINATE - split into new endpoints (see below)
+  /       DELETE : delete user account
+  /books  GET    : get books owned by user
+
+  ADD:
+  /book_requests_incoming GET
+  /book_requests_outgoing GET
+  /books_borrowed         GET
+  /books_lent             GET

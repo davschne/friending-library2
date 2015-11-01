@@ -21,6 +21,8 @@ CREATE TABLE Books (
   ISBN integer,
   title varchar,
   subtitle varchar,
+  authors varchar ARRAY,    -- (denormalized)
+  categories varchar ARRAY, -- (denormalized)
   publisher varchar,
   publishedDate integer,
   description varchar,
@@ -37,7 +39,8 @@ CREATE TABLE Authors (
   PRIMARY KEY (aID)
 );
 
-CREATE INDEX AuthorNames ON Authors (surname, given_name); -- index for searches by author name
+-- for searching books by author name
+CREATE INDEX AuthorNames ON Authors (surname, given_name);
 
 CREATE TABLE Wrote (
   aID integer REFERENCES Authors ON DELETE CASCADE,
@@ -45,14 +48,12 @@ CREATE TABLE Wrote (
   PRIMARY KEY (aID, ISBN)
 );
 
--- create a materialized view to hold denormalized book data?
--- where would this view be used? where wouldn't it be used?
--- if multiple authors, combine in string as concatenated list?
--- possible to index a materialized view?
-CREATE MATERIALIZED VIEW BookView AS
-  SELECT *
-  FROM (Authors JOIN Wrote USING(aID))
-    JOIN Books USING(ISBN);
+-- for searching books by category
+CREATE TABLE BooksToCategories (
+  category varchar,
+  ISBN integer REFERENCES Books ON DELETE CASCADE,
+  PRIMARY KEY (category, ISBN)
+);
 
 CREATE TABLE Copies (
   copyID serial,

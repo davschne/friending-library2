@@ -62,7 +62,7 @@ module.exports = function(router) {
       });
     });
 
-  router.route("/approve")
+  router.route("/checkout")
     .post(function(req, res) {
       Book.findById(req.body._id, function(err, bookDoc) {
         if (err) handle[500](err, res);
@@ -81,7 +81,7 @@ module.exports = function(router) {
       });
     });
 
-  router.route("/returned")
+  router.route("/checkin")
     .post(function(req, res) {
       Book.findById(req.body._id, function(err, bookDoc) {
         if (err) handle[500](err, res);

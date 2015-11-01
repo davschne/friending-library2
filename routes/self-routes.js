@@ -8,7 +8,7 @@ module.exports = function(router) {
   router.route("/")
     .get(function(req, res) {
       User.findById(req.user._id)
-        .deepPopulate(["books", "borrowing", "borrowing.owner", "requests", "requests.owner"])
+        .deepPopulate([/*"books",*/ "borrowing", "borrowing.owner", "requests", "requests.owner"])
         .exec(function(err, user) {
           if (err) {
             handle[500](err, res);
