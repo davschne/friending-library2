@@ -39,7 +39,8 @@ CREATE TABLE Authors (
   PRIMARY KEY (aID)
 );
 
-CREATE INDEX AuthorNames ON Authors (surname, given_name); -- index for searches by author name
+-- for searching books by author name
+CREATE INDEX AuthorNames ON Authors (surname, given_name);
 
 CREATE TABLE Wrote (
   aID integer REFERENCES Authors ON DELETE CASCADE,
@@ -47,13 +48,11 @@ CREATE TABLE Wrote (
   PRIMARY KEY (aID, ISBN)
 );
 
-CREATE TABLE Categories (
-  category varchar PRIMARY KEY;
-);
-
+-- for searching books by category
 CREATE TABLE BooksToCategories (
+  category varchar REFERENCES Categories,
   ISBN integer REFERENCES Books ON DELETE CASCADE,
-  category varchar REFERENCES Categories
+  PRIMARY KEY (category, ISBN)
 );
 
 CREATE TABLE Copies (

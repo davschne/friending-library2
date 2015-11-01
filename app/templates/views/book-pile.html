@@ -25,7 +25,7 @@
               <li><p>Owner:</p>{{book.owner.displayName}}</li>
             </ul>
             <button data-ng-click="toggleDescription(1, book)">Show Description</button>
-            <button data-ng-click="checkBook(user.access_token, {_id : book._id})">Request Book</button>
+            <button data-ng-click="requestBook(user.access_token, {_id : book._id})">Request Book</button>
           </section>
         </section>
         <section class="description" data-ng-if="book.showDescription">

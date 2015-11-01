@@ -2,9 +2,9 @@
 
 module.exports = function(app) {
 
-  app.controller('booksController', ['$scope', 'bookResource', '$cookies', '$location', function($scope, bookResource, $cookies, $location) {
+  app.controller('booksController', ['$scope', 'httpService', '$cookies', '$location', function($scope, httpService, $cookies, $location) {
 
-    var Http = bookResource();
+    var http = httpService;
 
     (function() {
 
@@ -18,13 +18,13 @@ module.exports = function(app) {
 
       function runResource() {
 
-        var userToken = $cookies.get('tok');
+        var token = $cookies.get('tok');
         $scope.user = {
-          access_token: userToken
+          access_token: token
         };
 
-        var populateBookPile = function(user) {
-          Http.availableBooks(user, function(data) {
+        var populateBookPile = function(token) {
+          http.availableBooks(token, function(data) {
             console.log('Inside function');
             console.log(data);
 
@@ -50,19 +50,19 @@ module.exports = function(app) {
           });
         };
 
-        populateBookPile(userToken);
+        populateBookPile(token);
 
-        $scope.checkBook = function(user, bookId) {
-          Http.checkoutBook(user, bookId, function(data) {
+        $scope.checkBook = function(token, bookId) {
+          http.requestBook(token, bookId, function(data) {
             console.log('Checked Out');
             console.log(data);
 
-            populateBookPile(user);
+            populateBookPile(token);
           });
         };
 
         $scope.userLogOut = function(user) {
-          Http.logOut(user, function(data) {
+          http.logOut(user, function(data) {
             console.log('Logged Out');
             console.log(data);
           })

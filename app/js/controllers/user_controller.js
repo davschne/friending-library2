@@ -2,9 +2,9 @@
 
 module.exports = function(app) {
 
-  app.controller('userController', ['$scope', '$location', 'userResource', '$cookies', function($scope, $location, userResource, $cookies) {
+  app.controller('userController', ['$scope', '$location', 'httpService', '$cookies', function($scope, $location, httpService, $cookies) {
 
-    var Http = userResource();
+    var http = httpService;
 
     (function() {
 
@@ -41,7 +41,7 @@ module.exports = function(app) {
       function runResource() {
 
         var getUserData = function(user) {
-          Http.getUser(user, function(data) {
+          http.getUser(user, function(data) {
             console.log('User Grab Success');
             console.log(data);
 
@@ -65,7 +65,7 @@ module.exports = function(app) {
         getUserData($scope.user.access_token);
 
         var getUserBooks = function(user) {
-          Http.getBooks(user, function(data) {
+          http.getBooks(user, function(data) {
             console.log('Book Grab Success');
             console.log(data);
 
@@ -108,7 +108,7 @@ module.exports = function(app) {
         getUserBooks($scope.user.access_token);
 
         $scope.askGoogle = function(userData) {
-          Http.connectGoogleBooks(userData, function(data) {
+          http.connectGoogleBooks(userData, function(data) {
             console.log('Google Data Back');
             console.log(data);
 
@@ -135,7 +135,7 @@ module.exports = function(app) {
         };
 
         $scope.submitBook = function(user, userData) {
-          Http.createBook(user, userData, function(data) {
+          http.createBook(user, userData, function(data) {
             console.log('Submit Success');
             console.log(data);
           });
@@ -145,7 +145,7 @@ module.exports = function(app) {
         };
 
         $scope.destroyBook = function(user, bookId) {
-          Http.removeBook(user, bookId, function(data) {
+          http.removeBook(user, bookId, function(data) {
             console.log('Removed Book!');
             console.log(data);
 
@@ -154,7 +154,7 @@ module.exports = function(app) {
         };
 
         $scope.removeRequest = function(user, bookId, closure) {
-          Http.undoRequest(user, bookId, function(data) {
+          http.undoRequest(user, bookId, function(data) {
             console.log('Undo Request');
             console.log(data);
 
@@ -163,7 +163,7 @@ module.exports = function(app) {
         };
 
         $scope.acceptRequest = function(user, userData) {
-          Http.approveRequest(user, userData, function(data) {
+          http.approveRequest(user, userData, function(data) {
             console.log('Request Accepted');
             console.log(data);
 
@@ -172,7 +172,7 @@ module.exports = function(app) {
         };
 
         $scope.rejectRequest = function(user, userData) {
-          Http.denyRequest(user, userData, function(data) {
+          http.denyRequest(user, userData, function(data) {
             console.log('Request Rejected');
             console.log(data);
 
@@ -181,7 +181,7 @@ module.exports = function(app) {
         };
 
         $scope.returnBook = function(user, userData) {
-          Http.bookReturn(user, userData, function(data) {
+          http.bookReturn(user, userData, function(data) {
             console.log('Book Returned');
             console.log(data);
 
@@ -190,7 +190,7 @@ module.exports = function(app) {
         };
 
         $scope.userLogOut = function(user) {
-          Http.logOut(user, function(data) {
+          http.logOut(user, function(data) {
             console.log('Logged Out');
             console.log(data);
           })

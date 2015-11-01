@@ -2,9 +2,9 @@
 
 module.exports = function(app) {
 
-  app.controller('authController', ['$scope', '$location', 'authResource', '$cookies', function($scope, $location, authResource, $cookies) {
+  app.controller('authController', ['$scope', '$location', 'httpService', '$cookies', function($scope, $location, httpService, $cookies) {
 
-    var Http = authResource();
+    var http = httpService;
 
     var grabToken = function() {
 
@@ -22,7 +22,7 @@ module.exports = function(app) {
     grabToken();
 
     $scope.userLogOut = function(token) {
-      Http.logOut(token, function(data) {
+      http.logOut(token, function(data) {
         console.log('Logged Out');
         console.log(data);
       });

@@ -45,14 +45,14 @@
     -- find if exists in Books?
     -- two separate transactions in case the book already exists and we're
     --   simply adding a new copy?
-    INSERT INTO Books
-    VALUES (
-
-    );
+    INSERT INTO Books (?...)
+    VALUES ( );
     INSERT INTO Copies (copyID, ISBN, ownerID)
-    VALUES (
-
-    );
+    VALUES ( );
+    INSERT INTO Categories (category)
+    VALUES ( );
+    INSERT INTO BooksToCategories (ISBN, category)
+    VALUES ( );
 
   /:copyID   DELETE
 
