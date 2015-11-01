@@ -32,7 +32,5 @@ module.exports = function(app) {
       $cookies.put('tok', '');
       $location.path('/');
     };
-
   }]);
-
 };
