@@ -77,22 +77,21 @@ module.exports = function(app) {
       });
     };
 
-    $scope.submitBook = function(user, userData) {
-      http.createBook(user, userData, function(data) {
+    $scope.submitBook = function(token, userData) {
+      http.createBook(token, userData, function(data) {
         console.log('Submit Success');
         console.log(data);
+        getUserBooks(token);
       });
 
-      getUserBooks(user);
       delete $scope.googleData;
     };
 
-    $scope.destroyBook = function(user, bookId) {
-      http.removeBook(user, bookId, function(data) {
+    $scope.destroyBook = function(token, bookId) {
+      http.removeBook(token, bookId, function(data) {
         console.log('Removed Book!');
         console.log(data);
-
-        getUserBooks(user);
+        getUserBooks(token);
       });
     };
   }]);
