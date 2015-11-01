@@ -19,7 +19,7 @@
     WHERE requesterID = $userID
       AND copyID      = $copyID;
 
-  /approve         POST
+  /checkout (formerly /approve)   POST
 
     BEGIN;
       DELETE FROM BookRequests
@@ -32,7 +32,7 @@
       );
     COMMIT;
 
-  /returned        POST
+  /checkin (formerly /returned)   POST
 
     DELETE FROM Borrowing
     WHERE borrowerID = $borrowerID
@@ -60,53 +60,107 @@
     WHERE ownerID = $userID
       AND copyID  = $copyID;
 
-  /available GET (may return many results)
+  /available GET (may return many results - stream results)
 
-    -- use materialized view?
+    -- all books that don't belong to user, aren't checked out, and user hasn't
+    --   requested already
 
-    SELECT *                            -- maybe refine this projection?
-    FROM Copies c, BookView b, Users u
-    WHERE c.ownerID IN (
-      SELECT uID2
-      FROM Friends
-      WHERE uID1 = $userID
-    )
-      AND b.ISBN = c.ISBN
+    SELECT *                         -- maybe refine this projection?
+    FROM Copies c, Books b, Users u
+    WHERE b.ISBN = c.ISBN
+      AND u.uID  = c.ownerID
+      AND c.copyID NOT IN (
+        SELECT copyID
+        FROM Borrowing
+      )
+      AND c.copyID NOT IN (
+        SELECT copyID
+        FROM BookRequests
+        WHERE requesterID = $userID
+      );
+
+    -- limit to friends
+
+    SELECT *                          -- maybe refine this projection?
+    FROM Copies c, Books b, Users u
+    WHERE b.ISBN = c.ISBN
       AND u.uID  = c.ownerID;
+      AND c.ownerID IN (
+        SELECT uID2
+        FROM Friends
+        WHERE uID1 = $userID
+      )
+      AND c.copyID NOT IN (
+        SELECT copyID
+        FROM Borrowing
+      )
+      AND c.copyID NOT IN (
+        SELECT copyID
+        FROM BookRequests
+        WHERE requesterID = $userID
+      );
 
 /api/self
 
   /          GET
 
-    -- also need :
-    -- incoming requests (
-    --   book title,
-    --   book authors,
-    --   book categories,
-    --   requester display_name
-    -- )
-    -- book lent (
-    --   book title,
-    --   book authors,
-    --   book categories,
-    --   borrower display_name
-    -- )
-
-    SELECT *              -- maybe refine this projection?
+    SELECT *
     FROM Users
     WHERE uID = $userID;
+
+  /book_requests_incoming GET
+
+    SELECT u.display_name, r.request_date, b.title, b.authors, b.categories
+    FROM   BookRequests r, Users u, Copies c, Books b
+    WHERE r.copyID IN (
+        SELECT copyID
+        FROM   Copies
+        WHERE  ownerID = $userID
+      )
+      AND c.copyID      = r.copyID
+      AND u.uID         = r.requesterID
+      AND b.ISBN        = c.ISBN;
+
+  /book_requests_outgoing GET
+
+    SELECT u.display_name, r.request_date, b.title, b.authors, b.categories
+    FROM   BookRequests r, Users u, Copies c, Books b
+    WHERE r.requesterID = $userID
+      AND c.copyID      = r.copyID
+      AND u.uID         = c.ownerID
+      AND b.ISBN        = c.ISBN;
+
+  /books_lent             GET
+
+    SELECT u.display_name, r.checkout_date, b.title, b.authors, b.categories
+    FROM   Borrowing brw, Users u, Copies c, Books b
+    WHERE brw.copyID IN (
+        SELECT copyID
+        FROM   Copies
+        WHERE  ownerID = $userID
+      )
+      AND c.copyID       = brw.copyID
+      AND u.uID          = brw.borrowerID
+      AND b.ISBN         = c.ISBN;
+
+  /books_borrowed         GET
+
+    SELECT u.display_name, r.checkout_date, b.title, b.authors, b.categories
+    FROM   Borrowing brw, Users u, Copies c, Books b
+    WHERE brw.borrowerID = $userID
+      AND c.copyID       = brw.copyID
+      AND u.uID          = c.ownerID
+      AND b.ISBN         = c.ISBN;
 
   /          DELETE
 
     DELETE FROM Users
     WHERE uID = $userID;
 
-  /books     GET    (may return many results)
-
-    -- use materialized view?
+  /books     GET    (may return many - stream results)
 
     SELECT *
-    FROM Copies JOIN BookView USING(ISBN)
+    FROM Copies JOIN Book USING(ISBN)
     WHERE ownerID = $userID;
 
 // extensions to the existing API:

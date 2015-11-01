@@ -21,18 +21,25 @@
 
   /request         POST   : create  outgoing book request
   /request/:copyID DELETE : cancel  outgoing book request
+
   /deny            POST   : deny    incoming book request
   /checkout        POST   : approve incoming book request, loan out book
   /checkin         POST   : lent book is returned to the user
 
 /api/books
 
-  /          POST   :
-  /:copyID   DELETE :
-  /available GET    :
+  /          POST   : add new copy (and book, if it doesn't exist)
+  /:copyID   DELETE : delete  copy
+  /available GET    : get books available to borrow
 
 /api/self
 
-  /          GET    :
-  /          DELETE :
-  /books            :
+  /       GET    : CHANGE OR ELIMINATE - split into new endpoints (see below)
+  /       DELETE : delete user account
+  /books  GET    : get books owned by user
+
+  ADD:
+  /book_requests_incoming GET
+  /book_requests_outgoing GET
+  /books_borrowed         GET
+  /books_lent             GET
