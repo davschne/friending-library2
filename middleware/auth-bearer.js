@@ -12,8 +12,10 @@ var authenticate = function(redis) {
       redis.get(token)
         .then(function(userID) {
           if (!userID) {
+            console.log('no userID');
             return done(null, false);
           } else {
+            console.log('userID :', userID);
             return done(null, userID, {scope: "all"});
           }
         })

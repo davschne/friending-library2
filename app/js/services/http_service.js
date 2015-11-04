@@ -2,7 +2,7 @@
 
 module.exports = function(app) {
 
-  app.factory('httpService', ['$http', function($http) {
+  app.factory('httpService', ['$http', '$rootScope', function($http, $rootScope) {
 
     function APICall(obj, token, callback) {
       /*
@@ -24,12 +24,27 @@ module.exports = function(app) {
         // e.g. : "Bearer 1223142134"
       })
         .success(callback)
-        .error(function(err) {
-          console.log(err);
+        .catch(function(res) {
+          handle(res, callback);
         });
     }
 
+    function handle(res, callback) {
+      switch (res.status) {
+        case 401:
+          $rootScope.clientLogout();
+          break;
+        default:
+          console.log(res.data);
+      }
+    }
+
     return {
+      testAPI: function(token, callback) {
+        console.log('testAPI triggered');
+        APICall({ method: 'POST', url: '/test'}, token, callback);
+      },
+
       getUser: function(token, callback) {
         APICall({ method: 'GET', url: '/api/self' }, token, callback);
       },

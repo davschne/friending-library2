@@ -47,10 +47,13 @@ require("./routes/auth-routes")(authRouter, pg, redis);
 // require("./routes/trans-routes")(transRouter);
 require("./routes/root-routes")(rootRouter, redis);
 
-app.get("/test", authenticate, function(req, res) {
-  res.json({msg: "Hit test endpoint."});
-});
 app.use("/auth", authRouter);
+
+app.post("/test", authenticate, function(req, res) {
+  console.log(req.user);
+  res.json({msg: "done"});
+});
+
 app.use("/api/self", authenticate, selfRouter);
 app.use("/api/books", authenticate, booksRouter);
 app.use("/api/trans", authenticate, transRouter);

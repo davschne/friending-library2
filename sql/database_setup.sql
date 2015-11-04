@@ -1,4 +1,4 @@
-BEGIN;
+-- BEGIN;
 
 CREATE TABLE Users (
   uID bigint,
@@ -75,7 +75,7 @@ CREATE TABLE BookRequests (
   copyID integer REFERENCES Copies ON DELETE CASCADE,
   request_date TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (requesterID, copyID)
-  -- optimized for requester's view ; possible to optimize for book owner?
+  -- optimized for requester's view. possible to optimize for book owner?
   -- separate indexes on the columns?
 );
 
@@ -83,8 +83,8 @@ CREATE TABLE BookRequests (
 --   requesterID bigint REFERENCES Users ON DELETE CASCADE,
 --   inviteeID bigint REFERENCES Users ON DELETE CASCADE,
 --   PRIMARY KEY (requesterID, inviteeID)
---   -- optimized for requester's view ; possible to optimize for invitee?
+--   -- optimized for requester's view. possible to optimize for invitee?
 --   -- separate indexes on the columns?
 -- );
 
-COMMIT;
+-- COMMIT;
