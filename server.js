@@ -5,26 +5,26 @@ var REDIS_URI = process.env.REDIS_URI
   || 'redis://:authpassword@127.0.0.1:6379/0';
 
 var express      = require('express');
-var promise      = require('bluebird');
 var passport     = require('passport');
 var Redis        = require('ioredis');
-var pgp          = require('pg-promise')({ promiseLib: promise });
+
+var dbUtil = require('./lib/db-util');
 
 var app   = express();
 
 // Create database interfaces
 var redis = new Redis(REDIS_URI);
-var pg    = pgp(PG_URI);
+var pg    = dbUtil.get_instance(PG_URI);
 
 // Middleware
 var bodyParser   = require('body-parser');
 var authenticate = require('./middleware/auth-bearer')(redis);
-var dbs          = require('./middleware/dbs');
+// var dbs          = require('./middleware/dbs');
 
 app.use(passport.initialize());
 app.use(express.static("public"));
 app.use(bodyParser.json());
-app.use(dbs(pg, redis));
+// app.use(dbs(pg, redis));
 
 // redis.ping().then(function(result) {
 //   console.log(result);
@@ -72,7 +72,15 @@ redis
     console.error(err);
   });
 
+// pg.test(function(err, res) {
+//   if (!err) {
+//     pg.users.find(200, function(err, res) {
+//       console.log(res);
+//     })
+//   }
+// })
+
 process.on("exit", function() {
   redis.disconnect();
-  pgp.end();
+  dbUtil.disconnect();
 });
