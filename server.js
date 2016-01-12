@@ -14,7 +14,7 @@ var app   = express();
 
 // Create database interfaces
 var redis = new Redis(REDIS_URI);
-var pg    = dbUtil.get_instance(PG_URI);
+var pg    = dbUtil.getInstance(PG_URI);
 
 // Middleware
 var bodyParser   = require('body-parser');
@@ -72,13 +72,16 @@ redis
     console.error(err);
   });
 
-// pg.test(function(err, res) {
-//   if (!err) {
-//     pg.users.find(200, function(err, res) {
-//       console.log(res);
-//     })
-//   }
-// })
+// console.log(pg);
+
+pg.testInsertAsync()
+  .then(pg.testQueryAsync())
+  .then(function(res) {
+    console.log(res);
+  })
+  .catch(function(err) {
+    console.error(err);
+  });
 
 process.on("exit", function() {
   redis.disconnect();

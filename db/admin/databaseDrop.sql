@@ -1,0 +1,3 @@
+DROP DATABASE $1;
+
+DROP ROLE $2;
