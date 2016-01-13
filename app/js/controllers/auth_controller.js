@@ -2,7 +2,7 @@
 
 module.exports = function(app) {
 
-  app.controller('authController', ['$scope', '$location', 'httpService', '$cookies', function($scope, $location, httpService, $cookies) {
+  app.controller('authController', ['$rootScope', '$location', 'httpService', '$cookies', function($rootScope, $location, httpService, $cookies) {
 
     var http = httpService;
 
@@ -27,8 +27,8 @@ module.exports = function(app) {
     var token = getToken();
 
     if (token) {
-      // add token to $scope
-      $scope.user = { access_token: token };
+      // add token to $rootScope
+      $rootScope.user = { access_token: token };
       // proceed to app
       console.log("redirecting to /available_books");
       $location.url('/available_books');
@@ -38,15 +38,21 @@ module.exports = function(app) {
       $location.url('/');
     }
 
-    $scope.userLogOut = function(token) {
+    function clientLogout() {
+      delete $rootScope.user;
+      $cookies.remove('tok');
+      $location.url('/');
+    }
+
+    function userLogOut(token) {
       http.logOut(token, function(data) {
         console.log('Logged Out');
         console.log(data);
       });
+      clientLogout();
+    }
 
-      delete $scope.user;
-      $cookies.remove('tok');
-      $location.url('/');
-    };
+    $rootScope.clientLogout = clientLogout;
+    $rootScope.userLogOut = userLogOut;
   }]);
 };

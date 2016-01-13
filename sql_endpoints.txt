@@ -4,7 +4,12 @@
 
     DELETE FROM BookRequests
     WHERE requesterID = $userID
-      AND      copyID = $copyID;
+      AND copyID      = $copyID;
+
+    [test:
+    [SELECT * FROM BookRequests
+    [WHERE requesterID = $userID
+    [  AND copyID      = $copyID;
 
   /request         POST
 
@@ -13,11 +18,18 @@
       $userID, $copyID, CURRENT_TIME
     );
 
+    [test:
+    [SELECT * FROM BookRequests
+    [WHERE requesterID = $userID
+    [  AND copyID      = $copyID;
+
   /deny            POST
 
     DELETE FROM BookRequests
-    WHERE requesterID = $userID
+    WHERE requesterID = $requesterID
       AND copyID      = $copyID;
+
+
 
   /checkout (formerly /approve)   POST
 

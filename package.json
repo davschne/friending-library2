@@ -42,6 +42,7 @@
     "body-parser": "^1.13.2",
     "express": "^4.13.1",
     "ioredis": "^1.10.0",
+    "massive": "^2.1.0",
     "passport": "^0.2.2",
     "passport-facebook": "^2.0.0",
     "passport-http-bearer": "^1.0.1",

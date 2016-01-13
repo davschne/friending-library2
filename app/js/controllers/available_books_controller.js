@@ -28,6 +28,10 @@ module.exports = function(app) {
 
     populateBookPile(token);
 
+    http.testAPI(token, function(data) {
+      console.log('testAPI success', data);
+    });
+
     $scope.toggleDescription = function(choice, bookObj) {
       if(choice === 1) {
         bookObj.showDescription = true;

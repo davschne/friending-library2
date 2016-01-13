@@ -1,11 +1,11 @@
+-Angular : if API call returns Unauthorized, return to login screen, delete cookie
+
 -setup
   -move creation tasks to a .js file (not shell scripts)
   -create user and database : database_creation.sql
   -log in as user and set up database : database_setup.sql
   -configure Redis (redis.conf?)
     -incl. auth (see http://redis.io/topics/security)
-
--update or insert in Postgres? Is this behavior necessary? For which endpoints?
 
 -stream results from Postgres? Use package node-pg-query-stream?
 
