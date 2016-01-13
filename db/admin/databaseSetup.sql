@@ -1,4 +1,4 @@
--- BEGIN;
+BEGIN;
 
 CREATE TABLE Users (
   uID bigint,
@@ -87,4 +87,4 @@ CREATE TABLE BookRequests (
 --   -- separate indexes on the columns?
 -- );
 
--- COMMIT;
+COMMIT;
