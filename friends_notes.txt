@@ -1,0 +1,80 @@
+IMPLEMENTING FRIENDS:
+--------------------
+
+OUTLINE:
+-------
+
+- browse or search all users for friends (/api/users GET)
+  - get profile pics from Facebook?
+- 3 levels of detail for user data
+  - self    : all data
+  - friends : basic info + books
+  - other   : basic info
+- friend requests : make, accept, deny
+- remove friend (disallow if currently borrowing)
+- friends array in User model
+- books/available query needs to search friends' books arrays
+- ADD contact info to users' profiles (email?)
+
+-------------------------------------------------------------
+SPECIFICS:
+---------
+
+Models:
+------
+
+User:
+
+x friends: [{type: String, ref: User}]
+x friend_requests_in: [{type: String, ref: User}]
+x friend_requests_out: [{type: String, ref: User}]
+
+Server Routes:
+-------------
+
+new:
+
+- /api/users                   GET    : get all users (basic info)
+- /api/friends                 GET    : get all friends
+- /api/friends/:userid         DELETE : remove friend (disallow if currently borrowing)
+- /api/friends/request         POST   : make friend request (body: user._id)
+- /api/friends/request/:userid DELETE : cancel friend request
+- /api/friends/approve         POST   : approve friend request (body: user._id)
+- /api/friends/deny            POST   : deny friend request (body: user._id)
+
+modify:
+
+x /api/books/available GET  : search friends' books
+- /api/self GET             : populate friends?
+- /api/self DELETE          : only allow if borrowing field empty,
+                              remove refs in friends arrays,
+                              remove refs in friend_requests_in, _out,
+                              remove refs in (book) requests,
+                              remove books via method?
+- /api/books/:bookid DELETE : use method on model
+                              remove refs in requests, borrowing
+                              ** update user to remove from books array **
+
+Client Views:
+------------
+
+new:
+
+- My Friends
+  - For each record, display basic info (displayName, first?, last? picture?)
+
+  - My Friends
+    - Remove button (/api/friends/:userid DELETE)
+
+  - Incoming Friend Requests
+    - Approve button (/api/friends/approve POST)
+    - Deny button (/api/friends/deny POST)
+
+  - Outgoing Friend Requests
+    - Cancel button (/api/friends/request/:userid DELETE)
+
+  - Add Friend button --> load Browse Users Sub-view (/api/users GET)
+    - Browse Users Sub-view:
+      - list all users (displayName, first?, last?, picture?)
+        - filter out non-friends
+      - Request button : (/api/friends/request POST)
