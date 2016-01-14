@@ -48,9 +48,9 @@ describe('db-util.js', function() {
     });
   });
 
-  describe('#dropUser', function() {
+  describe('#dropDBUser', function() {
     it('should drop a Postgres user/role', function(done) {
-      dbUtil.dropUser(pg_admin, TEST_USER)
+      dbUtil.dropDBUser(pg_admin, TEST_USER)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
         done();

@@ -36,9 +36,9 @@ describe('db-util.js', function() {
     // further tests for async functions generated from SQL files?
   });
 
-  describe('#createUser', function() {
+  describe('#createDBUser', function() {
     it('should create a Postgres user/role', function(done) {
-      dbUtil.createUser(pg_admin, TEST_USER, TEST_USER_PW)
+      dbUtil.createDBUser(pg_admin, TEST_USER, TEST_USER_PW)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
         done();
