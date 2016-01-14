@@ -29,7 +29,7 @@ var pg;
 describe('db-util.js', function() {
 
   describe('#getInstance', function() {
-    it("should connect to a running Postgres server and return a connection instance", function() {
+    it('should connect to a running Postgres server and return a connection instance', function() {
       pg_admin = dbUtil.getInstance(PG_ADMIN_URI);
       expect(pg_admin).to.exist;
     });
@@ -37,7 +37,7 @@ describe('db-util.js', function() {
   });
 
   describe('#createUser', function() {
-    it("should create a Postgres user/role", function(done) {
+    it('should create a Postgres user/role', function(done) {
       dbUtil.createUser(pg_admin, TEST_USER, TEST_USER_PW)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
@@ -51,7 +51,7 @@ describe('db-util.js', function() {
   });
 
   describe('#createDatabase', function() {
-    it("should create a Postgres database", function(done) {
+    it('should create a Postgres database', function(done) {
       dbUtil.createDatabase(
         pg_admin,
         TEST_DATABASE,
@@ -73,7 +73,7 @@ describe('db-util.js', function() {
     before(function() {
       pg = dbUtil.getInstance(PG_TEST_URI);
     });
-    it("should create the database tables", function(done) {
+    it('should create the database tables', function(done) {
       dbUtil.setupDatabase(pg)
       .then(function(res) {
         expect(res).to.exist; // returns a response object

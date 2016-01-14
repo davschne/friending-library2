@@ -32,7 +32,7 @@ describe('db-util.js', function() {
   });
 
   describe('#dropDatabase', function() {
-    it("should drop a Postgres database", function(done) {
+    it('should drop a Postgres database', function(done) {
       // set longer timeout
       // this.timeout(5000);
       // setTimeout(done, 5000);
@@ -49,7 +49,7 @@ describe('db-util.js', function() {
   });
 
   describe('#dropUser', function() {
-    it("should drop a Postgres user/role", function(done) {
+    it('should drop a Postgres user/role', function(done) {
       dbUtil.dropUser(pg_admin, TEST_USER)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
