@@ -33,9 +33,6 @@ describe('db-util.js', function() {
 
   describe('#dropDatabase', function() {
     it('should drop a Postgres database', function(done) {
-      // set longer timeout
-      // this.timeout(5000);
-      // setTimeout(done, 5000);
       dbUtil.dropDatabase(pg_admin, TEST_DATABASE)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
@@ -60,5 +57,9 @@ describe('db-util.js', function() {
         done();
       });
     });
+  });
+
+  after(function() {
+    pg_admin.end();
   });
 });

@@ -105,4 +105,8 @@ describe('db-util.js', function() {
       });
     });
   });
+
+  after(function() {
+    pg.end();
+  });
 });

@@ -85,4 +85,8 @@ describe('db-util.js', function() {
       });
     });
   });
+
+  after(function() {
+    pg_admin.end();
+  });
 });
