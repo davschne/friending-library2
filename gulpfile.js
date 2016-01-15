@@ -6,7 +6,7 @@ var webpack = require('gulp-webpack');
 var uglify = require('gulp-uglify');
 var minifyCSS = require('gulp-minify-css');
 var minifyHTML = require('gulp-minify-html');
-// var mocha = require("gulp-mocha");
+var mocha = require("gulp-mocha");
 // var jshint = require("gulp-jshint");
 
 // var gulpDB = require("./gulp-db");
@@ -71,10 +71,14 @@ gulp.task('default', ['build']);
 //     .pipe(jshint.reporter("default"));
 // });
 
-// gulp.task("test", function() {
-//   return gulp.src("./test/*.js")
-//     .pipe(mocha({"reporter" : "nyan"}));
-// });
+gulp.task("test", function() {
+  return gulp.src([
+      "./test/test-setup.js",
+      "./test/test-db-util.js",
+      "./test/test-cleanup.js"
+    ])
+    .pipe(mocha(/*{"reporter" : "nyan"}*/));
+});
 
 // gulp.task("dbSetup", gulpDB.dbSetup);
 
