@@ -15,6 +15,18 @@ var PG_TEST_URI   = 'postgres://' +
                     '@' + PG_ADDRESS + '/' +
                     TEST_DATABASE;
 
+var INSERT_USER = "INSERT INTO Users (uID, display_name) SELECT $1, $2 WHERE NOT EXISTS (SELECT uID FROM Users WHERE uID = $1);";
+
+var DELETE_USER = "DELETE FROM Users WHERE uid = $1;";
+
+var INSERT_BOOK = "INSERT INTO Books (ISBN, title, subtitle, authors, categories, publisher, publishedDate, description, pageCount, language, imageLink, imageLinkSmall) SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12 WHERE NOT EXISTS (SELECT ISBN FROM Books WHERE ISBN = CAST($1 AS varchar));"
+
+var DELETE_BOOK = "DELETE FROM Books WHERE ISBN = $1;";
+
+var INSERT_COPY = "INSERT INTO Copies (ISBN, ownerID) VALUES ($1, $2);";
+
+// var DELETE_COPY = "DELETE FROM Copies WHERE copyid = $1;";
+
 // database instance
 var pg;
 
@@ -25,7 +37,9 @@ describe('db-util.js', function() {
   });
 
   describe('#findOrCreateUser', function() {
+
     var user = testData.users[0];
+
     it("should return a response object", function(done) {
       dbUtil.findOrCreateUser(
         pg,
@@ -37,6 +51,7 @@ describe('db-util.js', function() {
         done();
       });
     });
+
     it("should create a tuple in the Users table if it doesn't already exist", function(done) {
       pg.runAsync("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
       .then(function(res) {
@@ -44,12 +59,30 @@ describe('db-util.js', function() {
         done();
       });
     });
+
+    // cleanup: delete the user
+    after(function(done) {
+      pg.runAsync(DELETE_USER, [user.uid])
+      .then(function(res) {
+        done();
+      });
+    })
   });
 
   describe('#createCopy', function() {
+
     var user = testData.users[0];
     var book = testData.books[0];
     var ISBN = book.ISBN[13] || book.ISBN[10];
+
+    // setup: create user to own the copy
+    before(function(done) {
+      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      .then(function(res) {
+        done();
+      });
+    });
+
     it("should return a response object", function(done) {
       dbUtil.createCopy(
         pg,
@@ -72,6 +105,7 @@ describe('db-util.js', function() {
         done();
       });
     });
+
     it("should create a tuple in the Copies table", function(done) {
       pg.runAsync("SELECT ownerid FROM Copies WHERE ownerid=" + user.uid + " AND isbn=\'" + ISBN + "\';")
       .then(function(res) {
@@ -79,6 +113,7 @@ describe('db-util.js', function() {
         done();
       });
     });
+
     it("should create a tuple in the Books table if it doesn't already exist", function(done) {
       pg.runAsync("SELECT isbn FROM Books WHERE isbn=\'" + ISBN + "\';")
       .then(function(res) {
@@ -86,10 +121,30 @@ describe('db-util.js', function() {
         done();
       });
     });
+
+    // cleanup: delete the user and book (cascade should delete the copy)
+    after(function(done) {
+      pg.runAsync(DELETE_USER, [user.uid])
+      .then(function() {
+        return pg.runAsync(DELETE_BOOK, [book.ISBN]);
+      })
+      .then(function(res) {
+        done();
+      });
+    });
   });
 
   describe('#deleteUser', function() {
     var user = testData.users[0];
+
+    // setup: create the user
+    before(function(done) {
+      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      .then(function(res) {
+        done();
+      });
+    });
+
     it("should return a response object", function(done) {
       dbUtil.deleteUser(pg, user.uid)
       .then(function(res) {
@@ -97,6 +152,7 @@ describe('db-util.js', function() {
         done();
       });
     });
+
     it("should delete a tuple from the Users table if it exists", function(done) {
       pg.runAsync("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
       .then(function(res) {
