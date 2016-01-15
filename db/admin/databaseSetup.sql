@@ -18,46 +18,47 @@ CREATE TABLE Users (
 -- );
 
 CREATE TABLE Books (
-  ISBN integer,
+  ISBN varchar,
   title varchar,
   subtitle varchar,
   authors varchar ARRAY,    -- (denormalized)
   categories varchar ARRAY, -- (denormalized)
   publisher varchar,
-  publishedDate integer,
+  publishedDate varchar,
   description varchar,
   pageCount integer,
   language varchar,
   imageLink varchar,
+  imageLinkSmall varchar,
   PRIMARY KEY (ISBN)
 );
 
-CREATE TABLE Authors (
-  aID serial,
-  surname varchar,
-  given_name varchar,
-  PRIMARY KEY (aID)
-);
+-- CREATE TABLE Authors (
+--   aID serial,
+--   surname varchar,
+--   given_name varchar,
+--   PRIMARY KEY (aID)
+-- );
 
--- for searching books by author name
-CREATE INDEX AuthorNames ON Authors (surname, given_name);
+-- -- for searching books by author name
+-- CREATE INDEX AuthorNames ON Authors (surname, given_name);
 
-CREATE TABLE Wrote (
-  aID integer REFERENCES Authors ON DELETE CASCADE,
-  ISBN integer REFERENCES Books ON DELETE CASCADE,
-  PRIMARY KEY (aID, ISBN)
-);
+-- CREATE TABLE Wrote (
+--   aID integer REFERENCES Authors ON DELETE CASCADE,
+--   ISBN varchar REFERENCES Books ON DELETE CASCADE,
+--   PRIMARY KEY (aID, ISBN)
+-- );
 
 -- for searching books by category
-CREATE TABLE BooksToCategories (
-  category varchar,
-  ISBN integer REFERENCES Books ON DELETE CASCADE,
-  PRIMARY KEY (category, ISBN)
-);
+-- CREATE TABLE BooksToCategories (
+--   category varchar,
+--   ISBN varchar REFERENCES Books ON DELETE CASCADE,
+--   PRIMARY KEY (category, ISBN)
+-- );
 
 CREATE TABLE Copies (
   copyID serial,
-  ISBN integer REFERENCES Books ON DELETE CASCADE,
+  ISBN varchar REFERENCES Books ON DELETE CASCADE,
   ownerID bigint REFERENCES Users (uID) ON DELETE CASCADE,
   PRIMARY KEY (copyID),
   UNIQUE (ownerID, ISBN, copyID)
