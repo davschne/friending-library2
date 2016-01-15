@@ -5,6 +5,12 @@ var dbUtil = require('../lib/db-util.js');
 
 var testData = require('../lib/test-data.js');
 
+// utility function to return random elements from testData arrays
+var rand = function(array) {
+  var val = Math.floor(Math.random() * array.length);
+  return array[val];
+};
+
 var PG_ADDRESS    = '127.0.0.1:5432';
 var PG_ADMIN_USER = 'postgres';
 var PG_ADMIN_PW   = '';
@@ -14,6 +20,8 @@ var PG_TEST_URI   = 'postgres://' +
                     PG_ADMIN_PW +
                     '@' + PG_ADDRESS + '/' +
                     TEST_DATABASE;
+
+// SQL for setup, teardown of tests
 
 var INSERT_USER = "INSERT INTO Users (uID, display_name) SELECT $1, $2 WHERE NOT EXISTS (SELECT uID FROM Users WHERE uID = $1);";
 
@@ -32,13 +40,14 @@ var pg;
 
 describe('db-util.js', function() {
 
+  // get database connection instance
   before(function() {
     pg = dbUtil.getInstance(PG_TEST_URI);
   });
 
   describe('#findOrCreateUser', function() {
 
-    var user = testData.users[0];
+    var user = rand(testData.users);
 
     it("should return a response object", function(done) {
       dbUtil.findOrCreateUser(
@@ -69,10 +78,39 @@ describe('db-util.js', function() {
     })
   });
 
+  describe('#deleteUser', function() {
+
+    var user = rand(testData.users);
+
+    // setup: create the user
+    before(function(done) {
+      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      .then(function(res) {
+        done();
+      });
+    });
+
+    it("should return a response object", function(done) {
+      dbUtil.deleteUser(pg, user.uid)
+      .then(function(res) {
+        expect(res).to.exist;
+        done();
+      });
+    });
+
+    it("should delete a tuple from the Users table", function(done) {
+      pg.runAsync("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
+      .then(function(res) {
+        expect(res).to.be.empty; // expect empty array
+        done();
+      });
+    });
+  });
+
   describe('#createCopy', function() {
 
-    var user = testData.users[0];
-    var book = testData.books[0];
+    var user = rand(testData.users);
+    var book = rand(testData.books);
     var ISBN = book.ISBN[13] || book.ISBN[10];
 
     // setup: create user to own the copy
@@ -89,7 +127,7 @@ describe('db-util.js', function() {
         user.uid,
         ISBN,
         book.title,
-        book.subtitle || '',
+        book.subtitle,
         book.authors,
         book.categories,
         book.publisher,
@@ -122,7 +160,7 @@ describe('db-util.js', function() {
       });
     });
 
-    // cleanup: delete the user and book (cascade should delete the copy)
+    // cleanup: delete user and book (cascade should delete the copy)
     after(function(done) {
       pg.runAsync(DELETE_USER, [user.uid])
       .then(function() {
@@ -134,34 +172,73 @@ describe('db-util.js', function() {
     });
   });
 
-  describe('#deleteUser', function() {
-    var user = testData.users[0];
+  describe("#deleteCopy", function() {
 
-    // setup: create the user
+    var user = rand(testData.users);
+    var book = rand(testData.books);
+    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var copyid;
+
+    // setup: insert user, book, and copy; retrieve and store copyid
     before(function(done) {
       pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      .then(function() {
+        return pg.runAsync(INSERT_BOOK, [
+          ISBN,
+          book.title,
+          book.subtitle,
+          book.authors,
+          book.categories,
+          book.publisher,
+          book.publishedDate,
+          book.description,
+          book.pageCount,
+          book.language,
+          book.imageLinks.thumbnail,
+          book.imageLinks.smallThumbnail
+        ]);
+      })
+      .then(function() {
+        return pg.runAsync(INSERT_COPY, [ISBN, user.uid]);
+      })
+      .then(function() {
+        return pg.runAsync("SELECT copyid FROM Copies WHERE ISBN=$1 AND ownerid=$2", [ISBN, user.uid]);
+      })
       .then(function(res) {
+        copyid = res[0].copyid;
         done();
       });
     });
 
     it("should return a response object", function(done) {
-      dbUtil.deleteUser(pg, user.uid)
+      dbUtil.deleteCopy(pg, copyid)
       .then(function(res) {
         expect(res).to.exist;
         done();
       });
     });
 
-    it("should delete a tuple from the Users table if it exists", function(done) {
-      pg.runAsync("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
+    it("should delete the tuple from the Copies table", function(done) {
+      pg.runAsync("SELECT copyid FROM Copies WHERE copyid=$1;", [copyid])
       .then(function(res) {
-        expect(res).to.be.empty; // expect empty array
+        expect(res).to.be.empty;
+        done();
+      });
+    });
+
+    // cleanup: delete user and book
+    after(function(done) {
+      pg.runAsync(DELETE_USER, [user.uid])
+      .then(function() {
+        return pg.runAsync(DELETE_BOOK, [book.ISBN]);
+      })
+      .then(function(res) {
         done();
       });
     });
   });
 
+  // close connection to database
   after(function() {
     pg.end();
   });
