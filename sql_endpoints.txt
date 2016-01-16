@@ -16,17 +16,6 @@
 
     dbUtil.checkoutBook()
 
-    BEGIN;
-      DELETE FROM BookRequests
-      WHERE requesterID = $uIDRequester
-        AND copyID      = $copyID;
-
-      INSERT INTO Borrowing (borrowerID, copyID, checkout_date)
-      VALUES (
-        $userID, $copyID, CURRENT_TIME
-      );
-    COMMIT;
-
   /checkin (formerly /returned)   POST
 
     dbUtil.checkinBook()
