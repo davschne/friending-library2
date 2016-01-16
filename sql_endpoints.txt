@@ -17,16 +17,6 @@
 
     dbUtil.createBookRequest()
 
-    INSERT INTO BookRequests (requesterID, copyID, request_date)
-    VALUES (
-      $userID, $copyID, CURRENT_TIME
-    );
-
-    [test:
-    [SELECT * FROM BookRequests
-    [WHERE requesterID = $userID
-    [  AND copyID      = $copyID;
-
   /deny            POST
 
     dbUtil.denyBookRequest()
