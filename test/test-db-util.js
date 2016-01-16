@@ -351,7 +351,7 @@ describe('db.js', function() {
     });
   });
 
-  describe("#cancelBookRequest", function() {
+  describe("#deleteBookRequest", function() {
 
     var owner = testData.users[0];
     var requester = testData.users[1];
@@ -376,7 +376,7 @@ describe('db.js', function() {
     });
 
     it("should return a response object", function(done) {
-      db.cancelBookRequest(requester.uid, copyid)
+      db.deleteBookRequest(requester.uid, copyid)
       .then(function(res) {
         expect(res).to.exist;
         done();

@@ -2,7 +2,7 @@
 
   /request/:copyID DELETE
 
-    dbUtil.cancelBookRequest()
+    dbUtil.deleteBookRequest()
 
   /request         POST
 
@@ -10,13 +10,7 @@
 
   /deny            POST
 
-    dbUtil.denyBookRequest()
-
-    DELETE FROM BookRequests
-    WHERE requesterID = $requesterID
-      AND copyID      = $copyID;
-
-
+    dbUtil.deleteBookRequest()
 
   /checkout (formerly /approve)   POST
 
