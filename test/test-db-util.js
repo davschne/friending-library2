@@ -62,6 +62,11 @@ var insertCopy = function(db, book, owner) {
   return db.run(SQL, [book.ISBN[13] || book.ISBN[10], owner.uid]);
 };
 
+var insertBookRequest = function(db, requester, copyid) {
+  var SQL = "INSERT INTO BookRequests (requesterid, copyid, request_date) VALUES ($1, $2, CURRENT_TIMESTAMP);";
+  return db.run(SQL, [requester.uid, copyid]);
+};
+
 // database instance
 var db;
 
@@ -339,6 +344,54 @@ describe('db.js', function() {
     });
 
     // cleanup: delete users and book (copy and request will cascade)
+    after(function(done) {
+      deleteAllUsers(db)
+      .then(deleteAllBooks.bind(null, db))
+      .then(done.bind(null, null));
+    });
+  });
+
+  describe("#cancelBookRequest", function() {
+
+    var owner = testData.users[0];
+    var requester = testData.users[1];
+    var book = rand(testData.books);
+    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var copyid;
+
+    // setup: create users, book, copy, bookrequest, store copyid for later
+    before(function(done) {
+      insertUser(db, owner)
+      .then(insertUser.bind(null, db, requester))
+      .then(insertBook.bind(null, db, book))
+      .then(insertCopy.bind(null, db, book, owner))
+      .then(function() {
+        return db.run("SELECT copyid FROM Copies WHERE isbn=$1 AND ownerid=$2;", [ISBN, owner.uid]);
+      })
+      .then(function(res) {
+        copyid = res[0].copyid;
+        return insertBookRequest(db, requester, copyid);
+      })
+      .then(done.bind(null, null));
+    });
+
+    it("should return a response object", function(done) {
+      db.cancelBookRequest(requester.uid, copyid)
+      .then(function(res) {
+        expect(res).to.exist;
+        done();
+      });
+    });
+
+    it("should delete a tuple from BookRequests", function(done) {
+      db.run("SELECT * FROM BookRequests WHERE requesterid=$1 AND copyid=$2;", [requester.uid, copyid])
+      .then(function(res) {
+        expect(res).to.be.empty;
+        done();
+      });
+    });
+
+    // cleanup: delete users, book (copy will cascade)
     after(function(done) {
       deleteAllUsers(db)
       .then(deleteAllBooks.bind(null, db))

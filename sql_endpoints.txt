@@ -4,15 +4,6 @@
 
     dbUtil.cancelBookRequest()
 
-    DELETE FROM BookRequests
-    WHERE requesterID = $userID
-      AND copyID      = $copyID;
-
-    [test:
-    [SELECT * FROM BookRequests
-    [WHERE requesterID = $userID
-    [  AND copyID      = $copyID;
-
   /request         POST
 
     dbUtil.createBookRequest()
