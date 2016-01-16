@@ -1,5 +1,6 @@
 var chai = require("chai");
 var expect = chai.expect;
+var Promise = require("bluebird");
 
 var dbUtil = require('../lib/db-util.js');
 
@@ -164,7 +165,7 @@ describe('db-util.js', function() {
     after(function(done) {
       pg.runAsync(DELETE_USER, [user.uid])
       .then(function() {
-        return pg.runAsync(DELETE_BOOK, [book.ISBN]);
+        return pg.runAsync(DELETE_BOOK, [ISBN]);
       })
       .then(function(res) {
         done();
@@ -230,9 +231,80 @@ describe('db-util.js', function() {
     after(function(done) {
       pg.runAsync(DELETE_USER, [user.uid])
       .then(function() {
-        return pg.runAsync(DELETE_BOOK, [book.ISBN]);
+        return pg.runAsync(DELETE_BOOK, [ISBN]);
       })
       .then(function(res) {
+        done();
+      });
+    });
+  });
+
+  describe("#getOwnBooks", function() {
+
+    var user = rand(testData.users);
+    var books = testData.books;
+
+    // setup: add user, add four books, add three copies owned by user (two duplicate)
+    before(function(done) {
+      // insert Users tuple
+      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      // insert four Books tuples
+      .then(function() {
+        // build chain of Promises
+        return books.slice(0, 4).reduce(function(seq, book) {
+          return seq.then(function() {
+            return pg.runAsync(INSERT_BOOK, [
+              book.ISBN[13] || book.ISBN[10],
+              book.title,
+              book.subtitle,
+              book.authors,
+              book.categories,
+              book.publisher,
+              book.publishedDate,
+              book.description,
+              book.pageCount,
+              book.language,
+              book.imageLinks.thumbnail,
+              book.imageLinks.smallThumbnail
+            ]);
+          });
+        }, Promise.resolve());
+      })
+      .then(function() {
+        // insert three Copies tuples (incl. two duplicates)
+        var copies = [books[0], books[0], books[1]];
+        // build chain of Promises
+        return copies.reduce(function(seq, book) {
+          return seq.then(function() {
+            return pg.runAsync(INSERT_COPY, [book.ISBN[13] || book.ISBN[10], user.uid]);
+          });
+        }, Promise.resolve());
+      })
+      .then(function() {
+        done();
+      });
+
+    });
+
+    it("should return tuples matching all Books owned by the User, including multiple copies of the same Book", function(done) {
+      dbUtil.getOwnBooks(pg, user.uid)
+      .then(function(res) {
+        expect(res).to.be.an.instanceof(Array);
+        expect(res).to.have.length(2);
+        expect(res[0].isbn).to.equal(books[0].ISBN[13] || books[0].ISBN[10]);
+        expect(res[1].isbn).to.equal(books[1].ISBN[13] || books[1].ISBN[10]);
+        expect(res[0].copyids).to.have.length(2);
+        done();
+      });
+    });
+
+    // cleanup: delete Users and Books tuples (Copies deletion will cascade)
+    after(function(done) {
+      pg.runAsync("DELETE FROM USERS;")
+      .then(function() {
+        return pg.runAsync("DELETE FROM BOOKS;");
+      })
+      .then(function() {
         done();
       });
     });

@@ -49,7 +49,7 @@
     DELETE FROM Borrowing
     WHERE borrowerID = $borrowerID
       AND copyID     = $copyID;
-
+-----------------------------------------
 /api/books
 
   /          POST
@@ -58,8 +58,7 @@
 
   /:copyID   DELETE
 
-    DELETE FROM Copies
-    WHERE copyID  = $copyID;
+    dbUtil.deleteCopy()
 
   /available GET (may return many results - stream results)
 
@@ -100,10 +99,10 @@
         FROM BookRequests
         WHERE requesterID = $userID
       );
-
+-----------------------------------------
 /api/self
 
-  /          GET
+  /          GET   (maybe not necessary?)
 
     SELECT *
     FROM Users
@@ -159,10 +158,8 @@
 
   /books     GET    (may return many - stream results)
 
-    SELECT *
-    FROM Copies JOIN Book USING(ISBN)
-    WHERE ownerID = $userID;
-
+    dbUtil.getOwnBooks()
+----------------------------------
 // extensions to the existing API:
 
 /api/friends
