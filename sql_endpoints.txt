@@ -20,9 +20,6 @@
 
     dbUtil.checkinBook()
 
-    DELETE FROM Borrowing
-    WHERE borrowerID = $borrowerID
-      AND copyID     = $copyID;
 -----------------------------------------
 /api/books
 

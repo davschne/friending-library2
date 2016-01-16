@@ -469,6 +469,53 @@ describe('db.js', function() {
     });
   });
 
+  describe("#checkinBook", function(done) {
+    var owner = testData.users[0];
+    var borrower = testData.users[1];
+    var book = rand(testData.books);
+    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var copyid;
+
+    // setup: create users, book, copy, borrowing, store copyid for later
+    before(function(done) {
+      insertUser(db, owner)
+      .then(insertUser.bind(null, db, borrower))
+      .then(insertBook.bind(null, db, book))
+      .then(insertCopy.bind(null, db, book, owner))
+      .then(function() {
+        return db.run("SELECT copyid FROM Copies WHERE isbn=$1 AND ownerid=$2;", [ISBN, owner.uid]);
+      })
+      .then(function(res) {
+        copyid = res[0].copyid;
+        return insertBorrowing(db, borrower, copyid);
+      })
+      .then(done.bind(null, null));
+    });
+
+    it("should return a response object", function(done) {
+      db.checkinBook(borrower.uid, copyid)
+      .then(function(res) {
+        expect(res).to.exist;
+        done();
+      });
+    });
+
+    it("should delete a tuple from Borrowing", function(done) {
+      db.run("SELECT * FROM Borrowing WHERE borrowerid=$1 AND copyid=$2;", [borrower.uid, copyid])
+      .then(function(res) {
+        expect(res).to.be.empty;
+        done();
+      });
+    });
+
+    // cleanup: delete users, books (copies will cascade)
+    after(function(done) {
+      deleteAllUsers(db)
+      .then(deleteAllBooks.bind(null, db))
+      .then(done.bind(null, null));
+    });
+  });
+
   // close connection to database
   after(function() {
     db.disconnect();
