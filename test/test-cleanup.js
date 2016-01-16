@@ -1,7 +1,7 @@
 var chai = require("chai");
 var expect = chai.expect;
 
-var dbUtil = require('../lib/db-util.js');
+var DB = require('../lib/db.js');
 
 var PG_ADDRESS    = '127.0.0.1:5432';
 var PG_ADMIN_USER = 'postgres';
@@ -23,23 +23,19 @@ var PG_TEST_URI   = 'postgres://' +
                     TEST_DATABASE;
 
 // database instance
-var pg_admin;
+var db;
 
-describe('db-util.js', function() {
+describe('db.js', function() {
 
   before(function() {
-    pg_admin = dbUtil.getInstance(PG_ADMIN_URI);
+    db_admin = new DB(PG_ADMIN_URI);
   });
 
   describe('#dropDatabase', function() {
     it('should drop a Postgres database', function(done) {
-      dbUtil.dropDatabase(pg_admin, TEST_DATABASE)
+      db_admin.dropDatabase(TEST_DATABASE)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
-        done();
-      })
-      .catch(function(err) {
-        expect(err).to.not.exist; // assertion fails if error
         done();
       });
     });
@@ -47,19 +43,15 @@ describe('db-util.js', function() {
 
   describe('#dropDBUser', function() {
     it('should drop a Postgres user/role', function(done) {
-      dbUtil.dropDBUser(pg_admin, TEST_USER)
+      db_admin.dropDBUser(TEST_USER)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
-        done();
-      })
-      .catch(function(err) {
-        expect(err).to.not.exist; // assertion fails if error
         done();
       });
     });
   });
 
   after(function() {
-    pg_admin.end();
+    db_admin.disconnect();
   });
 });

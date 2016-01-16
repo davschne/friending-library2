@@ -2,7 +2,7 @@ var chai = require("chai");
 var expect = chai.expect;
 var Promise = require("bluebird");
 
-var dbUtil = require('../lib/db-util.js');
+var DB = require('../lib/db.js');
 
 var testData = require('../lib/test-data.js');
 
@@ -37,13 +37,13 @@ var INSERT_COPY = "INSERT INTO Copies (ISBN, ownerID) VALUES ($1, $2);";
 // var DELETE_COPY = "DELETE FROM Copies WHERE copyid = $1;";
 
 // database instance
-var pg;
+var db;
 
-describe('db-util.js', function() {
+describe('db.js', function() {
 
   // get database connection instance
   before(function() {
-    pg = dbUtil.getInstance(PG_TEST_URI);
+    db = new DB(PG_TEST_URI);
   });
 
   describe('#findOrCreateUser', function() {
@@ -51,8 +51,7 @@ describe('db-util.js', function() {
     var user = rand(testData.users);
 
     it("should return a response object", function(done) {
-      dbUtil.findOrCreateUser(
-        pg,
+      db.findOrCreateUser(
         user.uid,
         user.display_name
       )
@@ -63,7 +62,7 @@ describe('db-util.js', function() {
     });
 
     it("should create a tuple in the Users table if it doesn't already exist", function(done) {
-      pg.runAsync("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
+      db.run("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
       .then(function(res) {
         expect(res[0].uid).to.equal(user.uid.toString());
         done();
@@ -72,7 +71,7 @@ describe('db-util.js', function() {
 
     // cleanup: delete the user
     after(function(done) {
-      pg.runAsync(DELETE_USER, [user.uid])
+      db.run(DELETE_USER, [user.uid])
       .then(function(res) {
         done();
       });
@@ -85,14 +84,14 @@ describe('db-util.js', function() {
 
     // setup: create the user
     before(function(done) {
-      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      db.run(INSERT_USER, [user.uid, user.display_name])
       .then(function(res) {
         done();
       });
     });
 
     it("should return a response object", function(done) {
-      dbUtil.deleteUser(pg, user.uid)
+      db.deleteUser(user.uid)
       .then(function(res) {
         expect(res).to.exist;
         done();
@@ -100,7 +99,7 @@ describe('db-util.js', function() {
     });
 
     it("should delete a tuple from the Users table", function(done) {
-      pg.runAsync("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
+      db.run("SELECT uid FROM Users WHERE uid=" + user.uid + ";")
       .then(function(res) {
         expect(res).to.be.empty; // expect empty array
         done();
@@ -116,15 +115,14 @@ describe('db-util.js', function() {
 
     // setup: create user to own the copy
     before(function(done) {
-      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      db.run(INSERT_USER, [user.uid, user.display_name])
       .then(function(res) {
         done();
       });
     });
 
     it("should return a response object", function(done) {
-      dbUtil.createCopy(
-        pg,
+      db.createCopy(
         user.uid,
         ISBN,
         book.title,
@@ -146,7 +144,7 @@ describe('db-util.js', function() {
     });
 
     it("should create a tuple in the Copies table", function(done) {
-      pg.runAsync("SELECT ownerid FROM Copies WHERE ownerid=" + user.uid + " AND isbn=\'" + ISBN + "\';")
+      db.run("SELECT ownerid FROM Copies WHERE ownerid=" + user.uid + " AND isbn=\'" + ISBN + "\';")
       .then(function(res) {
         expect(res[0].ownerid).to.equal(user.uid.toString());
         done();
@@ -154,7 +152,7 @@ describe('db-util.js', function() {
     });
 
     it("should create a tuple in the Books table if it doesn't already exist", function(done) {
-      pg.runAsync("SELECT isbn FROM Books WHERE isbn=\'" + ISBN + "\';")
+      db.run("SELECT isbn FROM Books WHERE isbn=\'" + ISBN + "\';")
       .then(function(res) {
         expect(res[0].isbn).to.equal(ISBN);
         done();
@@ -163,9 +161,9 @@ describe('db-util.js', function() {
 
     // cleanup: delete user and book (cascade should delete the copy)
     after(function(done) {
-      pg.runAsync(DELETE_USER, [user.uid])
+      db.run(DELETE_USER, [user.uid])
       .then(function() {
-        return pg.runAsync(DELETE_BOOK, [ISBN]);
+        return db.run(DELETE_BOOK, [ISBN]);
       })
       .then(function(res) {
         done();
@@ -182,9 +180,9 @@ describe('db-util.js', function() {
 
     // setup: insert user, book, and copy; retrieve and store copyid
     before(function(done) {
-      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      db.run(INSERT_USER, [user.uid, user.display_name])
       .then(function() {
-        return pg.runAsync(INSERT_BOOK, [
+        return db.run(INSERT_BOOK, [
           ISBN,
           book.title,
           book.subtitle,
@@ -200,10 +198,10 @@ describe('db-util.js', function() {
         ]);
       })
       .then(function() {
-        return pg.runAsync(INSERT_COPY, [ISBN, user.uid]);
+        return db.run(INSERT_COPY, [ISBN, user.uid]);
       })
       .then(function() {
-        return pg.runAsync("SELECT copyid FROM Copies WHERE ISBN=$1 AND ownerid=$2", [ISBN, user.uid]);
+        return db.run("SELECT copyid FROM Copies WHERE ISBN=$1 AND ownerid=$2", [ISBN, user.uid]);
       })
       .then(function(res) {
         copyid = res[0].copyid;
@@ -212,7 +210,7 @@ describe('db-util.js', function() {
     });
 
     it("should return a response object", function(done) {
-      dbUtil.deleteCopy(pg, copyid)
+      db.deleteCopy(copyid)
       .then(function(res) {
         expect(res).to.exist;
         done();
@@ -220,7 +218,7 @@ describe('db-util.js', function() {
     });
 
     it("should delete the tuple from the Copies table", function(done) {
-      pg.runAsync("SELECT copyid FROM Copies WHERE copyid=$1;", [copyid])
+      db.run("SELECT copyid FROM Copies WHERE copyid=$1;", [copyid])
       .then(function(res) {
         expect(res).to.be.empty;
         done();
@@ -229,9 +227,9 @@ describe('db-util.js', function() {
 
     // cleanup: delete user and book
     after(function(done) {
-      pg.runAsync(DELETE_USER, [user.uid])
+      db.run(DELETE_USER, [user.uid])
       .then(function() {
-        return pg.runAsync(DELETE_BOOK, [ISBN]);
+        return db.run(DELETE_BOOK, [ISBN]);
       })
       .then(function(res) {
         done();
@@ -247,13 +245,13 @@ describe('db-util.js', function() {
     // setup: add user, add four books, add three copies owned by user (two duplicate)
     before(function(done) {
       // insert Users tuple
-      pg.runAsync(INSERT_USER, [user.uid, user.display_name])
+      db.run(INSERT_USER, [user.uid, user.display_name])
       // insert four Books tuples
       .then(function() {
         // build chain of Promises
         return books.slice(0, 4).reduce(function(seq, book) {
           return seq.then(function() {
-            return pg.runAsync(INSERT_BOOK, [
+            return db.run(INSERT_BOOK, [
               book.ISBN[13] || book.ISBN[10],
               book.title,
               book.subtitle,
@@ -276,7 +274,7 @@ describe('db-util.js', function() {
         // build chain of Promises
         return copies.reduce(function(seq, book) {
           return seq.then(function() {
-            return pg.runAsync(INSERT_COPY, [book.ISBN[13] || book.ISBN[10], user.uid]);
+            return db.run(INSERT_COPY, [book.ISBN[13] || book.ISBN[10], user.uid]);
           });
         }, Promise.resolve());
       })
@@ -287,7 +285,7 @@ describe('db-util.js', function() {
     });
 
     it("should return tuples matching all Books owned by the User, including multiple copies of the same Book", function(done) {
-      dbUtil.getOwnBooks(pg, user.uid)
+      db.getOwnBooks(user.uid)
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(2);
@@ -300,9 +298,9 @@ describe('db-util.js', function() {
 
     // cleanup: delete Users and Books tuples (Copies deletion will cascade)
     after(function(done) {
-      pg.runAsync("DELETE FROM USERS;")
+      db.run("DELETE FROM USERS;")
       .then(function() {
-        return pg.runAsync("DELETE FROM BOOKS;");
+        return db.run("DELETE FROM BOOKS;");
       })
       .then(function() {
         done();
@@ -312,6 +310,6 @@ describe('db-util.js', function() {
 
   // close connection to database
   after(function() {
-    pg.end();
+    db.disconnect();
   });
 });

@@ -1,7 +1,7 @@
 var chai = require("chai");
 var expect = chai.expect;
 
-var dbUtil = require('../lib/db-util.js');
+var DB = require('../lib/db.js');
 
 var PG_ADDRESS    = '127.0.0.1:5432';
 var PG_ADMIN_USER = 'postgres';
@@ -23,28 +23,24 @@ var PG_TEST_URI   = 'postgres://' +
                     TEST_DATABASE;
 
 // database instances
-var pg_admin;
-var pg;
+var db_admin;
+var db;
 
-describe('db-util.js', function() {
+describe('db.js', function() {
 
-  describe('#getInstance', function() {
+  describe('Constructor', function() {
     it('should connect to a running Postgres server and return a connection instance', function() {
-      pg_admin = dbUtil.getInstance(PG_ADMIN_URI);
-      expect(pg_admin).to.exist;
+      db_admin = new DB(PG_ADMIN_URI);
+      expect(db_admin).to.exist;
     });
     // further tests for async functions generated from SQL files?
   });
 
   describe('#createDBUser', function() {
     it('should create a Postgres user/role', function(done) {
-      dbUtil.createDBUser(pg_admin, TEST_USER, TEST_USER_PW)
+      db_admin.createDBUser(TEST_USER, TEST_USER_PW)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
-        done();
-      })
-      .catch(function(err) {
-        expect(err).to.not.exist; // assertion fails if error
         done();
       });
     });
@@ -52,41 +48,31 @@ describe('db-util.js', function() {
 
   describe('#createDatabase', function() {
     it('should create a Postgres database', function(done) {
-      dbUtil.createDatabase(
-        pg_admin,
+      db_admin.createDatabase(
         TEST_DATABASE,
         PG_ADMIN_USER,
         TEST_TEMPLATE
       )
       .then(function(res) {
         expect(res).to.exist; // returns a response object
-        done();
-      })
-      .catch(function(err) {
-        expect(err).to.not.exist; // assertion fails if error
+        db_admin.disconnect(); // disconnect
         done();
       });
     });
   });
 
   describe('#setupDatabase', function() {
+    // connect to the new database and set it up
     before(function() {
-      pg = dbUtil.getInstance(PG_TEST_URI);
+      db = new DB(PG_TEST_URI);
     });
     it('should create the database tables', function(done) {
-      dbUtil.setupDatabase(pg)
+      db.setupDatabase()
       .then(function(res) {
         expect(res).to.exist; // returns a response object
-        done();
-      })
-      .catch(function(err) {
-        expect(err).to.not.exist; // assertion fails if error
+        db.disconnect(); // disconnect
         done();
       });
     });
-  });
-
-  after(function() {
-    pg_admin.end();
   });
 });

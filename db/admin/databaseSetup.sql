@@ -11,7 +11,7 @@ CREATE TABLE Users (
 -- index for user searches
 -- CREATE INDEX UserNames ON Users (surname, given_name);
 
--- CREATE TABLE Friendship (
+-- CREATE TABLE Friendships (
 --   uID1 bigint REFERENCES Users (uID) ON DELETE CASCADE,
 --   uID2 bigint REFERENCES Users (uID) ON DELETE CASCADE,
 --   PRIMARY KEY (uID1, uID2)

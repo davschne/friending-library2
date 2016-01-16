@@ -2,6 +2,8 @@
 
   /request/:copyID DELETE
 
+    dbUtil.cancelBookRequest()
+
     DELETE FROM BookRequests
     WHERE requesterID = $userID
       AND copyID      = $copyID;
@@ -12,6 +14,8 @@
     [  AND copyID      = $copyID;
 
   /request         POST
+
+    dbUtil.createBookRequest()
 
     INSERT INTO BookRequests (requesterID, copyID, request_date)
     VALUES (
@@ -25,6 +29,8 @@
 
   /deny            POST
 
+    dbUtil.denyBookRequest()
+
     DELETE FROM BookRequests
     WHERE requesterID = $requesterID
       AND copyID      = $copyID;
@@ -32,6 +38,8 @@
 
 
   /checkout (formerly /approve)   POST
+
+    dbUtil.checkoutBook()
 
     BEGIN;
       DELETE FROM BookRequests
@@ -45,6 +53,8 @@
     COMMIT;
 
   /checkin (formerly /returned)   POST
+
+    dbUtil.checkinBook()
 
     DELETE FROM Borrowing
     WHERE borrowerID = $borrowerID
@@ -61,6 +71,8 @@
     dbUtil.deleteCopy()
 
   /available GET (may return many results - stream results)
+
+    dbUtil.getAvailableBooks()
 
     -- all books that don't belong to user, aren't checked out, and user hasn't
     --   requested already
@@ -110,6 +122,8 @@
 
   /book_requests_incoming GET
 
+    dbUtil.getIncomingBookRequests()
+
     SELECT u.display_name, r.request_date, b.title, b.authors, b.categories
     FROM   BookRequests r, Users u, Copies c, Books b
     WHERE r.copyID IN (
@@ -123,6 +137,8 @@
 
   /book_requests_outgoing GET
 
+    dbUtil.getOutgoingBookRequests()
+
     SELECT u.display_name, r.request_date, b.title, b.authors, b.categories
     FROM   BookRequests r, Users u, Copies c, Books b
     WHERE r.requesterID = $userID
@@ -131,6 +147,8 @@
       AND b.ISBN        = c.ISBN;
 
   /books_lent             GET
+
+    dbUtil.getLentBooks()
 
     SELECT u.display_name, r.checkout_date, b.title, b.authors, b.categories
     FROM   Borrowing brw, Users u, Copies c, Books b
@@ -144,6 +162,8 @@
       AND b.ISBN         = c.ISBN;
 
   /books_borrowed         GET
+
+    dbUtil.getBorrowedBooks()
 
     SELECT u.display_name, r.checkout_date, b.title, b.authors, b.categories
     FROM   Borrowing brw, Users u, Copies c, Books b
