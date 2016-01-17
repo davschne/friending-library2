@@ -1,39 +1,26 @@
 /api/trans
 
-  /request/:copyID DELETE
+  /request/:copyID DELETE : db.deleteBookRequest()
 
-    dbUtil.deleteBookRequest()
+  /request           POST : db.createBookRequest()
 
-  /request         POST
+  /deny              POST : db.deleteBookRequest()
 
-    dbUtil.createBookRequest()
+  /checkout          POST : db.checkoutBook()
+    (formerly /approve)
 
-  /deny            POST
-
-    dbUtil.deleteBookRequest()
-
-  /checkout (formerly /approve)   POST
-
-    dbUtil.checkoutBook()
-
-  /checkin (formerly /returned)   POST
-
-    dbUtil.checkinBook()
+  /checkin           POST : db.checkinBook()
+    (formerly /returned)
 
 -----------------------------------------
 /api/books
 
-  /          POST
+  /            POST : db.createCopy()
 
-    dbUtil.createCopy()
+  /:copyID   DELETE : db.deleteCopy()
 
-  /:copyID   DELETE
-
-    dbUtil.deleteCopy()
-
-  /available GET (may return many results - stream results)
-
-    dbUtil.getAvailableBooks()
+  /available    GET : db.getAvailableBooks()
+    (stream results)
 
     -- all books that don't belong to user, aren't checked out, and user hasn't
     --   requested already
@@ -81,47 +68,19 @@
     FROM Users
     WHERE uID = $userID;
 
-  /book_requests_incoming GET
+  /book_requests_incoming GET : db.getIncomingBookRequests()
 
-    dbUtil.getIncomingBookRequests()
+  /book_requests_outgoing GET : db.getOutgoingBookRequests()
 
-  /book_requests_outgoing GET
+  /books_lent             GET : db.getLentBooks()
 
-    dbUtil.getOutgoingBookRequests()
+  /books_borrowed         GET : db.getBorrowedBooks()
 
-  /books_lent             GET
+  /                    DELETE : db.deleteUser()
 
-    dbUtil.getLentBooks()
+  /books                  GET : db.getOwnBooks()
+    (stream results)
 
-    SELECT u.display_name, r.checkout_date, b.title, b.authors, b.categories
-    FROM   Borrowing brw, Users u, Copies c, Books b
-    WHERE brw.copyID IN (
-        SELECT copyID
-        FROM   Copies
-        WHERE  ownerID = $userID
-      )
-      AND c.copyID       = brw.copyID
-      AND u.uID          = brw.borrowerID
-      AND b.ISBN         = c.ISBN;
-
-  /books_borrowed         GET
-
-    dbUtil.getBorrowedBooks()
-
-    SELECT u.display_name, r.checkout_date, b.title, b.authors, b.categories
-    FROM   Borrowing brw, Users u, Copies c, Books b
-    WHERE brw.borrowerID = $userID
-      AND c.copyID       = brw.copyID
-      AND u.uID          = c.ownerID
-      AND b.ISBN         = c.ISBN;
-
-  /          DELETE
-
-    dbUtil.deleteUser()
-
-  /books     GET    (may return many - stream results)
-
-    dbUtil.getOwnBooks()
 ----------------------------------
 // extensions to the existing API:
 
