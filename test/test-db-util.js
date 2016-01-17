@@ -511,37 +511,16 @@ describe('db.js', function() {
     var users = testData.users;
     var books = testData.books;
     var copies = [
-      {
-        owner: users[0],
-        book: books[0]
-      },
-      {
-        owner: users[0],
-        book: books[1]
-      },
-      { // not in result set
-        owner: users[0],
-        book: books[2]
-      },
-      { // not in result set
-        owner: users[1],
-        book: books[3]
-      }
+      { owner: users[0], book: books[0] },
+      { owner: users[0], book: books[1] },
+      { owner: users[0], book: books[2] }, // not in result set
+      { owner: users[1], book: books[3] }  // not in result set
     ];
 
     var requests = [
-      { // not in result set
-        requester: users[0],
-        copy: copies[3]
-      },
-      {
-        requester: users[1],
-        copy: copies[1]
-      },
-      {
-        requester: users[2],
-        copy: copies[0]
-      }
+      { requester: users[0], copy: copies[3] }, // not in result set
+      { requester: users[1], copy: copies[1] },
+      { requester: users[2], copy: copies[0] }
     ];
 
     // setup: create users, books, copies, book requests
@@ -581,6 +560,73 @@ describe('db.js', function() {
         expect(res[1].copyid).to.equal(requests[2].copy.copyid);
         expect(res[1].requesterid).to.equal(requests[2].requester.uid.toString());
         expect(res[1].isbn).to.equal(requests[2].copy.book.ISBN[13] || requests[2].copy.book.ISBN[10]);
+        done();
+      });
+    });
+
+    // cleanup: delete users, books (copies, book requests will cascade)
+    after(function(done) {
+      deleteAllUsers(db)
+      .then(deleteAllBooks.bind(null, db))
+      .then(done.bind(null, null));
+    });
+  });
+
+  describe("#getOutgoingBookRequests", function() {
+    // users[0] is requester for outgoing book requests
+    var users = testData.users;
+    var books = testData.books;
+    var copies = [
+      { owner: users[0], book: books[0] }, // not in result set
+      { owner: users[1], book: books[1] }, // not in result set
+      { owner: users[2], book: books[2] },
+      { owner: users[3], book: books[3] }
+    ];
+
+    var requests = [
+      { requester: users[0], copy: copies[2] },
+      { requester: users[0], copy: copies[3] },
+      { requester: users[3], copy: copies[1] } // not in result set
+    ];
+
+    // setup: create users, books, copies, book requests
+    before(function(done) {
+      // insert Users tuples (chain of Promises)
+      users.reduce(function(seq, user) {
+        return seq.then(insertUser.bind(null, db, user));
+      }, Promise.resolve())
+      // insert Books tuples
+      .then(books.reduce.bind(books, function(seq, book) {
+        return seq.then(insertBook.bind(null, db, book));
+      }, Promise.resolve()))
+      // insert Copies tuples
+      .then(copies.reduce.bind(copies, function(seq, copy, index) {
+        return seq.then(function() {
+          return insertCopy(db, copy.book, copy.owner);
+        })
+        .then(function(res) {
+          copies[index].copyid = res[0].copyid;
+        });
+      }, Promise.resolve()))
+      // insert BookRequests tuples
+      .then(requests.reduce.bind(requests, function(seq, request) {
+        return seq.then(insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
+      }, Promise.resolve()))
+      .then(done.bind(null, null));
+    });
+
+    it("should return an array of tuples of the user's outgoing book requests", function(done) {
+      db.getOutgoingBookRequests(users[0].uid)
+      .then(function(res) {
+        // console.log(res);
+        expect(res).to.be.an.instanceof(Array);
+        expect(res).to.have.length(2);
+        expect(res[0].copyid).to.equal(requests[0].copy.copyid);
+        expect(res[0].ownerid).to.equal(requests[0].copy.owner.uid.toString());
+        expect(res[0].isbn).to.equal(requests[0].copy.book.ISBN[13] || requests[0].copy.book.ISBN[10]);
+        expect(res[1].copyid).to.equal(requests[1].copy.copyid);
+        expect(res[1].ownerid).to.equal(requests[1].copy.owner.uid.toString());
+        expect(res[1].isbn).to.equal(requests[1].copy.book.ISBN[13] || requests[1].copy.book.ISBN[10]);
         done();
       });
     });

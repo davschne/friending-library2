@@ -85,27 +85,9 @@
 
     dbUtil.getIncomingBookRequests()
 
-    SELECT u.display_name, r.request_date, b.title, b.authors, b.categories
-    FROM   BookRequests r, Users u, Copies c, Books b
-    WHERE r.copyID IN (
-        SELECT copyID
-        FROM   Copies
-        WHERE  ownerID = $userID
-      )
-      AND c.copyID      = r.copyID
-      AND u.uID         = r.requesterID
-      AND b.ISBN        = c.ISBN;
-
   /book_requests_outgoing GET
 
     dbUtil.getOutgoingBookRequests()
-
-    SELECT u.display_name, r.request_date, b.title, b.authors, b.categories
-    FROM   BookRequests r, Users u, Copies c, Books b
-    WHERE r.requesterID = $userID
-      AND c.copyID      = r.copyID
-      AND u.uID         = c.ownerID
-      AND b.ISBN        = c.ISBN;
 
   /books_lent             GET
 
