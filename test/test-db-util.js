@@ -58,8 +58,11 @@ var deleteAllBooks = function(db) {
 };
 
 var insertCopy = function(db, book, owner) {
-  var SQL = "INSERT INTO Copies (ISBN, ownerID) VALUES ($1, $2);";
-  return db.run(SQL, [book.ISBN[13] || book.ISBN[10], owner.uid]);
+  var SQL = "INSERT INTO Copies (ISBN, ownerID) VALUES ($1, $2) RETURNING copyid;";
+  return db.run(SQL, [book.ISBN[13] || book.ISBN[10], owner.uid])
+    .then(function(res) {
+      return res;
+    });
 };
 
 var insertBookRequest = function(db, requester, copyid) {
@@ -159,7 +162,7 @@ describe('db.js', function() {
       });
     });
 
-    it("should return a response object", function(done) {
+    it("should return a response object containing the copyid", function(done) {
       db.createCopy(
         user.uid,
         ISBN,
@@ -177,6 +180,8 @@ describe('db.js', function() {
       )
       .then(function(res) {
         expect(res).to.exist;
+        expect(res[0]).to.have.property("copyid");
+        expect(res[0].copyid).to.be.a("number");
         done();
       });
     });
@@ -219,9 +224,6 @@ describe('db.js', function() {
       insertUser(db, user)
       .then(insertBook.bind(null, db, book))
       .then(insertCopy.bind(null, db, book, user))
-      .then(function() {
-        return db.run("SELECT copyid FROM Copies WHERE ISBN=$1 AND ownerid=$2", [ISBN, user.uid]);
-      })
       .then(function(res) {
         copyid = res[0].copyid;
         done();
@@ -285,7 +287,6 @@ describe('db.js', function() {
       .then(function() {
         done();
       });
-
     });
 
     it("should return tuples matching all Books owned by the User, including multiple copies of the same Book", function(done) {
@@ -324,9 +325,6 @@ describe('db.js', function() {
       .then(insertUser.bind(null, db, requester))
       .then(insertBook.bind(null, db, book))
       .then(insertCopy.bind(null, db, book, owner))
-      .then(function() {
-        return db.run("SELECT copyid FROM Copies WHERE isbn=$1 AND ownerid=$2;", [ISBN, owner.uid]);
-      })
       .then(function(res) {
         copyid = res[0].copyid;
         done();
@@ -375,9 +373,6 @@ describe('db.js', function() {
       .then(insertUser.bind(null, db, requester))
       .then(insertBook.bind(null, db, book))
       .then(insertCopy.bind(null, db, book, owner))
-      .then(function() {
-        return db.run("SELECT copyid FROM Copies WHERE isbn=$1 AND ownerid=$2;", [ISBN, owner.uid]);
-      })
       .then(function(res) {
         copyid = res[0].copyid;
         return insertBookRequest(db, requester, copyid);
@@ -422,9 +417,6 @@ describe('db.js', function() {
       .then(insertUser.bind(null, db, requester))
       .then(insertBook.bind(null, db, book))
       .then(insertCopy.bind(null, db, book, owner))
-      .then(function() {
-        return db.run("SELECT copyid FROM Copies WHERE isbn=$1 AND ownerid=$2;", [ISBN, owner.uid]);
-      })
       .then(function(res) {
         copyid = res[0].copyid;
         return insertBookRequest(db, requester, copyid);
@@ -482,9 +474,6 @@ describe('db.js', function() {
       .then(insertUser.bind(null, db, borrower))
       .then(insertBook.bind(null, db, book))
       .then(insertCopy.bind(null, db, book, owner))
-      .then(function() {
-        return db.run("SELECT copyid FROM Copies WHERE isbn=$1 AND ownerid=$2;", [ISBN, owner.uid]);
-      })
       .then(function(res) {
         copyid = res[0].copyid;
         return insertBorrowing(db, borrower, copyid);
@@ -509,6 +498,94 @@ describe('db.js', function() {
     });
 
     // cleanup: delete users, books (copies will cascade)
+    after(function(done) {
+      deleteAllUsers(db)
+      .then(deleteAllBooks.bind(null, db))
+      .then(done.bind(null, null));
+    });
+  });
+
+  describe("#getIncomingBookRequests", function() {
+
+    // users[0] is target for incoming book requests
+    var users = testData.users;
+    var books = testData.books;
+    var copies = [
+      {
+        owner: users[0],
+        book: books[0]
+      },
+      {
+        owner: users[0],
+        book: books[1]
+      },
+      { // not in result set
+        owner: users[0],
+        book: books[2]
+      },
+      { // not in result set
+        owner: users[1],
+        book: books[3]
+      }
+    ];
+
+    var requests = [
+      { // not in result set
+        requester: users[0],
+        copy: copies[3]
+      },
+      {
+        requester: users[1],
+        copy: copies[1]
+      },
+      {
+        requester: users[2],
+        copy: copies[0]
+      }
+    ];
+
+    // setup: create users, books, copies, book requests
+    before(function(done) {
+      // insert Users tuples (chain of Promises)
+      users.reduce(function(seq, user) {
+        return seq.then(insertUser.bind(null, db, user));
+      }, Promise.resolve())
+      // insert Books tuples
+      .then(books.reduce.bind(books, function(seq, book) {
+        return seq.then(insertBook.bind(null, db, book));
+      }, Promise.resolve()))
+      // insert Copies tuples
+      .then(copies.reduce.bind(copies, function(seq, copy, index) {
+        return seq.then(function() {
+          return insertCopy(db, copy.book, copy.owner);
+        })
+        .then(function(res) {
+          copies[index].copyid = res[0].copyid;
+        });
+      }, Promise.resolve()))
+      // insert BookRequests tuples
+      .then(requests.reduce.bind(requests, function(seq, request) {
+        return seq.then(insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
+      }, Promise.resolve()))
+      .then(done.bind(null, null));
+    });
+
+    it("should return an array of tuples of the user's incoming book requests", function(done) {
+      db.getIncomingBookRequests(users[0].uid)
+      .then(function(res) {
+        expect(res).to.be.an.instanceof(Array);
+        expect(res).to.have.length(2);
+        expect(res[0].copyid).to.equal(requests[1].copy.copyid);
+        expect(res[0].requesterid).to.equal(requests[1].requester.uid.toString());
+        expect(res[0].isbn).to.equal(requests[1].copy.book.ISBN[13] || requests[1].copy.book.ISBN[10]);
+        expect(res[1].copyid).to.equal(requests[2].copy.copyid);
+        expect(res[1].requesterid).to.equal(requests[2].requester.uid.toString());
+        expect(res[1].isbn).to.equal(requests[2].copy.book.ISBN[13] || requests[2].copy.book.ISBN[10]);
+        done();
+      });
+    });
+
+    // cleanup: delete users, books (copies, book requests will cascade)
     after(function(done) {
       deleteAllUsers(db)
       .then(deleteAllBooks.bind(null, db))

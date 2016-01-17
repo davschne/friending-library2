@@ -1,3 +1,3 @@
 DELETE FROM Borrowing
-  WHERE borrowerID = $1
-    AND copyID     = $2;
+WHERE borrowerID = $1
+  AND copyID     = $2;
