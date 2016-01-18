@@ -1,26 +1,24 @@
+/* jshint expr: true */
+
 var chai = require("chai");
 var expect = chai.expect;
 var Promise = require("bluebird");
 
-var DB = require('../lib/db.js');
-
+var DB       = require('../lib/db.js');
+var LOGIN    = require('./login.json');
 var testData = require('../lib/test-data.js');
+
+var PG_TEST_URI = 'postgres://' +
+                  LOGIN.TEST_USER + ':' +
+                  LOGIN.TEST_USER_PW +
+                  '@' + LOGIN.ADDRESS + '/' +
+                  LOGIN.TEST_DB;
 
 // utility function to return random elements from testData arrays
 var rand = function(array) {
   var val = Math.floor(Math.random() * array.length);
   return array[val];
 };
-
-var PG_ADDRESS    = '127.0.0.1:5432';
-var PG_ADMIN_USER = 'postgres';
-var PG_ADMIN_PW   = '';
-var TEST_DATABASE = 'friending_library_test';
-var PG_TEST_URI   = 'postgres://' +
-                    PG_ADMIN_USER + ':' +
-                    PG_ADMIN_PW +
-                    '@' + PG_ADDRESS + '/' +
-                    TEST_DATABASE;
 
 // SQL for setup, teardown of tests
 

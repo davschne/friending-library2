@@ -8,13 +8,13 @@ var express      = require('express');
 var passport     = require('passport');
 var Redis        = require('ioredis');
 
-var dbUtil = require('./lib/db-util');
+var DB = require('./lib/db');
 
 var app   = express();
 
 // Create database interfaces
 var redis = new Redis(REDIS_URI);
-var pg    = dbUtil.getInstance(PG_URI);
+var pg    = new DB(PG_URI);
 
 // Middleware
 var bodyParser   = require('body-parser');
@@ -85,5 +85,5 @@ pg.testInsertAsync()
 
 process.on("exit", function() {
   redis.disconnect();
-  dbUtil.disconnect();
+  db.disconnect();
 });

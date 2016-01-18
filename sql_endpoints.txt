@@ -21,44 +21,6 @@
 
   /available    GET : db.getAvailableBooks()
     (stream results)
-
-    -- all books that don't belong to user, aren't checked out, and user hasn't
-    --   requested already
-
-    SELECT *                         -- maybe refine this projection?
-    FROM Copies c, Books b, Users u
-    WHERE b.ISBN = c.ISBN
-      AND u.uID  = c.ownerID
-      AND c.copyID NOT IN (
-        SELECT copyID
-        FROM Borrowing
-      )
-      AND c.copyID NOT IN (
-        SELECT copyID
-        FROM BookRequests
-        WHERE requesterID = $userID
-      );
-
-    -- limit to friends
-
-    SELECT *                          -- maybe refine this projection?
-    FROM Copies c, Books b, Users u
-    WHERE b.ISBN = c.ISBN
-      AND u.uID  = c.ownerID;
-      AND c.ownerID IN (
-        SELECT uID2
-        FROM Friends
-        WHERE uID1 = $userID
-      )
-      AND c.copyID NOT IN (
-        SELECT copyID
-        FROM Borrowing
-      )
-      AND c.copyID NOT IN (
-        SELECT copyID
-        FROM BookRequests
-        WHERE requesterID = $userID
-      );
 -----------------------------------------
 /api/self
 
@@ -68,6 +30,8 @@
     FROM Users
     WHERE uID = $userID;
 
+  /                    DELETE : db.deleteUser()
+
   /book_requests_incoming GET : db.getIncomingBookRequests()
 
   /book_requests_outgoing GET : db.getOutgoingBookRequests()
@@ -75,8 +39,6 @@
   /books_lent             GET : db.getLentBooks()
 
   /books_borrowed         GET : db.getBorrowedBooks()
-
-  /                    DELETE : db.deleteUser()
 
   /books                  GET : db.getOwnBooks()
     (stream results)

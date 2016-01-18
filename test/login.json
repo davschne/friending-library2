@@ -1,0 +1,10 @@
+{
+  "ADDRESS"       : "127.0.0.1:5432",
+  "ADMIN_USER"    : "postgres",
+  "ADMIN_PW"      : "",
+  "DEFAULT_DB"    : "template1",
+  "TEST_DB"       : "friending_library_test",
+  "TEST_TEMPLATE" : "template1",
+  "TEST_USER"     : "friending_library_test_user",
+  "TEST_USER_PW"  : "test"
+}
