@@ -773,6 +773,85 @@ describe('db.js', function() {
     });
   });
 
+  describe("#getAvailableBooks", function() {
+    // one copy is currently borrowed
+    // one is already requested by user
+    // one belongs to user
+    // should return just one book
+    var users = testData.users;
+    var books = testData.books;
+    var copies = [
+      { owner: users[0], book: books[0]},
+      { owner: users[1], book: books[1]},
+      { owner: users[2], book: books[2]},
+      { owner: users[3], book: books[3]}  // in result set
+    ];
+    var request = { requester: users[0], copy: copies[1]};
+    var borrowing = { borrower: users[0], copy: copies[2]};
+
+    // setup: create users, books, copies, borrowing
+    before(function(done) {
+      // insert Users tuples (chain of Promises)
+      users.reduce(function(seq, user) {
+        return seq.then(insertUser.bind(null, db, user));
+      }, Promise.resolve())
+      // insert Books tuples
+      .then(books.reduce.bind(books, function(seq, book) {
+        return seq.then(insertBook.bind(null, db, book));
+      }, Promise.resolve()))
+      // insert Copies tuples
+      .then(copies.reduce.bind(copies, function(seq, copy, index) {
+        return seq.then(function() {
+          return insertCopy(db, copy.book, copy.owner);
+        })
+        .then(function(res) {
+          copies[index].copyid = res[0].copyid;
+        });
+      }, Promise.resolve()))
+      // insert Book Request tuple
+      .then(function() {
+        return insertBookRequest(db, request.requester, request.copy.copyid);
+      })
+      // insert Borrowing tuple
+      .then(function() {
+        return insertBorrowing(db, borrowing.borrower, borrowing.copy.copyid);
+      })
+      .then(done.bind(null, null));
+    });
+
+    it("should return an array of books that aren't currently borrowed, haven't already been requested by the user, and don't belong to the user", function(done) {
+      db.getAvailableBooks(users[0].uid)
+      .then(function(res) {
+        expect(res).to.be.an.instanceof(Array);
+        expect(res).to.have.length(1);
+        expect(res[0].isbn).to.equal(copies[3].book.ISBN[13] || copies[3].book.ISBN[10]);
+        expect(res[0]).to.have.property("title");
+        expect(res[0]).to.have.property("subtitle");
+        expect(res[0]).to.have.property("authors");
+        expect(res[0]).to.have.property("categories");
+        expect(res[0]).to.have.property("publisher");
+        expect(res[0]).to.have.property("publisheddate");
+        expect(res[0]).to.have.property("description");
+        expect(res[0]).to.have.property("pagecount");
+        expect(res[0]).to.have.property("language");
+        expect(res[0]).to.have.property("imagelink");
+        expect(res[0]).to.have.property("imagelinksmall");
+        expect(res[0].copyid).to.equal(copies[3].copyid);
+        expect(res[0].ownerid).to.equal(copies[3].owner.uid.toString());
+        expect(res[0].owner_display_name).to.equal(copies[3].owner.display_name);
+        done();
+      });
+    });
+
+    // delete Borrowing, Users, Books (Copies, Book Request will cascade)
+    after(function(done) {
+      deleteAllBorrowing(db)
+      .then(deleteAllUsers.bind(null, db))
+      .then(deleteAllBooks.bind(null, db))
+      .then(done.bind(null, null));
+    });
+  });
+
   // close connection to database
   after(function() {
     db.disconnect();
