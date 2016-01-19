@@ -30,13 +30,13 @@ var transRouter = express.Router();
 
 // require("./routes/root-routes")(rootRouter, db);
 // require("./routes/auth-routes")(authRouter, db);
-require("./routes/self-routes")(selfRouter, db);
+require("./routes/self-routes")(selfRouter, db, redis);
 // require("./routes/books-routes")(booksRouter, db);
 // require("./routes/trans-routes")(transRouter, db);
 
 // app.use("/", rootRouter);
 // app.use("/auth", authRouter);
-app.use("/api/self", /*authenticate,*/ selfRouter);
+app.use("/api/self", authenticate, selfRouter);
 // app.use("/api/books", authenticate, booksRouter);
 // app.use("/api/trans", authenticate, transRouter);
 
@@ -59,7 +59,7 @@ redis
 });
 
 app.listen(PORT, function() {
-  console.log("Server listening on port " + PORT);
+  // console.log("Server listening on port " + PORT);
   console.log("Server ready");
 });
 

@@ -48,19 +48,16 @@ describe("self-routes.js", function() {
     // wait for server to start before proceeding
     app.stdout.on("data", function(data) {
       var out = data.toString();
-      // console.log("data:", out);
+      // console.log("server.js:", out);            // PRINT STDOUT
       if (out === "Server ready\n") done();
     });
   });
 
   describe("/api/self", function() {
 
+    xdescribe("GET", function() {
 
-    describe("GET", function() {
-
-      // before(function(done) {
-
-      // });
+      // before(function(done) {});
 
       it("should return an existent User as JSON, fully populated", function(done) {
         chai.request(url)
@@ -78,32 +75,66 @@ describe("self-routes.js", function() {
           });
       });
 
-      // after(function(done) {
-
-      // });
+      // after(function(done) {});
     });
 
     describe("DELETE", function() {
 
-      var user = util.rand(testData.users);
+      var user1 = testData.users[0];
+      var user2 = testData.users[1];
 
-      // setup: create the user
-      // before(function(done) {
-      //   util.insertUser(db, user)
-      //   .then(done.bind(null, null));
-      // });
+      // setup: create the user, set access_tokens in Redis
+      before(function(done) {
+        util.insertUser(db, user1)
+        .then(function() {
+          return redis.set(user1.access_token, user1.uid);
+        })
+        .then(function() {
+          return redis.set(user2.access_token, user2.uid);
+        })
+        .then(done.bind(null, null));
+      });
 
-      it("should return a response object with status 200", function(done) {
-        chai.request(url)
-        .del("/api/self")
-        // .set("Authorization", "Bearer " + testUsers[0].access_token)
-        .end(function(err, res) {
-          // console.error(err);
-          expect(err).to.be.null;
-          expect(res).to.be.json;
-          expect(res).to.have.status(200);
-          done();
+      describe("on success:", function() {
+
+        it("should return a response object with status 200", function(done) {
+          chai.request(url)
+          .del("/api/self")
+          .set("Authorization", "Bearer " + user1.access_token)
+          .end(function(err, res) {
+            expect(err).to.be.null;
+            expect(res).to.be.json;
+            expect(res).to.have.status(200);
+            done();
+          });
         });
+
+        it("should delete the user's access token", function(done) {
+          redis.get(user1.access_token)
+          .then(function(res) {
+            expect(res).to.be.null;
+            done();
+          });
+        });
+      });
+
+      describe("on failure (user not found):", function() {
+        it("should return a response object with status 404", function(done) {
+          chai.request(url)
+          .del("/api/self")
+          .set("Authorization", "Bearer " + user2.access_token)
+          .end(function(err, res) {
+            expect(err).to.be.null
+            expect(res).to.be.json;
+            expect(res).to.have.status(404);
+            done();
+          });
+        });
+      });
+
+      after(function(done) {
+        redis.del(user2.access_token)
+        .then(done.bind(null, null));
       });
     });
 
