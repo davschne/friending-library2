@@ -4,84 +4,64 @@ var PG_URI    = process.env.PG_URI
 var REDIS_URI = process.env.REDIS_URI
   || 'redis://:authpassword@127.0.0.1:6379/0';
 
-var express      = require('express');
-var passport     = require('passport');
-var Redis        = require('ioredis');
-
-var DB = require('./lib/db');
-
-var app   = express();
+var express = require('express');
+var app     = express();
+var DB      = require('./lib/db');
+var Redis   = require('ioredis');
 
 // Create database interfaces
 var redis = new Redis(REDIS_URI);
-var pg    = new DB(PG_URI);
+var db    = new DB(PG_URI);
 
 // Middleware
 var bodyParser   = require('body-parser');
+var passport     = require('passport');
 var authenticate = require('./middleware/auth-bearer')(redis);
-// var dbs          = require('./middleware/dbs');
-
-app.use(passport.initialize());
 app.use(express.static("public"));
 app.use(bodyParser.json());
-// app.use(dbs(pg, redis));
+app.use(passport.initialize());
+
+// Routing
+var rootRouter  = express.Router();
+var authRouter  = express.Router();
+var selfRouter  = express.Router();
+var booksRouter = express.Router();
+var transRouter = express.Router();
+
+// require("./routes/root-routes")(rootRouter, db);
+// require("./routes/auth-routes")(authRouter, db);
+require("./routes/self-routes")(selfRouter, db);
+// require("./routes/books-routes")(booksRouter, db);
+// require("./routes/trans-routes")(transRouter, db);
+
+// app.use("/", rootRouter);
+// app.use("/auth", authRouter);
+app.use("/api/self", /*authenticate,*/ selfRouter);
+// app.use("/api/books", authenticate, booksRouter);
+// app.use("/api/trans", authenticate, transRouter);
 
 // redis.ping().then(function(result) {
 //   console.log(result);
 // });
 
-// pg.query("select * from test").then(function(data) {
-//   console.log(data);
-// })
-// .catch(function(err) { console.log(err); });
-
-var authRouter  = express.Router();
-var selfRouter  = express.Router();
-var booksRouter = express.Router();
-var transRouter = express.Router();
-var rootRouter  = express.Router();
-
-require("./routes/auth-routes")(authRouter, pg, redis);
-// require("./routes/self-routes")(selfRouter);
-// require("./routes/books-routes")(booksRouter);
-// require("./routes/trans-routes")(transRouter);
-require("./routes/root-routes")(rootRouter, redis);
-
-app.use("/auth", authRouter);
-
-app.post("/test", authenticate, function(req, res) {
-  console.log(req.user);
-  res.json({msg: "done"});
-});
-
-app.use("/api/self", authenticate, selfRouter);
-app.use("/api/books", authenticate, booksRouter);
-app.use("/api/trans", authenticate, transRouter);
-app.use("/", rootRouter);
-
-app.listen(PORT, function() {
-  console.log("Server running on port " + PORT);
-});
+// app.post("/test", authenticate, function(req, res) {
+//   console.log(req.user);
+//   res.json({msg: "done"});
+// });
 
 redis
-  .on("connect", function() {
-    console.log("Connected to Redis server");
-  })
-  .on("error", function(err) {
-    console.log("Couldn't connect to Redis server");
-    console.error(err);
-  });
+.on("connect", function() {
+  console.log("Connected to Redis server");
+})
+.on("error", function(err) {
+  console.log("Couldn't connect to Redis server");
+  console.error(err);
+});
 
-// console.log(pg);
-
-pg.testInsertAsync()
-  .then(pg.testQueryAsync())
-  .then(function(res) {
-    console.log(res);
-  })
-  .catch(function(err) {
-    console.error(err);
-  });
+app.listen(PORT, function() {
+  console.log("Server listening on port " + PORT);
+  console.log("Server ready");
+});
 
 process.on("exit", function() {
   redis.disconnect();

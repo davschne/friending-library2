@@ -2,3 +2,4 @@
 node_modules
 public
 credentials.sh
+dump.rdb

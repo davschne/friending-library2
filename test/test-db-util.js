@@ -6,6 +6,7 @@ var Promise = require("bluebird");
 
 var DB       = require('../lib/db.js');
 var LOGIN    = require('./login.json');
+var util     = require('../lib/test-util.js');
 var testData = require('../lib/test-data.js');
 
 var PG_TEST_URI = 'postgres://' +
@@ -13,70 +14,6 @@ var PG_TEST_URI = 'postgres://' +
                   LOGIN.TEST_USER_PW +
                   '@' + LOGIN.ADDRESS + '/' +
                   LOGIN.TEST_DB;
-
-// utility function to return random elements from testData arrays
-var rand = function(array) {
-  var val = Math.floor(Math.random() * array.length);
-  return array[val];
-};
-
-// SQL for setup, teardown of tests
-
-var insertUser = function(db, user) {
-  var SQL = "INSERT INTO Users (uID, display_name) SELECT $1, $2 WHERE NOT EXISTS (SELECT uID FROM Users WHERE uID = $1);";
-  return db.run(SQL, [user.uid, user.display_name]);
-};
-
-var deleteAllUsers = function(db) {
-  var SQL = "DELETE FROM Users;";
-  return db.run(SQL);
-};
-
-var insertBook = function(db, book) {
-  var SQL = "INSERT INTO Books (ISBN, title, subtitle, authors, categories, publisher, publishedDate, description, pageCount, language, imageLink, imageLinkSmall) SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12 WHERE NOT EXISTS (SELECT ISBN FROM Books WHERE ISBN = CAST($1 AS varchar));"
-  return db.run(SQL, [
-    book.ISBN[13] || book.ISBN[10],
-    book.title,
-    book.subtitle,
-    book.authors,
-    book.categories,
-    book.publisher,
-    book.publishedDate,
-    book.description,
-    book.pageCount,
-    book.language,
-    book.imageLinks.thumbnail,
-    book.imageLinks.smallThumbnail
-  ]);
-};
-
-var deleteAllBooks = function(db) {
-  var SQL = "DELETE FROM Books;";
-  return db.run(SQL);
-};
-
-var insertCopy = function(db, book, owner) {
-  var SQL = "INSERT INTO Copies (ISBN, ownerID) VALUES ($1, $2) RETURNING copyid;";
-  return db.run(SQL, [book.ISBN[13] || book.ISBN[10], owner.uid])
-    .then(function(res) {
-      return res;
-    });
-};
-
-var insertBookRequest = function(db, requester, copyid) {
-  var SQL = "INSERT INTO BookRequests (requesterid, copyid, request_date) VALUES ($1, $2, CURRENT_TIMESTAMP);";
-  return db.run(SQL, [requester.uid, copyid]);
-};
-
-var insertBorrowing = function(db, borrower, copyid) {
-  var SQL = "INSERT INTO Borrowing (borrowerID, copyID, checkout_date) VALUES ($1, $2, CURRENT_TIMESTAMP);";
-  return db.run(SQL, [borrower.uid, copyid]);
-};
-
-var deleteAllBorrowing = function(db) {
-  var SQL = "DELETE FROM BORROWING;";
-  return db.run(SQL);
-};
 
 // database instance
 var db;
@@ -90,7 +27,7 @@ describe('db.js', function() {
 
   describe('#findOrCreateUser', function() {
 
-    var user = rand(testData.users);
+    var user = util.rand(testData.users);
 
     it("should return a response object", function(done) {
       db.findOrCreateUser(user.uid, user.display_name)
@@ -110,7 +47,7 @@ describe('db.js', function() {
 
     // cleanup: delete the user
     after(function(done) {
-      deleteAllUsers(db)
+      util.deleteAllUsers(db)
       .then(function(res) {
         done();
       });
@@ -119,11 +56,11 @@ describe('db.js', function() {
 
   describe('#deleteUser', function() {
 
-    var user = rand(testData.users);
+    var user = util.rand(testData.users);
 
     // setup: create the user
     before(function(done) {
-      insertUser(db, user)
+      util.insertUser(db, user)
       .then(function(res) {
         done();
       });
@@ -148,13 +85,13 @@ describe('db.js', function() {
 
   describe('#createCopy', function() {
 
-    var user = rand(testData.users);
-    var book = rand(testData.books);
+    var user = util.rand(testData.users);
+    var book = util.rand(testData.books);
     var ISBN = book.ISBN[13] || book.ISBN[10];
 
     // setup: create user to own the copy
     before(function(done) {
-      insertUser(db, user)
+      util.insertUser(db, user)
       .then(function(res) {
         done();
       });
@@ -202,8 +139,8 @@ describe('db.js', function() {
 
     // cleanup: delete user and book (cascade should delete the copy)
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(function(res) {
         done();
       });
@@ -212,16 +149,16 @@ describe('db.js', function() {
 
   describe("#deleteCopy", function() {
 
-    var user = rand(testData.users);
-    var book = rand(testData.books);
+    var user = util.rand(testData.users);
+    var book = util.rand(testData.books);
     var ISBN = book.ISBN[13] || book.ISBN[10];
     var copyid;
 
     // setup: insert user, book, and copy; retrieve and store copyid
     before(function(done) {
-      insertUser(db, user)
-      .then(insertBook.bind(null, db, book))
-      .then(insertCopy.bind(null, db, book, user))
+      util.insertUser(db, user)
+      .then(util.insertBook.bind(null, db, book))
+      .then(util.insertCopy.bind(null, db, book, user))
       .then(function(res) {
         copyid = res[0].copyid;
         done();
@@ -246,8 +183,8 @@ describe('db.js', function() {
 
     // cleanup: delete user and book
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(function(res) {
         done();
       });
@@ -256,19 +193,19 @@ describe('db.js', function() {
 
   describe("#getOwnBooks", function() {
 
-    var user = rand(testData.users);
+    var user = util.rand(testData.users);
     var books = testData.books;
 
     // setup: add user, add four books, add three copies owned by user (two duplicate)
     before(function(done) {
       // insert Users tuple
-      insertUser(db, user)
+      util.insertUser(db, user)
       // insert four Books tuples
       .then(function() {
         // build chain of Promises
         return books.slice(0, 4).reduce(function(seq, book) {
           return seq.then(function() {
-            return insertBook(db, book);
+            return util.insertBook(db, book);
           });
         }, Promise.resolve());
       })
@@ -278,7 +215,7 @@ describe('db.js', function() {
         // build chain of Promises
         return copies.reduce(function(seq, book) {
           return seq.then(function() {
-            return insertCopy(db, book, user);
+            return util.insertCopy(db, book, user);
           });
         }, Promise.resolve());
       })
@@ -301,8 +238,8 @@ describe('db.js', function() {
 
     // cleanup: delete Users and Books tuples (Copies deletion will cascade)
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(function() {
         done();
       });
@@ -313,16 +250,16 @@ describe('db.js', function() {
 
     var owner = testData.users[0];
     var requester = testData.users[1];
-    var book = rand(testData.books);
+    var book = util.rand(testData.books);
     var ISBN = book.ISBN[13] || book.ISBN[10];
     var copyid;
 
     // setup: create users, book, copy, store copyid for later
     before(function(done) {
-      insertUser(db, owner)
-      .then(insertUser.bind(null, db, requester))
-      .then(insertBook.bind(null, db, book))
-      .then(insertCopy.bind(null, db, book, owner))
+      util.insertUser(db, owner)
+      .then(util.insertUser.bind(null, db, requester))
+      .then(util.insertBook.bind(null, db, book))
+      .then(util.insertCopy.bind(null, db, book, owner))
       .then(function(res) {
         copyid = res[0].copyid;
         done();
@@ -351,8 +288,8 @@ describe('db.js', function() {
 
     // cleanup: delete users and book (copy and request will cascade)
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -361,19 +298,19 @@ describe('db.js', function() {
 
     var owner = testData.users[0];
     var requester = testData.users[1];
-    var book = rand(testData.books);
+    var book = util.rand(testData.books);
     var ISBN = book.ISBN[13] || book.ISBN[10];
     var copyid;
 
     // setup: create users, book, copy, bookrequest, store copyid for later
     before(function(done) {
-      insertUser(db, owner)
-      .then(insertUser.bind(null, db, requester))
-      .then(insertBook.bind(null, db, book))
-      .then(insertCopy.bind(null, db, book, owner))
+      util.insertUser(db, owner)
+      .then(util.insertUser.bind(null, db, requester))
+      .then(util.insertBook.bind(null, db, book))
+      .then(util.insertCopy.bind(null, db, book, owner))
       .then(function(res) {
         copyid = res[0].copyid;
-        return insertBookRequest(db, requester, copyid);
+        return util.insertBookRequest(db, requester, copyid);
       })
       .then(done.bind(null, null));
     });
@@ -396,8 +333,8 @@ describe('db.js', function() {
 
     // cleanup: delete users, book (copy will cascade)
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -405,19 +342,19 @@ describe('db.js', function() {
   describe("#checkoutBook", function() {
     var owner = testData.users[0];
     var requester = testData.users[1];
-    var book = rand(testData.books);
+    var book = util.rand(testData.books);
     var ISBN = book.ISBN[13] || book.ISBN[10];
     var copyid;
 
     // setup: create users, book, copy, bookrequest, store copyid for later
     before(function(done) {
-      insertUser(db, owner)
-      .then(insertUser.bind(null, db, requester))
-      .then(insertBook.bind(null, db, book))
-      .then(insertCopy.bind(null, db, book, owner))
+      util.insertUser(db, owner)
+      .then(util.insertUser.bind(null, db, requester))
+      .then(util.insertBook.bind(null, db, book))
+      .then(util.insertCopy.bind(null, db, book, owner))
       .then(function(res) {
         copyid = res[0].copyid;
-        return insertBookRequest(db, requester, copyid);
+        return util.insertBookRequest(db, requester, copyid);
       })
       .then(done.bind(null, null));
     });
@@ -452,9 +389,9 @@ describe('db.js', function() {
 
     // cleanup: delete borrowing, users, books (copies will cascade)
     after(function(done) {
-      deleteAllBorrowing(db)
-      .then(deleteAllUsers.bind(null, db))
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllBorrowing(db)
+      .then(util.deleteAllUsers.bind(null, db))
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -462,19 +399,19 @@ describe('db.js', function() {
   describe("#checkinBook", function(done) {
     var owner = testData.users[0];
     var borrower = testData.users[1];
-    var book = rand(testData.books);
+    var book = util.rand(testData.books);
     var ISBN = book.ISBN[13] || book.ISBN[10];
     var copyid;
 
     // setup: create users, book, copy, borrowing, store copyid for later
     before(function(done) {
-      insertUser(db, owner)
-      .then(insertUser.bind(null, db, borrower))
-      .then(insertBook.bind(null, db, book))
-      .then(insertCopy.bind(null, db, book, owner))
+      util.insertUser(db, owner)
+      .then(util.insertUser.bind(null, db, borrower))
+      .then(util.insertBook.bind(null, db, book))
+      .then(util.insertCopy.bind(null, db, book, owner))
       .then(function(res) {
         copyid = res[0].copyid;
-        return insertBorrowing(db, borrower, copyid);
+        return util.insertBorrowing(db, borrower, copyid);
       })
       .then(done.bind(null, null));
     });
@@ -497,8 +434,8 @@ describe('db.js', function() {
 
     // cleanup: delete users, books (copies will cascade)
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -525,16 +462,16 @@ describe('db.js', function() {
     before(function(done) {
       // insert Users tuples (chain of Promises)
       users.reduce(function(seq, user) {
-        return seq.then(insertUser.bind(null, db, user));
+        return seq.then(util.insertUser.bind(null, db, user));
       }, Promise.resolve())
       // insert Books tuples
       .then(books.reduce.bind(books, function(seq, book) {
-        return seq.then(insertBook.bind(null, db, book));
+        return seq.then(util.insertBook.bind(null, db, book));
       }, Promise.resolve()))
       // insert Copies tuples
       .then(copies.reduce.bind(copies, function(seq, copy, index) {
         return seq.then(function() {
-          return insertCopy(db, copy.book, copy.owner);
+          return util.insertCopy(db, copy.book, copy.owner);
         })
         .then(function(res) {
           copies[index].copyid = res[0].copyid;
@@ -542,7 +479,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert BookRequests tuples
       .then(requests.reduce.bind(requests, function(seq, request) {
-        return seq.then(insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
+        return seq.then(util.insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -564,8 +501,8 @@ describe('db.js', function() {
 
     // cleanup: delete users, books (copies, book requests will cascade)
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -591,16 +528,16 @@ describe('db.js', function() {
     before(function(done) {
       // insert Users tuples (chain of Promises)
       users.reduce(function(seq, user) {
-        return seq.then(insertUser.bind(null, db, user));
+        return seq.then(util.insertUser.bind(null, db, user));
       }, Promise.resolve())
       // insert Books tuples
       .then(books.reduce.bind(books, function(seq, book) {
-        return seq.then(insertBook.bind(null, db, book));
+        return seq.then(util.insertBook.bind(null, db, book));
       }, Promise.resolve()))
       // insert Copies tuples
       .then(copies.reduce.bind(copies, function(seq, copy, index) {
         return seq.then(function() {
-          return insertCopy(db, copy.book, copy.owner);
+          return util.insertCopy(db, copy.book, copy.owner);
         })
         .then(function(res) {
           copies[index].copyid = res[0].copyid;
@@ -608,7 +545,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert BookRequests tuples
       .then(requests.reduce.bind(requests, function(seq, request) {
-        return seq.then(insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
+        return seq.then(util.insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -630,8 +567,8 @@ describe('db.js', function() {
 
     // cleanup: delete users, books (copies, book requests will cascade)
     after(function(done) {
-      deleteAllUsers(db)
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -658,16 +595,16 @@ describe('db.js', function() {
     before(function(done) {
       // insert Users tuples (chain of Promises)
       users.reduce(function(seq, user) {
-        return seq.then(insertUser.bind(null, db, user));
+        return seq.then(util.insertUser.bind(null, db, user));
       }, Promise.resolve())
       // insert Books tuples
       .then(books.reduce.bind(books, function(seq, book) {
-        return seq.then(insertBook.bind(null, db, book));
+        return seq.then(util.insertBook.bind(null, db, book));
       }, Promise.resolve()))
       // insert Copies tuples
       .then(copies.reduce.bind(copies, function(seq, copy, index) {
         return seq.then(function() {
-          return insertCopy(db, copy.book, copy.owner);
+          return util.insertCopy(db, copy.book, copy.owner);
         })
         .then(function(res) {
           copies[index].copyid = res[0].copyid;
@@ -675,7 +612,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert Borrowing tuples
       .then(borrowing.reduce.bind(borrowing, function(seq, borrowing) {
-        return seq.then(insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid));
+        return seq.then(util.insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -697,9 +634,9 @@ describe('db.js', function() {
 
     // cleanup: delete borrowing, users, books (copies will cascade)
     after(function(done) {
-      deleteAllBorrowing(db)
-      .then(deleteAllUsers.bind(null, db))
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllBorrowing(db)
+      .then(util.deleteAllUsers.bind(null, db))
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -725,16 +662,16 @@ describe('db.js', function() {
     before(function(done) {
       // insert Users tuples (chain of Promises)
       users.reduce(function(seq, user) {
-        return seq.then(insertUser.bind(null, db, user));
+        return seq.then(util.insertUser.bind(null, db, user));
       }, Promise.resolve())
       // insert Books tuples
       .then(books.reduce.bind(books, function(seq, book) {
-        return seq.then(insertBook.bind(null, db, book));
+        return seq.then(util.insertBook.bind(null, db, book));
       }, Promise.resolve()))
       // insert Copies tuples
       .then(copies.reduce.bind(copies, function(seq, copy, index) {
         return seq.then(function() {
-          return insertCopy(db, copy.book, copy.owner);
+          return util.insertCopy(db, copy.book, copy.owner);
         })
         .then(function(res) {
           copies[index].copyid = res[0].copyid;
@@ -742,7 +679,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert Borrowing tuples
       .then(borrowing.reduce.bind(borrowing, function(seq, borrowing) {
-        return seq.then(insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid));
+        return seq.then(util.insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -764,9 +701,9 @@ describe('db.js', function() {
 
     // cleanup: delete borrowing, users, books (copies will cascade)
     after(function(done) {
-      deleteAllBorrowing(db)
-      .then(deleteAllUsers.bind(null, db))
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllBorrowing(db)
+      .then(util.deleteAllUsers.bind(null, db))
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });
@@ -791,16 +728,16 @@ describe('db.js', function() {
     before(function(done) {
       // insert Users tuples (chain of Promises)
       users.reduce(function(seq, user) {
-        return seq.then(insertUser.bind(null, db, user));
+        return seq.then(util.insertUser.bind(null, db, user));
       }, Promise.resolve())
       // insert Books tuples
       .then(books.reduce.bind(books, function(seq, book) {
-        return seq.then(insertBook.bind(null, db, book));
+        return seq.then(util.insertBook.bind(null, db, book));
       }, Promise.resolve()))
       // insert Copies tuples
       .then(copies.reduce.bind(copies, function(seq, copy, index) {
         return seq.then(function() {
-          return insertCopy(db, copy.book, copy.owner);
+          return util.insertCopy(db, copy.book, copy.owner);
         })
         .then(function(res) {
           copies[index].copyid = res[0].copyid;
@@ -808,11 +745,11 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert Book Request tuple
       .then(function() {
-        return insertBookRequest(db, request.requester, request.copy.copyid);
+        return util.insertBookRequest(db, request.requester, request.copy.copyid);
       })
       // insert Borrowing tuple
       .then(function() {
-        return insertBorrowing(db, borrowing.borrower, borrowing.copy.copyid);
+        return util.insertBorrowing(db, borrowing.borrower, borrowing.copy.copyid);
       })
       .then(done.bind(null, null));
     });
@@ -843,9 +780,9 @@ describe('db.js', function() {
 
     // delete Borrowing, Users, Books (Copies, Book Request will cascade)
     after(function(done) {
-      deleteAllBorrowing(db)
-      .then(deleteAllUsers.bind(null, db))
-      .then(deleteAllBooks.bind(null, db))
+      util.deleteAllBorrowing(db)
+      .then(util.deleteAllUsers.bind(null, db))
+      .then(util.deleteAllBooks.bind(null, db))
       .then(done.bind(null, null));
     });
   });

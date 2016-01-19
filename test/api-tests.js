@@ -1,105 +1,120 @@
 /* jshint expr: true */
 
+var cp   = require("child_process");
+var spawn = cp.spawn;
 var chai = require("chai");
 chai.use(require("chai-http"));
 var expect = chai.expect;
-var port = process.env.PORT || 3000;
-var url = "localhost:" + port;
-// var app = require("../server");
 
 var DB       = require('../lib/db.js');
-var LOGIN    = require('./login.json');
+var Redis    = require('ioredis');
+var login    = require('./login.json');
+var util     = require('../lib/test-util.js');
 var testData = require('../lib/test-data.js');
 
-var db; // database instance
+var PG_TEST_URI = 'postgres://' +
+                  login.TEST_USER + ':' +
+                  login.TEST_USER_PW +
+                  '@' + login.ADDRESS + '/' +
+                  login.TEST_DB;
+var REDIS_TEST_URI = login.REDIS_TEST_URI;
+var PORT = process.env.PORT || 3000;
+var url = "localhost:" + PORT;
 
-// describe("/api/self", function() {
+var app;
+// var app = require("../server.js");
 
-//   // get database connection instance
-//   before(function() {
-//     db = new DB(PG_TEST_URI);
-//   });
+// database instances
+var db;
+var redis;
 
-//   describe("GET", function() {
+describe("self-routes.js", function() {
 
-//     before(function(done) {
-//       testUsers[0].books.push(testBooks[3]._id);
-//       testUsers[0].borrowing.push(testBooks[1]._id);
-//       testUsers[0].requests.push(testBooks[2]._id);
-//       User.create(testUsers[0], function(err, data) {
-//         if (!err) {
-//           testBooks[3].owner = testUsers[0]._id;
-//           Book.create(testBooks[3], function(err, data) {
-//             testBooks[1].owner = testUsers[1]._id;
-//             Book.create(testBooks[1], function(err, data) {
-//               testBooks[2].owner = testUsers[1]._id;
-//               Book.create(testBooks[2], function(err, data) {
-//                 done();
-//               });
-//             });
-//           });
-//         }
-//       });
-//     });
+  before(function(done) {
+    // get database connection instances
+    db    = new DB(PG_TEST_URI);
+    redis = new Redis(REDIS_TEST_URI);
+    // run server as child process
+    app = spawn("node", ["server.js"],
+      {
+        env: {
+          PATH: process.env.PATH,
+          PORT: PORT,
+          PG_URI: PG_TEST_URI,
+          REDIS_URI: REDIS_TEST_URI
+        }
+      }
+    );
+    // wait for server to start before proceeding
+    app.stdout.on("data", function(data) {
+      var out = data.toString();
+      // console.log("data:", out);
+      if (out === "Server ready\n") done();
+    });
+  });
 
-//     it("should return an existent User as JSON, fully populated", function(done) {
-//       chai.request(url)
-//         .get("/api/self")
-//         .set("Authorization", "Bearer " + testUsers[0].access_token)
-//         .end(function(err, res) {
-//           expect(res).to.have.status(200);
-//           expect(res).to.be.json;
-//           expect(res.body._id).to.eql(testUsers[0]._id);
-//           expect(res.body.books.length).to.eql(1);
-//           expect(res.body.borrowing.length).to.eql(1);
-//           expect(res.body.requests.length).to.eql(1);
-//           done();
-//         });
-//     });
+  describe("/api/self", function() {
 
-//     after(function(done) {
-//       User.findByIdAndRemove(testUsers[0]._id, function(err, data) {
-//         if (!err) done();
-//       });
-//     });
 
-//     after(function(done) {
-//       Book.remove({$or: [{_id: testBooks[3]._id},
-//                          {_id: testBooks[1]._id},
-//                          {_id: testBooks[2]._id}]
-//       }, function(err) {
-//         if (!err) done();
-//       });
-//     });
-//   });
+    describe("GET", function() {
 
-//   describe("DELETE", function() {
+      // before(function(done) {
 
-//     before(function(done) {
-//       User.create(testUsers[0], function(err, data) {
-//         if (!err) done();
-//       });
-//     });
+      // });
 
-//     it("should delete a User and all of their Books from the database, and return the User as JSON", function(done) {
-//       chai.request(url)
-//         .del("/api/self")
-//         .set("Authorization", "Bearer " + testUsers[0].access_token)
-//         .end(function(err, res) {
-//           expect(res).to.have.status(200);
-//           User.findOne({_id: testUsers[0]._id}, function(err, userDoc) {
-//             expect(userDoc).to.be.null;
-//             Book.find({owner: testUsers[0]._id}, function(err, bookDocs) {
-//               expect(bookDocs.length).to.eql(0);
-//               expect(res.body._id).to.eql(testUsers[0]._id);
-//               expect(res).to.be.json;
-//               done();
-//             });
-//           });
-//         });
-//     });
-//   });
-// });
+      it("should return an existent User as JSON, fully populated", function(done) {
+        chai.request(url)
+          .get("/api/self")
+          // .set("Authorization", "Bearer " + testUsers[0].access_token)
+          .end(function(err, res) {
+            expect(err).to.be.null;
+            expect(res).to.be.json;
+            expect(res).to.have.status(200);
+            // expect(res.body._id).to.eql(testUsers[0]._id);
+            // expect(res.body.books.length).to.eql(1);
+            // expect(res.body.borrowing.length).to.eql(1);
+            // expect(res.body.requests.length).to.eql(1);
+            done();
+          });
+      });
+
+      // after(function(done) {
+
+      // });
+    });
+
+    describe("DELETE", function() {
+
+      var user = util.rand(testData.users);
+
+      // setup: create the user
+      // before(function(done) {
+      //   util.insertUser(db, user)
+      //   .then(done.bind(null, null));
+      // });
+
+      it("should return a response object with status 200", function(done) {
+        chai.request(url)
+        .del("/api/self")
+        // .set("Authorization", "Bearer " + testUsers[0].access_token)
+        .end(function(err, res) {
+          // console.error(err);
+          expect(err).to.be.null;
+          expect(res).to.be.json;
+          expect(res).to.have.status(200);
+          done();
+        });
+      });
+    });
+
+  });
+
+  after(function() {
+    redis.disconnect();
+    db.disconnect();
+    app.kill();
+  });
+});
 
 // describe("/api/self/books", function() {
 

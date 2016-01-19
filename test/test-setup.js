@@ -11,15 +11,11 @@ var PG_ADMIN_URI  = 'postgres://' +
                     '@' + LOGIN.ADDRESS + '/' +
                     LOGIN.DEFAULT_DB;
 
-console.log(PG_ADMIN_URI);
-
 var PG_TEST_URI = 'postgres://' +
                   LOGIN.TEST_USER + ':' +
                   LOGIN.TEST_USER_PW +
                   '@' + LOGIN.ADDRESS + '/' +
                   LOGIN.TEST_DB;
-
-console.log(PG_TEST_URI);
 
 // database instances
 var db_admin;
