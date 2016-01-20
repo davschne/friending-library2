@@ -4,7 +4,7 @@
   "description": "Allowing users to harness the power of social media to find great books to read, Friending Library facilitates borrowing and lending books within your social circle.",
   "main": "server.js",
   "scripts": {
-    "test": "mocha test/test-setup.js test/test-db-util.js test/api-tests.js test/test-cleanup.js"
+    "test": "mocha test/setup-tests.js test/db-tests.js test/api-tests.js test/cleanup-tests.js"
   },
   "repository": {
     "type": "git",

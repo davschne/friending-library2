@@ -5,7 +5,7 @@ var expect = chai.expect;
 var Promise = require("bluebird");
 
 var DB       = require('../lib/db.js');
-var LOGIN    = require('./login.json');
+var LOGIN    = require('../lib/login.json');
 var util     = require('../lib/test-util.js');
 var testData = require('../lib/test-data.js');
 

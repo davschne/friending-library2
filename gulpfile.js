@@ -73,10 +73,10 @@ gulp.task('default', ['build']);
 
 gulp.task("test", function() {
   return gulp.src([
-      "./test/test-setup.js",
-      "./test/test-db-util.js",
-      "./test/api-test.js",
-      "./test/test-cleanup.js"
+      "./test/setup-tests.js",
+      "./test/db-tests.js",
+      "./test/api-tests.js",
+      "./test/cleanup-tests.js"
     ])
     .pipe(mocha(/*{"reporter" : "nyan"}*/));
 });

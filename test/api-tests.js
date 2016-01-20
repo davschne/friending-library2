@@ -8,7 +8,7 @@ var expect = chai.expect;
 
 var DB       = require('../lib/db.js');
 var Redis    = require('ioredis');
-var login    = require('./login.json');
+var login    = require('../lib/login.json');
 var util     = require('../lib/test-util.js');
 var testData = require('../lib/test-data.js');
 
@@ -137,7 +137,37 @@ describe("self-routes.js", function() {
         .then(done.bind(null, null));
       });
     });
+  });
 
+  xdescribe("/api/self/books", function() {
+
+    describe("GET", function() {
+
+      // should this return books that are borrowed or requested?
+
+      before(function(done) {
+
+      });
+
+      it("should return an array of the user's books as JSON with 'request' and 'borrower' fields populated", function(done) {
+        chai.request(url)
+        .get("/api/self/books")
+        .set("Authorization", "Bearer " + testUsers[0].access_token)
+        .end(function(err, res) {
+          expect(err).to.be.null;
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an("array");
+          expect(res.body[0].borrower.displayName).to.equal(testUsers[1].displayName);
+          expect(res.body[0].request.displayName).to.equal(testUsers[1].displayName);
+          done();
+        });
+      });
+
+      after(function(done) {
+
+      });
+    });
   });
 
   after(function() {
@@ -147,52 +177,3 @@ describe("self-routes.js", function() {
   });
 });
 
-// describe("/api/self/books", function() {
-
-//   before(function(done) {
-//     User.create(testUsers[0])
-//       .then(function() {
-//         return User.create(testUsers[1]);
-//       }, function(err) { throw err; })
-//       .then(function() {
-//         testBooks[3].owner = testUsers[0]._id;
-//         testBooks[3].borrower = testUsers[1]._id;
-//         testBooks[3].request = testUsers[1]._id;
-//         return Book.create(testBooks[3]);
-//       }, function(err) { throw err; })
-//       .then(function() {
-//         done();
-//       }, function(err) { throw err; });
-//     });
-
-//   describe("GET", function() {
-//     it("should return an array of the user's books as JSON with 'request' and 'borrower' fields populated", function(done) {
-//       chai.request(url)
-//         .get("/api/self/books")
-//         .set("Authorization", "Bearer " + testUsers[0].access_token)
-//         .end(function(err, res) {
-//           expect(err).to.be.null;
-//           expect(res).to.have.status(200);
-//           expect(res).to.be.json;
-//           expect(res.body).to.be.an("array");
-//           expect(res.body[0].borrower.displayName).to.equal(testUsers[1].displayName);
-//           expect(res.body[0].request.displayName).to.equal(testUsers[1].displayName);
-//           done();
-//         });
-//       });
-//     });
-
-//   after(function(done) {
-//     User.findByIdAndRemove(testUsers[0]._id)
-//       .exec()
-//       .then(function() {
-//         return User.findByIdAndRemove(testUsers[1]._id);
-//       }, function(err) { throw err; })
-//       .then(function() {
-//         return Book.remove({owner: testUsers[0]._id});
-//       }, function(err) { throw err; })
-//       .then(function() {
-//         done();
-//       }, function(err) { throw err; });
-//   });
-// });

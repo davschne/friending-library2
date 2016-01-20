@@ -4,7 +4,7 @@ var expect = chai.expect;
 var DB = require('../lib/db.js');
 
 var DB       = require('../lib/db.js');
-var LOGIN    = require('./login.json');
+var LOGIN    = require('../lib/login.json');
 var testData = require('../lib/test-data.js');
 
 var PG_ADMIN_URI  = 'postgres://' +
