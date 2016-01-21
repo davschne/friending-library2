@@ -74,4 +74,16 @@ module.exports = function(router, db, redis) {
       handle[500](err, res);
     });
   });
+
+  router.route("/books_borrowed")
+  .get(function(req, res) {
+    console.log("Received GET request at /api/self/books_borrowed");
+    db.getBorrowedBooks(req.user.uid)
+    .then(function(db_res) {
+      res.json(db_res);
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
+  })
 };
