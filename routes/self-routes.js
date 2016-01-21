@@ -4,7 +4,7 @@ module.exports = function(router, db, redis) {
   router.route("/")
   .get(function(req, res) {
     console.log("Received GET request at /api/self");
-    res.json({msg: "not implemented"});
+    res.json({message: "not implemented"});
   })
   .delete(function(req, res) {
     console.log("Received DELETE request at /api/self");
@@ -16,7 +16,7 @@ module.exports = function(router, db, redis) {
       }
       else return redis.del(req.user.token)
         .then(function() {
-          res.json({msg: "user deleted"});
+          res.json({message: "user deleted"});
         });
     })
     .catch(function(err) {

@@ -54,6 +54,9 @@ describe("self-routes.js", function() {
       if (LOG_SERVER_OUTPUT) console.log("server.js:", out);
       if (out === "Server ready\n") done();
     });
+    app.stderr.on("data", function(data) {
+      if (LOG_SERVER_OUTPUT) console.error("server.js:", data.toString());
+    });
   });
 
   describe("/api/self", function() {
@@ -458,7 +461,7 @@ describe("self-routes.js", function() {
     });
   });
 
-  describe("/api/self/books_borrowed", function() {
+  describe("/api/self/books_borrowed GET", function() {
 
     var users = testData.users.slice(0, 2);
     var books = testData.books.slice(0, 2);
@@ -535,6 +538,99 @@ describe("self-routes.js", function() {
       .then(done.bind(null, null));
     });
   });
+});
+
+describe("books-routes.js", function() {
+
+  describe("/api/books POST", function() {
+
+    var user = util.rand(testData.users);
+    var book = util.rand(testData.books);
+
+    before(function(done) {
+      // insert user
+      util.insertUser(db, user)
+      // set access token in Redis
+      .then(function() {
+        return redis.set(user.access_token, user.uid);
+      })
+      .then(done.bind(null, null));
+    });
+
+    it("should return a JSON response object containing the copyid of the inserted copy as JSON with status 200", function(done) {
+      chai.request(url)
+      .post("/api/books")
+      .set("Authorization", "Bearer " + user.access_token)
+      .type("json")
+      .send(book)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an("array");
+        expect(res.body).to.have.length(1);
+        expect(res.body[0]).to.have.property("copyid");
+        done();
+      });
+    });
+
+    after(function(done) {
+      // delete users and books (copy will cascade), delete access token
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
+      .then(function() {
+        return redis.del(user.access_token);
+      })
+      .then(done.bind(null, null));
+    });
+  });
+
+  describe("/api/books/:copyid DELETE", function() {
+
+    var user = util.rand(testData.users);
+    var book = util.rand(testData.books);
+    var copyid;
+
+    before(function(done) {
+      // insert user
+      util.insertUser(db, user)
+      // set access token in Redis
+      .then(function() {
+        return redis.set(user.access_token, user.uid);
+      })
+      // insert book
+      .then(util.insertBook.bind(null, db, book))
+      // insert copy
+      .then(util.insertCopy.bind(null, db, book, user))
+      // store copyid
+      .then(function(res) {
+        copyid = res[0].copyid;
+      })
+      .then(done.bind(null, null));
+    });
+
+    it("should return a JSON response object with status 200", function(done) {
+      chai.request(url)
+      .del("/api/books/" + copyid)
+      .set("Authorization", "Bearer " + user.access_token)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.be.json;
+        expect(res).to.have.status(200);
+        done();
+      });
+    });
+
+    after(function(done) {
+      // delete users and books, delete access token
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
+      .then(function() {
+        return redis.del(user.access_token);
+      })
+      .then(done.bind(null, null));
+    });
+  });
 
   after(function() {
     redis.disconnect();
@@ -542,4 +638,3 @@ describe("self-routes.js", function() {
     app.kill();
   });
 });
-
