@@ -267,7 +267,82 @@ describe("self-routes.js", function() {
     });
   });
 
-  // xdescribe("/api/self/book_requests/outgoing");
+  describe("/api/self/book_requests/outgoing GET", function() {
+
+    var users = testData.users.slice(0, 2);
+    var books = testData.books.slice(0, 2);
+    var copies = [];
+    books.forEach(function(book, index) {
+      copies.push({ book: books[index], owner: users[0]})
+    });
+
+    before(function(done) {
+      // insert users
+      users.reduce(function(seq, user) {
+        return seq.then(util.insertUser.bind(null, db, user));
+      }, Promise.resolve())
+      // insert access token for users[1]
+      .then(function() {
+        return redis.set(users[1].access_token, users[1].uid);
+      })
+      // insert books
+      .then(books.reduce.bind(books, function(seq, book) {
+        return seq.then(util.insertBook.bind(null, db, book));
+      }, Promise.resolve()))
+      // insert copies
+      .then(copies.reduce.bind(copies, function(seq, copy, index) {
+        return seq.then(util.insertCopy.bind(null, db, copy.book, copy.owner))
+        // store copyid and insert book request
+        .then(function(res) {
+          var copyid = res[0].copyid;
+          copies[index].copyid = copyid;
+          return util.insertBookRequest(db, users[1], copyid);
+        });
+      }, Promise.resolve()))
+      .then(done.bind(null, null));
+    });
+
+    it("should return an array of books requested by the user as JSON with status 200", function(done) {
+      chai.request(url)
+        .get("/api/self/book_requests/outgoing")
+        .set("Authorization", "Bearer " + users[1].access_token)
+        .end(function(err, res) {
+          expect(err).to.be.null;
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an("array");
+          expect(res.body).to.have.length(2);
+          res.body.forEach(function(record) {
+            expect(record).to.contain.keys(
+              "isbn",
+              "title",
+              "subtitle",
+              "authors",
+              "categories",
+              "publisher",
+              "publisheddate",
+              "description",
+              "pagecount",
+              "language",
+              "imagelink",
+              "imagelinksmall",
+              "copyid",
+              "ownerid",
+              "owner_display_name",
+              "request_date"
+            );
+          });
+          done();
+        });
+    });
+
+    after(function(done) {
+      redis.del(users[1].access_token)
+      .then(util.deleteAllUsers.bind(null, db))
+      .then(util.deleteAllBooks.bind(null, db))
+      .then(done.bind(null, null));
+    });
+  });
   // xdescribe("/api/self/books_lent");
   // xdescribe("/api/self/books_borrowed");
 

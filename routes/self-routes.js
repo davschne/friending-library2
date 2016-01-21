@@ -47,4 +47,16 @@ module.exports = function(router, db, redis) {
       handle[500](err, res);
     });
   });
+
+  router.route("/book_requests/outgoing")
+  .get(function(req, res) {
+    console.log("Received GET request at /api/self/book_requests/outgoing");
+    db.getOutgoingBookRequests(req.user.uid)
+    .then(function(db_res) {
+      res.json(db_res);
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
+  })
 };

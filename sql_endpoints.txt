@@ -32,9 +32,9 @@
 
   /                    DELETE : db.deleteUser()
 
-  /book_requests_incoming GET : db.getIncomingBookRequests()
+  /book_requests/incoming GET : db.getIncomingBookRequests()
 
-  /book_requests_outgoing GET : db.getOutgoingBookRequests()
+  /book_requests/outgoing GET : db.getOutgoingBookRequests()
 
   /books_lent             GET : db.getLentBooks()
 
