@@ -20,7 +20,10 @@ module.exports = function(router, db, redis) {
         });
     })
     .catch(function(err) {
-      handle[500](err, res);
+      if (err.cause && err.cause.message == 'update or delete on table "users" violates foreign key constraint "borrowing_borrowerid_fkey" on table "borrowing"') {
+        handle[403](err, res);
+      }
+      else handle[500](err, res);
     });
   });
 

@@ -1,6 +1,6 @@
 /* jshint expr: true */
 
-var LOG_SERVER_OUTPUT = false; // enable logging of child process?
+var LOG_SERVER_OUTPUT = true; // enable logging of child process?
 
 var cp   = require("child_process");
 var spawn = cp.spawn;
@@ -60,17 +60,32 @@ describe("self-routes.js", function() {
 
     describe("DELETE", function() {
 
-      var user1 = testData.users[0];
-      var user2 = testData.users[1];
+      var users = testData.users;
+      var book = util.rand(testData.books);
+      var copy = { book: book, owner: users[1] }
 
       // setup: create the user, set access_tokens in Redis
       before(function(done) {
-        util.insertUser(db, user1)
+        // insert users 0, 1, 2
+        users.slice(0, 3).reduce(function(seq, user) {
+          return seq.then(util.insertUser.bind(null, db, user));
+        }, Promise.resolve())
+        // set access tokens in Redis for all users
         .then(function() {
-          return redis.set(user1.access_token, user1.uid);
+          return users.reduce(function(seq, user) {
+            return seq.then(function() {
+              return redis.set(user.access_token, user.uid);
+            });
+          }, Promise.resolve());
         })
-        .then(function() {
-          return redis.set(user2.access_token, user2.uid);
+        // insert book
+        .then(util.insertBook.bind(null, db, book))
+        // insert copy
+        .then(util.insertCopy.bind(null, db, copy.book, copy.owner))
+        // store copyid and insert Borrowing (users[2] borrowing)
+        .then(function(res) {
+          copy.copyid = res[0].copyid;
+          return util.insertBorrowing(db, users[2], copy.copyid);
         })
         .then(done.bind(null, null));
       });
@@ -80,7 +95,7 @@ describe("self-routes.js", function() {
         it("should return a response object with status 200", function(done) {
           chai.request(url)
           .del("/api/self")
-          .set("Authorization", "Bearer " + user1.access_token)
+          .set("Authorization", "Bearer " + users[0].access_token)
           .end(function(err, res) {
             expect(err).to.be.null;
             expect(res).to.be.json;
@@ -90,7 +105,7 @@ describe("self-routes.js", function() {
         });
 
         it("should delete the user's access token", function(done) {
-          redis.get(user1.access_token)
+          redis.get(users[0].access_token)
           .then(function(res) {
             expect(res).to.be.null;
             done();
@@ -98,22 +113,43 @@ describe("self-routes.js", function() {
         });
       });
 
-      describe("on failure (user not found):", function() {
-        it("should return a response object with status 404", function(done) {
-          chai.request(url)
-          .del("/api/self")
-          .set("Authorization", "Bearer " + user2.access_token)
-          .end(function(err, res) {
-            expect(err).to.be.null
-            expect(res).to.be.json;
-            expect(res).to.have.status(404);
-            done();
+      describe("on failure:", function() {
+        describe("(user not found):", function() {
+          it("should return a response object with status 404", function(done) {
+            chai.request(url)
+            .del("/api/self")
+            .set("Authorization", "Bearer " + users[3].access_token)
+            .end(function(err, res) {
+              expect(err).to.be.null
+              expect(res).to.be.json;
+              expect(res).to.have.status(404);
+              done();
+            });
+          });
+        });
+        describe("(user currently borrowing one or more books):", function() {
+          it("should return a response object with status 403", function(done) {
+            chai.request(url)
+            .del("/api/self")
+            .set("Authorization", "Bearer " + users[2].access_token)
+            .end(function(err, res) {
+              // console.log(res);
+              expect(err).to.be.null
+              expect(res).to.be.json;
+              expect(res).to.have.status(403);
+              done();
+            });
           });
         });
       });
 
       after(function(done) {
-        redis.del(user2.access_token)
+        users.slice(1, 4).reduce(function(seq, user) {
+          return redis.del(user.access_token);
+        }, Promise.resolve())
+        .then(util.deleteAllBorrowing.bind(null, db))
+        .then(util.deleteAllUsers.bind(null, db))
+        .then(util.deleteAllBooks.bind(null, db))
         .then(done.bind(null, null));
       });
     });
