@@ -192,6 +192,11 @@ describe("self-routes.js", function() {
     });
   });
 
+  xdescribe("/api/self/book_requests_incoming");
+  xdescribe("/api/self/book_requests_outgoing");
+  xdescribe("/api/self/books_lent");
+  xdescribe("/api/self/books_borrowed");
+
   after(function() {
     redis.disconnect();
     db.disconnect();
