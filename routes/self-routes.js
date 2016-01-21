@@ -27,7 +27,13 @@ module.exports = function(router, db, redis) {
   router.route("/books")
   .get(function(req, res) {
     console.log("Received GET request at /api/self/books");
-    var user = req.user;
-    res.json({msg: "okay"});
+    db.getOwnBooks(req.user.uid)
+    .then(function(db_res) {
+      console.log(db_res);
+      res.json(db_res);
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
   });
 };

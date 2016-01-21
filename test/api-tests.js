@@ -55,29 +55,6 @@ describe("self-routes.js", function() {
 
   describe("/api/self", function() {
 
-    xdescribe("GET", function() {
-
-      // before(function(done) {});
-
-      it("should return an existent User as JSON, fully populated", function(done) {
-        chai.request(url)
-          .get("/api/self")
-          // .set("Authorization", "Bearer " + testUsers[0].access_token)
-          .end(function(err, res) {
-            expect(err).to.be.null;
-            expect(res).to.be.json;
-            expect(res).to.have.status(200);
-            // expect(res.body._id).to.eql(testUsers[0]._id);
-            // expect(res.body.books.length).to.eql(1);
-            // expect(res.body.borrowing.length).to.eql(1);
-            // expect(res.body.requests.length).to.eql(1);
-            done();
-          });
-      });
-
-      // after(function(done) {});
-    });
-
     describe("DELETE", function() {
 
       var user1 = testData.users[0];
@@ -139,33 +116,78 @@ describe("self-routes.js", function() {
     });
   });
 
-  xdescribe("/api/self/books", function() {
+  describe("/api/self/books", function() {
 
     describe("GET", function() {
 
-      // should this return books that are borrowed or requested?
-
-      before(function(done) {
-
+      var user = testData.users[0];
+      var books = testData.books;
+      var copies = [];
+      books.forEach(function(book, index) {
+        copies.push({ book: books[index] });
       });
 
-      it("should return an array of the user's books as JSON with 'request' and 'borrower' fields populated", function(done) {
-        chai.request(url)
-        .get("/api/self/books")
-        .set("Authorization", "Bearer " + testUsers[0].access_token)
-        .end(function(err, res) {
-          expect(err).to.be.null;
-          expect(res).to.have.status(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an("array");
-          expect(res.body[0].borrower.displayName).to.equal(testUsers[1].displayName);
-          expect(res.body[0].request.displayName).to.equal(testUsers[1].displayName);
-          done();
+      before(function(done) {
+        // insert user
+        util.insertUser(db, user)
+        // set access tokens
+        .then(function() {
+          return redis.set(user.access_token, user.uid);
+        })
+        // insert books
+        .then(books.reduce.bind(books, function(seq, book) {
+          return seq.then(util.insertBook.bind(null, db, book));
+        }, Promise.resolve()))
+        // insert copies
+        .then(copies.reduce.bind(copies, function(seq, copy, index) {
+          return seq.then(util.insertCopy.bind(null, db, copy.book, user))
+          .then(function(res) {
+            copies[index].copyid = res[0].copyid;
+          });
+        }, Promise.resolve()))
+        .then(done.bind(null, null));
+      });
+
+      describe("on success:", function() {
+        it("should return an array of the user's books as JSON with status 200", function(done) {
+          chai.request(url)
+          .get("/api/self/books")
+          .set("Authorization", "Bearer " + user.access_token)
+          .end(function(err, res) {
+            expect(err).to.be.null;
+            expect(res).to.have.status(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an("array");
+            expect(res.body).to.have.length(4);
+            res.body.forEach(function(record) {
+              expect(record).to.contain.keys(
+                "isbn",
+                "title",
+                "subtitle",
+                "authors",
+                "categories",
+                "publisher",
+                "publisheddate",
+                "description",
+                "pagecount",
+                "language",
+                "imagelink",
+                "imagelinksmall",
+                "copyids"
+              );
+            });
+            done();
+          });
         });
       });
 
       after(function(done) {
-
+        util.deleteAllUsers(db)
+        .then(util.deleteAllBooks.bind(null, db))
+        .then(function() {
+          redis.del(user.access_token);
+        })
+        .then(done.bind(null, null));
       });
     });
   });
