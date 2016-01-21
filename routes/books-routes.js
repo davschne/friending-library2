@@ -46,6 +46,12 @@ module.exports = function(router, db) {
 
   router.get("/available", function(req, res) {
     console.log("Received GET request at /api/books/available");
-
+    db.getAvailableBooks(req.user.uid)
+    .then(function(db_res) {
+      res.json(db_res);
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
   });
 };

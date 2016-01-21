@@ -632,6 +632,73 @@ describe("books-routes.js", function() {
     });
   });
 
+  describe("/api/books/available GET", function() {
+
+    var users = testData.users;
+    var books = testData.books;
+
+    before(function(done) {
+      // insert users
+      util.insertUser(db, users[0])
+      .then(util.insertUser.bind(null, db, users[1]))
+      // set access token in Redis for users[0]
+      .then(function() {
+        return redis.set(users[0].access_token, users[0].uid);
+      })
+      // insert books and copies
+      .then(function() {
+        return books.reduce(function(seq, book) {
+          return seq.then(util.insertBook.bind(null, db, book))
+            .then(util.insertCopy.bind(null, db, book, users[1]));
+        }, Promise.resolve());
+      })
+      .then(done.bind(null, null));
+    });
+
+    it("should return a JSON array of books available to be borrowed with status 200", function(done) {
+      chai.request(url)
+      .get("/api/books/available")
+      .set("Authorization", "Bearer " + users[0].access_token)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an("array");
+        expect(res.body).to.have.length(4);
+        res.body.forEach(function(record) {
+          expect(record).to.contain.keys(
+            "isbn",
+            "title",
+            "subtitle",
+            "authors",
+            "categories",
+            "publisher",
+            "publisheddate",
+            "description",
+            "pagecount",
+            "language",
+            "imagelink",
+            "imagelinksmall",
+            "copyid",
+            "ownerid",
+            "owner_display_name"
+          );
+        });
+        done();
+      });
+    });
+
+    after(function(done) {
+      // delete users, books (copies will cascade), delete access token
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
+      .then(function() {
+        return redis.del(users[0].access_token);
+      })
+      .then(done.bind(null, null));
+    });
+  });
+
   after(function() {
     redis.disconnect();
     db.disconnect();
