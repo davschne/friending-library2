@@ -1,5 +1,7 @@
 /* jshint expr: true */
 
+var LOG_SERVER_OUTPUT = false; // enable logging of child process?
+
 var cp   = require("child_process");
 var spawn = cp.spawn;
 var chai = require("chai");
@@ -48,7 +50,8 @@ describe("self-routes.js", function() {
     // wait for server to start before proceeding
     app.stdout.on("data", function(data) {
       var out = data.toString();
-      // console.log("server.js:", out);            // PRINT STDOUT
+      // PRINT STDOUT
+      if (LOG_SERVER_OUTPUT) console.log("server.js:", out);
       if (out === "Server ready\n") done();
     });
   });
@@ -116,86 +119,157 @@ describe("self-routes.js", function() {
     });
   });
 
-  describe("/api/self/books", function() {
+  describe("/api/self/books GET", function() {
 
-    describe("GET", function() {
+    var user = testData.users[0];
+    var books = testData.books;
+    var copies = [];
+    books.forEach(function(book, index) {
+      copies.push({ book: books[index] });
+    });
 
-      var user = testData.users[0];
-      var books = testData.books;
-      var copies = [];
-      books.forEach(function(book, index) {
-        copies.push({ book: books[index] });
-      });
-
-      before(function(done) {
-        // insert user
-        util.insertUser(db, user)
-        // set access tokens
-        .then(function() {
-          return redis.set(user.access_token, user.uid);
-        })
-        // insert books
-        .then(books.reduce.bind(books, function(seq, book) {
-          return seq.then(util.insertBook.bind(null, db, book));
-        }, Promise.resolve()))
-        // insert copies
-        .then(copies.reduce.bind(copies, function(seq, copy, index) {
-          return seq.then(util.insertCopy.bind(null, db, copy.book, user))
-          .then(function(res) {
-            copies[index].copyid = res[0].copyid;
-          });
-        }, Promise.resolve()))
-        .then(done.bind(null, null));
-      });
-
-      describe("on success:", function() {
-        it("should return an array of the user's books as JSON with status 200", function(done) {
-          chai.request(url)
-          .get("/api/self/books")
-          .set("Authorization", "Bearer " + user.access_token)
-          .end(function(err, res) {
-            expect(err).to.be.null;
-            expect(res).to.have.status(200);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an("array");
-            expect(res.body).to.have.length(4);
-            res.body.forEach(function(record) {
-              expect(record).to.contain.keys(
-                "isbn",
-                "title",
-                "subtitle",
-                "authors",
-                "categories",
-                "publisher",
-                "publisheddate",
-                "description",
-                "pagecount",
-                "language",
-                "imagelink",
-                "imagelinksmall",
-                "copyids"
-              );
-            });
-            done();
-          });
+    before(function(done) {
+      // insert user
+      util.insertUser(db, user)
+      // set access tokens
+      .then(function() {
+        return redis.set(user.access_token, user.uid);
+      })
+      // insert books
+      .then(books.reduce.bind(books, function(seq, book) {
+        return seq.then(util.insertBook.bind(null, db, book));
+      }, Promise.resolve()))
+      // insert copies
+      .then(copies.reduce.bind(copies, function(seq, copy, index) {
+        return seq.then(util.insertCopy.bind(null, db, copy.book, user))
+        .then(function(res) {
+          copies[index].copyid = res[0].copyid;
         });
-      });
+      }, Promise.resolve()))
+      .then(done.bind(null, null));
+    });
 
-      after(function(done) {
-        util.deleteAllUsers(db)
-        .then(util.deleteAllBooks.bind(null, db))
-        .then(function() {
-          redis.del(user.access_token);
-        })
-        .then(done.bind(null, null));
+    it("should return an array of the user's books as JSON with status 200", function(done) {
+      chai.request(url)
+      .get("/api/self/books")
+      .set("Authorization", "Bearer " + user.access_token)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an("array");
+        expect(res.body).to.have.length(4);
+        res.body.forEach(function(record) {
+          expect(record).to.contain.keys(
+            "isbn",
+            "title",
+            "subtitle",
+            "authors",
+            "categories",
+            "publisher",
+            "publisheddate",
+            "description",
+            "pagecount",
+            "language",
+            "imagelink",
+            "imagelinksmall",
+            "copyids"
+          );
+        });
+        done();
       });
+    });
+
+    after(function(done) {
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
+      .then(function() {
+        redis.del(user.access_token);
+      })
+      .then(done.bind(null, null));
     });
   });
 
-  xdescribe("/api/self/book_requests_incoming");
-  xdescribe("/api/self/book_requests_outgoing");
-  xdescribe("/api/self/books_lent");
-  xdescribe("/api/self/books_borrowed");
+  describe("/api/self/book_requests/incoming GET", function() {
+
+    var users = testData.users.slice(0, 2);
+    var books = testData.books.slice(0, 2);
+    var copies = [];
+    books.forEach(function(book, index) {
+      copies.push({ book: books[index], owner: users[0]})
+    });
+
+    before(function(done) {
+      // insert users
+      users.reduce(function(seq, user) {
+        return seq.then(util.insertUser.bind(null, db, user));
+      }, Promise.resolve())
+      // insert access token for users[0]
+      .then(function() {
+        return redis.set(users[0].access_token, users[0].uid);
+      })
+      // insert books
+      .then(books.reduce.bind(books, function(seq, book) {
+        return seq.then(util.insertBook.bind(null, db, book));
+      }, Promise.resolve()))
+      // insert copies
+      .then(copies.reduce.bind(copies, function(seq, copy, index) {
+        return seq.then(util.insertCopy.bind(null, db, copy.book, copy.owner))
+        // store copyid and insert book request
+        .then(function(res) {
+          var copyid = res[0].copyid;
+          copies[index].copyid = copyid;
+          return util.insertBookRequest(db, users[1], copyid);
+        });
+      }, Promise.resolve()))
+      .then(done.bind(null, null));
+    });
+
+    it("should return an array of requests for books owned by the user as JSON with status 200", function(done) {
+      chai.request(url)
+        .get("/api/self/book_requests/incoming")
+        .set("Authorization", "Bearer " + users[0].access_token)
+        .end(function(err, res) {
+          expect(err).to.be.null;
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an("array");
+          expect(res.body).to.have.length(2);
+          res.body.forEach(function(record) {
+            expect(record).to.contain.keys(
+              "isbn",
+              "title",
+              "subtitle",
+              "authors",
+              "categories",
+              "publisher",
+              "publisheddate",
+              "description",
+              "pagecount",
+              "language",
+              "imagelink",
+              "imagelinksmall",
+              "copyid",
+              "requesterid",
+              "requester_display_name",
+              "request_date"
+            );
+          });
+          done();
+        });
+    });
+
+    after(function(done) {
+      redis.del(users[0].access_token)
+      .then(util.deleteAllUsers.bind(null, db))
+      .then(util.deleteAllBooks.bind(null, db))
+      .then(done.bind(null, null));
+    });
+  });
+
+  // xdescribe("/api/self/book_requests/outgoing");
+  // xdescribe("/api/self/books_lent");
+  // xdescribe("/api/self/books_borrowed");
 
   after(function() {
     redis.disconnect();
