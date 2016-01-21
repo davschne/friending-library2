@@ -1,102 +1,35 @@
-var express = require("express");
-var authenticate = require(__dirname + "/../middleware/auth-bearer");
-var User = require(__dirname + "/../models/User");
-var Book = require(__dirname + "/../models/Book");
 var handle = require("../lib/handle");
 
-module.exports = function(router) {
-  router.delete("/request/:bookid", function(req, res) {
-      Book.findByIdAndUpdate(req.params.bookid, {request: ""}, function(err, updatedBookDoc) {
-        if (err) handle[500](err, res);
-        else if (updatedBookDoc === null) res.sendStatus(404);
-        else {
-          User.update({_id: req.user._id}, {$pull: {requests : req.params.bookid}}, function(err) {
-            if (err) handle[500](err, res);
-            res.json(updatedBookDoc);
-          });
-        }
-      });
-    });
+module.exports = function(router, db) {
 
   router.post("/request", function(req, res) {
-    Book.findById(req.body._id, function(err, bookDoc) {
-      if (err) handle[500](err, res);
-      else if (bookDoc === null) res.sendStatus(404);
-      else {
-        // Check if book is borrowed or requested
-        if (bookDoc.borrower || bookDoc.request) res.sendStatus(409);
-        else {
-          // Update the user
-          User.update({_id: req.user._id}, {$push: {requests : req.body._id}}, function(err) {
-            if (err) handle[500](err, res);
-            else {
-              Book.findByIdAndUpdate(req.body._id, {request: req.user._id}, function(err, updatedBookDoc) {
-                if (err) handle[500](err, res);
-                else {
-                  res.json(updatedBookDoc);
-                }
-              });
-            }
-          });
-        }
-      }
+    console.log("Received POST request at api/trans/request");
+    db.createBookRequest(req.user.uid, req.body.copyid)
+    .then(function(db_res) {
+      res.json({ message: "Book requested" });
+    })
+    .catch(function(err) {
+      handle[500](err, res);
     });
   });
 
-  router.route("/deny")
-    .post(function(req, res) {
-      Book.findById(req.body._id, function(err, bookDoc) {
-        if (err) handle[500](err, res);
-        else if (bookDoc === null) res.sendStatus(404);
-        else if (bookDoc.owner != req.user._id) res.sendStatus(403);
-        else {
-          User.update({_id: bookDoc.request}, { $pull: {requests : req.body._id} }, function(err) {
-            if (err) handle[500](err, res);
-            else {
-              Book.findByIdAndUpdate(req.body._id, {request: ""}, function(err, updatedBookDoc) {
-                res.json(updatedBookDoc);
-              });
-            }
-          });
-        }
-      });
-    });
+  router.delete("/request/:copyid", function(req, res) {
+    var copyid = req.params.copyid;
+    console.log("Received DELETE request at /api/trans/request/" + copyid);
+    res.json({});
+  });
 
-  router.route("/checkout")
-    .post(function(req, res) {
-      Book.findById(req.body._id, function(err, bookDoc) {
-        if (err) handle[500](err, res);
-        else if (bookDoc === null) res.sendStatus(404);
-        else if (bookDoc.owner != req.user._id) res.sendStatus(403);
-        else {
-          User.update({_id: bookDoc.request}, { $pull: {requests : req.body._id}, $push: {borrowing : req.body._id} }, function(err) {
-            if (err) handle[500](err, res);
-            else {
-              Book.findByIdAndUpdate(req.body._id, {borrower: bookDoc.request, request: ""}, function(err, updatedBookDoc) {
-                res.json(updatedBookDoc);
-              });
-            }
-          });
-        }
-      });
-    });
+  router.post("/deny", function(req, res) {
+    console.log("Received POST request at /api/trans/deny");
+  });
 
-  router.route("/checkin")
-    .post(function(req, res) {
-      Book.findById(req.body._id, function(err, bookDoc) {
-        if (err) handle[500](err, res);
-        else if (bookDoc === null) res.sendStatus(404);
-        else if (bookDoc.owner != req.user._id) res.sendStatus(403);
-        else {
-          User.update({_id: bookDoc.borrower}, { $pull: {borrowing : req.body._id} }, function(err) {
-            if (err) handle[500](err, res);
-            else {
-              Book.findByIdAndUpdate(req.body._id, {borrower: ""}, function(err, updatedBookDoc) {
-                res.json(updatedBookDoc);
-              });
-            }
-          });
-        }
-      });
-    });
+  router.post("/checkout", function(req, res) {
+    console.log("Received POST request at /api/trans/checkout");
+    res.json({});
+  });
+
+  router.post("/checkin", function(req, res) {
+    console.log("Received POST request at /api/trans/checkin");
+    res.json({});
+  });
 };

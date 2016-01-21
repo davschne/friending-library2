@@ -32,13 +32,13 @@ var transRouter = express.Router();
 // require("./routes/auth-routes")(authRouter, db);
 require("./routes/self-routes")(selfRouter, db, redis);
 require("./routes/books-routes")(booksRouter, db);
-// require("./routes/trans-routes")(transRouter, db);
+require("./routes/trans-routes")(transRouter, db);
 
 // app.use("/", rootRouter);
 // app.use("/auth", authRouter);
 app.use("/api/self", authenticate, selfRouter);
 app.use("/api/books", authenticate, booksRouter);
-// app.use("/api/trans", authenticate, transRouter);
+app.use("/api/trans", authenticate, transRouter);
 
 // redis.ping().then(function(result) {
 //   console.log(result);
