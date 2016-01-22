@@ -56,6 +56,12 @@ module.exports = function(router, db) {
 
   router.post("/checkin", function(req, res) {
     console.log("Received POST request at /api/trans/checkin");
-    res.json({});
+    db.checkinBook(req.body.borrowerid, req.body.copyid)
+    .then(function(db_res) {
+      res.json({ message: "Book checked in" });
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
   });
 };
