@@ -9,8 +9,6 @@ var minifyHTML = require('gulp-minify-html');
 var mocha = require("gulp-mocha");
 // var jshint = require("gulp-jshint");
 
-// var gulpDB = require("./gulp-db");
-
 gulp.task('sass', function() {
   gulp.src('./app/sass/**/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
@@ -38,7 +36,6 @@ gulp.task('copy-html', function() {
     conditionals: true,
     spare: true
   };
-
   return gulp.src('./app/**/*.html')
     .pipe(gulp.dest('./public/'))
     .pipe(minifyHTML(opts))
@@ -46,7 +43,6 @@ gulp.task('copy-html', function() {
 });
 
 gulp.task('copy', function() {
-
   return gulp.src([
     './app/**/*.otf',
     './app/**/*.ttf',
@@ -54,12 +50,6 @@ gulp.task('copy', function() {
     './app/**/*.png'])
     .pipe(gulp.dest('./public/'));
 });
-
-// gulp.task('copy-svg', function() {
-
-//   return gulp.src('./app/**/*.ttf')
-//     .pipe(gulp.dest('./public/'));
-// });
 
 gulp.task('build', ['sass', 'copy-html', 'copy', 'webpack']);
 
@@ -78,9 +68,5 @@ gulp.task("test", function() {
       "./test/api-tests.js",
       "./test/cleanup-tests.js"
     ])
-    .pipe(mocha(/*{"reporter" : "nyan"}*/));
+    .pipe(mocha());
 });
-
-// gulp.task("dbSetup", gulpDB.dbSetup);
-
-// gulp.task("dbBreakdown", gulpDB.dbBreakdown);
