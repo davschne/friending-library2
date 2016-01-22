@@ -834,6 +834,77 @@ describe("trans-routes.js", function() {
     });
   });
 
+  describe("/api/trans/deny POST", function() {
+
+    var users = testData.users;
+    var book  = util.rand(testData.books);
+    var copyid;
+
+    before(function(done) {
+      // insert users
+      util.insertUser(db, users[0])
+      .then(util.insertUser.bind(null, db, users[1]))
+      // set access token in Redis for users[1]
+      .then(function() {
+        return redis.set(users[1].access_token, users[1].uid);
+      })
+      // insert book
+      .then(util.insertBook.bind(null, db, book))
+      // insert copy and store copyid
+      .then(util.insertCopy.bind(null, db, book, users[1]))
+      .then(function(res) {
+        copyid = res[0].copyid;
+      })
+      // insert book request
+      .then(function() {
+        return util.insertBookRequest(db, users[0], copyid);
+      })
+      .then(done.bind(null, null));
+    });
+
+    describe("on success:", function() {
+      it("should return a JSON response object with status 200", function(done) {
+        chai.request(url)
+        .post("/api/trans/deny")
+        .set("Authorization", "Bearer " + users[1].access_token)
+        .type("json")
+        .send({ copyid: copyid, requesterid: users[0].uid })
+        .end(function(err, res) {
+          expect(err).to.be.null;
+          expect(res).to.be.json;
+          expect(res).to.have.status(200);
+          done();
+        });
+      });
+    });
+
+    describe("on failure (request not found):", function() {
+      it("should return a JSON response object with status 404", function(done) {
+        chai.request(url)
+        .post("/api/trans/deny")
+        .set("Authorization", "Bearer " + users[1].access_token)
+        .type("json")
+        .send({ copyid: copyid, requesterid: users[0].uid })
+        .end(function(err, res) {
+          expect(err).to.be.null;
+          expect(res).to.be.json;
+          expect(res).to.have.status(404);
+          done();
+        });
+      })
+    });
+
+    after(function(done) {
+      // delete users, book (copy will cascade), delete access token
+      util.deleteAllUsers(db)
+      .then(util.deleteAllBooks.bind(null, db))
+      .then(function() {
+        return redis.del(users[1].access_token);
+      })
+      .then(done.bind(null, null));
+    });
+  });
+
   after(function() {
     redis.disconnect();
     db.disconnect();

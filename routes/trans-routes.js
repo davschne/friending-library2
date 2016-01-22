@@ -30,6 +30,17 @@ module.exports = function(router, db) {
 
   router.post("/deny", function(req, res) {
     console.log("Received POST request at /api/trans/deny");
+    var copyid = req.body.copyid;
+    db.deleteBookRequest(req.body.requesterid, copyid)
+    .then(function(db_res) {
+      if (!db_res[0] || db_res[0].copyid !== copyid) {
+        handle[404](new Error("Book request not found"), res);
+      }
+      else res.json({ message: "Book request deleted"});
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
   });
 
   router.post("/checkout", function(req, res) {
