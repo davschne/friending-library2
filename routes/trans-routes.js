@@ -16,7 +16,16 @@ module.exports = function(router, db) {
   router.delete("/request/:copyid", function(req, res) {
     var copyid = req.params.copyid;
     console.log("Received DELETE request at /api/trans/request/" + copyid);
-    res.json({});
+    db.deleteBookRequest(req.user.uid, copyid)
+    .then(function(db_res) {
+      if (!db_res[0] || db_res[0].copyid.toString() !== copyid) {
+        handle[404](new Error("Book request not found"), res);
+      }
+      else res.json({ message: "Book request deleted"});
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
   });
 
   router.post("/deny", function(req, res) {
