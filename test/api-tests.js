@@ -30,7 +30,7 @@ var app;
 var db;
 var redis;
 
-describe("self-routes.js", function() {
+describe("root-routes.js", function() {
 
   before(function(done) {
     // get database connection instances
@@ -58,6 +58,53 @@ describe("self-routes.js", function() {
       if (LOG_SERVER_OUTPUT) console.error("server.js:", data.toString());
     });
   });
+
+  describe("/login GET", function() {
+    it("should redirect to /auth/facebook", function(done) {
+      chai.request(url)
+      .get("/login")
+      .redirects(0)
+      .end(function(err, res) {
+        expect(err).to.be.null;
+        expect(res).to.redirectTo("/auth/facebook");
+        done();
+      });
+    });
+  });
+
+  describe("/logout POST", function() {
+
+    var user = testData.users[0];
+
+    // set access token
+    before(function(done) {
+      redis.set(user.access_token, user.uid)
+      .then(done.bind(null, null));
+    });
+
+    it("should send a JSON response object with status 200", function(done) {
+      chai.request(url)
+      .post("/logout")
+      .set("Authorization", "Bearer " + user.access_token)
+      .end(function(err, res) {
+        expect(err).to.be.null
+        expect(res).to.be.json;
+        expect(res).to.have.status(200);
+        done();
+      });
+    });
+
+    it("should remove the user's access token from Redis", function(done) {
+      redis.get(user.access_token)
+      .then(function(res) {
+        expect(res).to.be.null;
+        done();
+      });
+    });
+  });
+});
+
+describe("self-routes.js", function() {
 
   describe("/api/self", function() {
 

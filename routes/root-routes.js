@@ -1,19 +1,18 @@
-var handle = require("../lib/handle");
-var authenticate = require("../middleware/auth-bearer");
-
-module.exports = function(router, redis) {
+module.exports = function(router, redis, handle, authenticate) {
 
   router.get("/login", function(req, res) {
+    console.log("Received GET request at /login");
     res.redirect(302, "/auth/facebook");
   });
 
   router.post("/logout", authenticate, function(req, res) {
-    redis.del(req.user._id)
-      .then(function(result) {
-        res.json({msg: "Log-out successful"});
-      })
-      .catch(function(err) {
-        handle[500](err, res);
-      });
+    console.log("Received POST request at /logout");
+    redis.del(req.user.token)
+    .then(function(result) {
+      res.json({ message: "Logout successful" });
+    })
+    .catch(function(err) {
+      handle[500](err, res);
+    });
   });
 };

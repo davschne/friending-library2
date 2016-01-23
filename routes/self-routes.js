@@ -1,6 +1,4 @@
-var handle = require("../lib/handle");
-
-module.exports = function(router, db, redis) {
+module.exports = function(router, db, redis, handle) {
   router.route("/")
   .get(function(req, res) {
     console.log("Received GET request at /api/self");

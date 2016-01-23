@@ -16,10 +16,13 @@ var db    = new DB(PG_URI);
 // Middleware
 var bodyParser   = require('body-parser');
 var passport     = require('passport');
-var authenticate = require('./middleware/auth-bearer')(redis);
+var authenticate = require('./middleware/auth-bearer')(redis, passport);
 app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(passport.initialize());
+
+// Handler utility
+var handle = require('./lib/handle.js');
 
 // Routing
 var rootRouter  = express.Router();
@@ -28,13 +31,13 @@ var selfRouter  = express.Router();
 var booksRouter = express.Router();
 var transRouter = express.Router();
 
-// require("./routes/root-routes")(rootRouter, db);
-// require("./routes/auth-routes")(authRouter, db);
-require("./routes/self-routes")(selfRouter, db, redis);
-require("./routes/books-routes")(booksRouter, db);
-require("./routes/trans-routes")(transRouter, db);
+require("./routes/root-routes")(rootRouter, redis, handle, authenticate);
+// require("./routes/auth-routes")(authRouter, db, redis, handle, passport);
+require("./routes/self-routes")(selfRouter, db, redis, handle);
+require("./routes/books-routes")(booksRouter, db, handle);
+require("./routes/trans-routes")(transRouter, db, handle);
 
-// app.use("/", rootRouter);
+app.use("/", rootRouter);
 // app.use("/auth", authRouter);
 app.use("/api/self", authenticate, selfRouter);
 app.use("/api/books", authenticate, booksRouter);

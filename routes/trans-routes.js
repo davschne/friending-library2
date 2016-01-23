@@ -1,6 +1,4 @@
-var handle = require("../lib/handle");
-
-module.exports = function(router, db) {
+module.exports = function(router, db, handle) {
 
   router.post("/request", function(req, res) {
     console.log("Received POST request at api/trans/request");

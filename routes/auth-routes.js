@@ -2,12 +2,9 @@ var FB_ID     = process.env.FB_ID;
 var FB_SECRET = process.env.FB_SECRET;
 var APP_URL   = process.env.APP_URL || "http://localhost:3000";
 
-var passport = require("passport");
 var FacebookStrategy = require("passport-facebook").Strategy;
 
-var db = require("../lib/db.js");
-
-module.exports = function(router, pg, redis) {
+module.exports = function(router, db, redis, handle, passport) {
 
   passport.use(new FacebookStrategy(
     {
