@@ -1,18 +1,18 @@
 'use strict';
 
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var webpack = require('gulp-webpack');
-var uglify = require('gulp-uglify');
-var minifyCSS = require('gulp-minify-css');
+var gulp       = require('gulp');
+var sass       = require('gulp-sass');
+var webpack    = require('gulp-webpack');
+var uglify     = require('gulp-uglify');
+var minifyCSS  = require('gulp-minify-css');
 var minifyHTML = require('gulp-minify-html');
-var mocha = require("gulp-mocha");
+var mocha      = require("gulp-mocha");
 // var jshint = require("gulp-jshint");
 
 gulp.task('sass', function() {
   gulp.src('./app/sass/**/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
-    // .pipe(minifyCSS({compaibility: 'ie8'}))
+    .pipe(minifyCSS({compaibility: 'ie8'}))
     .pipe(gulp.dest('./public/css/'));
 });
 
@@ -51,7 +51,7 @@ gulp.task('copy', function() {
     .pipe(gulp.dest('./public/'));
 });
 
-gulp.task('build', ['sass', 'copy-html', 'copy', 'webpack']);
+gulp.task('build', [/*'sass',*/ 'copy-html', 'copy', 'webpack']);
 
 gulp.task('default', ['build']);
 

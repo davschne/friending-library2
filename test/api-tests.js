@@ -24,7 +24,6 @@ var PORT = process.env.PORT || 3000;
 var url = "localhost:" + PORT;
 
 var app;
-// var app = require("../server.js");
 
 // database instances
 var db;

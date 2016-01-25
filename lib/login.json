@@ -1,5 +1,9 @@
 {
   "ADDRESS"       : "127.0.0.1:5432",
+  "USER"          : "friending_library_user",
+  "USER_PW"       : "readmorebooks",
+  "DB"            : "friending_library",
+  "DB_TEMPLATE"   : "template1",
   "ADMIN_USER"    : "postgres",
   "ADMIN_PW"      : "",
   "DEFAULT_DB"    : "template1",
