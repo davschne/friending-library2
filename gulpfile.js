@@ -51,7 +51,7 @@ gulp.task('copy', function() {
     .pipe(gulp.dest('./public/'));
 });
 
-gulp.task('build', [/*'sass',*/ 'copy-html', 'copy', 'webpack']);
+gulp.task('build', ['sass', 'copy-html', 'copy', 'webpack']);
 
 gulp.task('default', ['build']);
 

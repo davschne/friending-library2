@@ -1,8 +1,8 @@
 var PORT      = process.env.PORT || 3000;
-// var PG_URI    = process.env.PG_URI
-//   || 'postgres://friending_library_user:test@127.0.0.1:5432/friending_library';
-// var REDIS_URI = process.env.REDIS_URI
-//   || 'redis://:authpassword@127.0.0.1:6379/0';
+var PG_URI    = process.env.PG_URI
+  || 'postgres://friending_library_user:test@127.0.0.1:5432/friending_library';
+var REDIS_URI = process.env.REDIS_URI
+  || 'redis://:authpassword@127.0.0.1:6379/0';
 
 var express = require('express');
 var app     = express();
@@ -12,11 +12,11 @@ var Redis   = require('ioredis');
 var login   = require('./lib/login.json');
 
 // Create database interfaces
-var redis = new Redis(login.REDIS_URI);
+var redis = new Redis(REDIS_URI);
 // try connecting to database
 // check if database and user exist
 // if not, create them
-var db    = new DB(login);
+var db    = new DB(PG_URI);
 
 // Middleware
 var bodyParser   = require('body-parser');
@@ -37,13 +37,13 @@ var booksRouter = express.Router();
 var transRouter = express.Router();
 
 require("./routes/root-routes")(rootRouter, redis, handle, authenticate);
-require("./routes/auth-routes")(authRouter, db, redis, handle, passport);
+// require("./routes/auth-routes")(authRouter, db, redis, handle, passport);
 require("./routes/self-routes")(selfRouter, db, redis, handle);
 require("./routes/books-routes")(booksRouter, db, handle);
 require("./routes/trans-routes")(transRouter, db, handle);
 
 app.use("/", rootRouter);
-app.use("/auth", authRouter);
+// app.use("/auth", authRouter);
 app.use("/api/self", authenticate, selfRouter);
 app.use("/api/books", authenticate, booksRouter);
 app.use("/api/trans", authenticate, transRouter);
