@@ -1,2 +1,0 @@
-SELECT * FROM Users
-  WHERE uID = 201;

@@ -3,15 +3,9 @@ var expect = chai.expect;
 
 var DB = require('../lib/db.js');
 
-var DB       = require('../lib/db.js');
-var LOGIN    = require('../lib/login.json');
-var testData = require('../lib/test-data.js');
-
-var PG_ADMIN_URI  = 'postgres://' +
-                    LOGIN.ADMIN_USER + ':' +
-                    LOGIN.ADMIN_PW +
-                    '@' + LOGIN.ADDRESS + '/' +
-                    LOGIN.DEFAULT_DB;
+var DB       = require('../lib/db/pgp.js');
+var login    = require('../lib/login.js');
+var testData = require('../lib/test/test-data.js');
 
 // database instance
 var db;
@@ -19,12 +13,12 @@ var db;
 describe('db.js', function() {
 
   before(function() {
-    db_admin = new DB(PG_ADMIN_URI);
+    db_admin = new DB(login.pg.admin);
   });
 
   describe('#dropDatabase', function() {
     it('should drop a Postgres database', function(done) {
-      db_admin.dropDatabase(LOGIN.TEST_DB)
+      db_admin.dropDatabase(login.pg.test.database)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
         done();
@@ -34,7 +28,7 @@ describe('db.js', function() {
 
   describe('#dropDBUser', function() {
     it('should drop a Postgres user/role', function(done) {
-      db_admin.dropDBUser(LOGIN.TEST_USER)
+      db_admin.dropDBUser(login.pg.test.user)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
         done();

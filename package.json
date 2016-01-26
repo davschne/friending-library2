@@ -46,6 +46,6 @@
     "passport": "^0.2.2",
     "passport-facebook": "^2.0.0",
     "passport-http-bearer": "^1.0.1",
-    "pg-promise": "^2.2.4"
+    "pg-promise": "^3.0.6"
   }
 }

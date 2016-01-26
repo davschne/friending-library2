@@ -1,1 +1,0 @@
-DELETE FROM Users WHERE uid = $1 RETURNING uid;
