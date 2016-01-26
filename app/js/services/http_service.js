@@ -19,18 +19,16 @@ module.exports = function(app) {
         url: obj.url,
         headers: {'Authorization': 'Bearer ' + token},
         data: obj.data
-
-        // white space in 'Bearer ' + token is crucial.
-        // e.g. : "Bearer 1223142134"
       })
-        .success(callback)
-        .catch(function(res) {
-          handle(res, callback);
-        });
+      .success(callback)
+      .catch(function(res) {
+        handle(res, callback);
+      });
     }
 
     function handle(res, callback) {
       switch (res.status) {
+        // API call unauthorized because of invalid token (most likely expired)
         case 401:
           $rootScope.clientLogout();
           break;
@@ -51,13 +49,13 @@ module.exports = function(app) {
 
       getIncomingBookRequests: function(token, callback) {
         APICall({
-          method: 'GET', url: '/api/self/book_requests_incoming'
+          method: 'GET', url: '/api/self/book_requests/incoming'
         }, token, callback);
       },
 
       getOutgoingBookRequests: function(token, callback) {
         APICall({
-          method: 'GET', url: '/api/self/book_requests_outgoing'
+          method: 'GET', url: '/api/self/book_requests/outgoing'
         }, token, callback);
       },
 

@@ -9,8 +9,7 @@ module.exports = function(app) {
 
     var populateBookPile = function(token) {
       http.availableBooks(token, function(data) {
-        console.log('Inside function');
-        console.log(data);
+        console.log("available books:", data);
 
         $scope.books = data;
 
@@ -27,10 +26,6 @@ module.exports = function(app) {
     };
 
     populateBookPile(token);
-
-    http.testAPI(token, function(data) {
-      console.log('testAPI success', data);
-    });
 
     $scope.toggleDescription = function(choice, bookObj) {
       if(choice === 1) {
