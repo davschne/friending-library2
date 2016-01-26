@@ -6,17 +6,17 @@ var REDIS_URI = process.env.REDIS_URI
 
 var express = require('express');
 var app     = express();
-var DB      = require('./lib/db');
+var DB      = require('./lib/db/pgp');
 var Redis   = require('ioredis');
 
-var login   = require('./lib/login.json');
+var login   = require('./lib/login.js');
 
 // Create database interfaces
-var redis = new Redis(REDIS_URI);
+var redis = new Redis(login.redis.URI);
 // try connecting to database
 // check if database and user exist
 // if not, create them
-var db    = new DB(PG_URI);
+var db    = new DB(login.pg.prod);
 
 // Middleware
 var bodyParser   = require('body-parser');
