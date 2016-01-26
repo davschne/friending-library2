@@ -1,30 +1,23 @@
 /* jshint expr: true */
 
-var LOG_SERVER_OUTPUT = true; // enable logging of child process?
+var LOG_SERVER_OUTPUT = false; // enable logging of child process?
 
-var cp   = require("child_process");
-var spawn = cp.spawn;
-var chai = require("chai");
-chai.use(require("chai-http"));
+var cp     = require("child_process");
+var spawn  = cp.spawn;
+var chai   = require("chai");
 var expect = chai.expect;
+chai.use(require("chai-http"));
 
-var DB       = require('../lib/db.js');
+var DB       = require('../lib/db/pgp.js');
 var Redis    = require('ioredis');
-var login    = require('../lib/login.json');
-var util     = require('../lib/test-util.js');
-var testData = require('../lib/test-data.js');
+var login    = require('../lib/login.js');
+var util     = require('../lib/test/test-util.js');
+var testData = require('../lib/test/test-data.js');
 
-var PG_TEST_URI = 'postgres://' +
-                  login.TEST_USER + ':' +
-                  login.TEST_USER_PW +
-                  '@' + login.ADDRESS + '/' +
-                  login.TEST_DB;
-var REDIS_TEST_URI = login.REDIS_TEST_URI;
 var PORT = process.env.PORT || 3000;
 var url = "localhost:" + PORT;
 
 var app;
-// var app = require("../server.js");
 
 // database instances
 var db;
@@ -34,16 +27,23 @@ describe("root-routes.js", function() {
 
   before(function(done) {
     // get database connection instances
-    db    = new DB(PG_TEST_URI);
-    redis = new Redis(REDIS_TEST_URI);
+    db    = new DB(login.pg.test);
+    redis = new Redis(login.redis.test.URI);
     // run server as child process
     app = spawn("node", ["server.js"],
       {
         env: {
           PATH: process.env.PATH,
           PORT: PORT,
-          PG_URI: PG_TEST_URI,
-          REDIS_URI: REDIS_TEST_URI
+          PG_PROD_HOST: login.pg.test.host,
+          PG_PROD_PORT: login.pg.test.port,
+          PG_PROD_USER: login.pg.test.user,
+          PG_PROD_PW  : login.pg.test.password,
+          PG_PROD_DB  : login.pg.test.database,
+          REDIS_PROD_URI: login.redis.test.URI,
+          FB_ID: process.env.FB_ID,
+          FB_SECRET: process.env.FB_SECRET,
+          APP_URL: process.env.APP_URL
         }
       }
     );

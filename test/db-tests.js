@@ -4,16 +4,10 @@ var chai = require("chai");
 var expect = chai.expect;
 var Promise = require("bluebird");
 
-var DB       = require('../lib/db.js');
-var LOGIN    = require('../lib/login.json');
-var util     = require('../lib/test-util.js');
-var testData = require('../lib/test-data.js');
-
-var PG_TEST_URI = 'postgres://' +
-                  LOGIN.TEST_USER + ':' +
-                  LOGIN.TEST_USER_PW +
-                  '@' + LOGIN.ADDRESS + '/' +
-                  LOGIN.TEST_DB;
+var DB       = require('../lib/db/pgp.js');
+var login    = require('../lib/login.js');
+var util     = require('../lib/test/test-util.js');
+var testData = require('../lib/test/test-data.js');
 
 // database instance
 var db;
@@ -22,7 +16,7 @@ describe('db.js', function() {
 
   // get database connection instance
   before(function() {
-    db = new DB(PG_TEST_URI);
+    db = new DB(login.pg.test);
   });
 
   describe('#findOrCreateUser', function() {
@@ -38,7 +32,7 @@ describe('db.js', function() {
     });
 
     it("should create a tuple in the Users table if it doesn't already exist", function(done) {
-      db.run("SELECT uid FROM Users WHERE uid=$1;", [user.uid])
+      db.query("SELECT uid FROM Users WHERE uid=$1;", [user.uid])
       .then(function(res) {
         expect(res[0].uid).to.equal(user.uid.toString());
         done();
@@ -75,7 +69,7 @@ describe('db.js', function() {
     });
 
     it("should delete a tuple from the Users table", function(done) {
-      db.run("SELECT uid FROM Users WHERE uid=$1;", [user.uid])
+      db.query("SELECT uid FROM Users WHERE uid=$1;", [user.uid])
       .then(function(res) {
         expect(res).to.be.empty; // expect empty array
         done();
@@ -114,6 +108,7 @@ describe('db.js', function() {
         book.imageLinks.smallThumbnail
       )
       .then(function(res) {
+        console.log("res:", res);
         expect(res).to.exist;
         expect(res[0]).to.have.property("copyid");
         expect(res[0].copyid).to.be.a("number");
@@ -122,7 +117,7 @@ describe('db.js', function() {
     });
 
     it("should create a tuple in the Copies table", function(done) {
-      db.run("SELECT ownerid FROM Copies WHERE ownerid=$1 AND isbn=$2;", [user.uid, ISBN])
+      db.query("SELECT ownerid FROM Copies WHERE ownerid=$1 AND isbn=$2;", [user.uid, ISBN])
       .then(function(res) {
         expect(res[0].ownerid).to.equal(user.uid.toString());
         done();
@@ -130,7 +125,7 @@ describe('db.js', function() {
     });
 
     it("should create a tuple in the Books table if it doesn't already exist", function(done) {
-      db.run("SELECT isbn FROM Books WHERE isbn=$1;", [ISBN])
+      db.query("SELECT isbn FROM Books WHERE isbn=$1;", [ISBN])
       .then(function(res) {
         expect(res[0].isbn).to.equal(ISBN);
         done();
@@ -174,7 +169,7 @@ describe('db.js', function() {
     });
 
     it("should delete the tuple from the Copies table", function(done) {
-      db.run("SELECT copyid FROM Copies WHERE copyid=$1;", [copyid])
+      db.query("SELECT copyid FROM Copies WHERE copyid=$1;", [copyid])
       .then(function(res) {
         expect(res).to.be.empty;
         done();
@@ -275,7 +270,7 @@ describe('db.js', function() {
     });
 
     it("should create a tuple in BookRequests", function(done) {
-      db.run("SELECT * FROM BookRequests WHERE requesterid=$1 AND copyid=$2;", [requester.uid, copyid])
+      db.query("SELECT * FROM BookRequests WHERE requesterid=$1 AND copyid=$2;", [requester.uid, copyid])
       .then(function(res) {
         expect(res).to.exist;
         expect(res[0]).to.have.property("requesterid");
@@ -324,7 +319,7 @@ describe('db.js', function() {
     });
 
     it("should delete a tuple from BookRequests", function(done) {
-      db.run("SELECT * FROM BookRequests WHERE requesterid=$1 AND copyid=$2;", [requester.uid, copyid])
+      db.query("SELECT * FROM BookRequests WHERE requesterid=$1 AND copyid=$2;", [requester.uid, copyid])
       .then(function(res) {
         expect(res).to.be.empty;
         done();
@@ -368,7 +363,7 @@ describe('db.js', function() {
     });
 
     it("should delete a tuple from BookRequests", function(done) {
-      db.run("SELECT * FROM BookRequests WHERE requesterid=$1 AND copyid=$2;", [requester.uid, copyid])
+      db.query("SELECT * FROM BookRequests WHERE requesterid=$1 AND copyid=$2;", [requester.uid, copyid])
       .then(function(res) {
         expect(res).to.be.empty;
         done();
@@ -376,7 +371,7 @@ describe('db.js', function() {
     });
 
     it("should insert a tuple into Borrowing", function(done) {
-      db.run("SELECT * FROM Borrowing WHERE borrowerid=$1 AND copyid=$2;", [requester.uid, copyid])
+      db.query("SELECT * FROM Borrowing WHERE borrowerid=$1 AND copyid=$2;", [requester.uid, copyid])
       .then(function(res) {
         expect(res).to.exist;
         expect(res[0]).to.have.property("borrowerid");
@@ -425,7 +420,7 @@ describe('db.js', function() {
     });
 
     it("should delete a tuple from Borrowing", function(done) {
-      db.run("SELECT * FROM Borrowing WHERE borrowerid=$1 AND copyid=$2;", [borrower.uid, copyid])
+      db.query("SELECT * FROM Borrowing WHERE borrowerid=$1 AND copyid=$2;", [borrower.uid, copyid])
       .then(function(res) {
         expect(res).to.be.empty;
         done();

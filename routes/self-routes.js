@@ -11,14 +11,15 @@ module.exports = function(router, db, redis, handle) {
       // if db operation successful, deleted User's uid returned
       if (!db_res[0] || db_res[0].uid !== req.user.uid.toString()) {
         handle[404](new Error("User tuple not found"), res);
+      } else {
+        return redis.del(req.user.token)
+          .then(function() {
+            res.json({message: "user deleted"});
+          });
       }
-      else return redis.del(req.user.token)
-        .then(function() {
-          res.json({message: "user deleted"});
-        });
     })
     .catch(function(err) {
-      if (err.cause && err.cause.message == 'update or delete on table "users" violates foreign key constraint "borrowing_borrowerid_fkey" on table "borrowing"') {
+      if (err.code == "23503") { // violates foreign key constraint
         handle[403](err, res);
       }
       else handle[500](err, res);

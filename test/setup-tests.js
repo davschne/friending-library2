@@ -1,21 +1,9 @@
 var chai = require("chai");
 var expect = chai.expect;
 
-var DB       = require('../lib/db.js');
-var LOGIN    = require('../lib/login.json');
-var testData = require('../lib/test-data.js');
-
-var PG_ADMIN_URI  = 'postgres://' +
-                    LOGIN.ADMIN_USER + ':' +
-                    LOGIN.ADMIN_PW +
-                    '@' + LOGIN.ADDRESS + '/' +
-                    LOGIN.DEFAULT_DB;
-
-var PG_TEST_URI = 'postgres://' +
-                  LOGIN.TEST_USER + ':' +
-                  LOGIN.TEST_USER_PW +
-                  '@' + LOGIN.ADDRESS + '/' +
-                  LOGIN.TEST_DB;
+var DB       = require('../lib/db/pgp.js');
+var login    = require('../lib/login.js');
+var testData = require('../lib/test/test-data.js');
 
 // database instances
 var db_admin;
@@ -25,7 +13,7 @@ describe('db.js', function() {
 
   describe('Constructor', function() {
     it('should connect to a running Postgres server and return a connection instance', function() {
-      db_admin = new DB(PG_ADMIN_URI);
+      db_admin = DB(login.pg.admin);
       expect(db_admin).to.exist;
     });
     // further tests for async functions generated from SQL files?
@@ -33,7 +21,7 @@ describe('db.js', function() {
 
   describe('#createDBUser', function() {
     it('should create a Postgres user/role', function(done) {
-      db_admin.createDBUser(LOGIN.TEST_USER, LOGIN.TEST_USER_PW)
+      db_admin.createDBUser(login.pg.test.user, login.pg.test.password)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
         done();
@@ -44,9 +32,9 @@ describe('db.js', function() {
   describe('#createDatabase', function() {
     it('should create a Postgres database', function(done) {
       db_admin.createDatabase(
-        LOGIN.TEST_DB,
-        LOGIN.TEST_USER,
-        LOGIN.TEST_TEMPLATE
+        login.pg.test.database,
+        login.pg.test.user,
+        login.pg.template
       )
       .then(function(res) {
         expect(res).to.exist; // returns a response object
@@ -59,7 +47,7 @@ describe('db.js', function() {
   describe('#setupDatabase', function() {
     // connect to the new database and set it up
     before(function() {
-      db = new DB(PG_TEST_URI);
+      db = new DB(login.pg.test);
     });
     it('should create the database tables', function(done) {
       db.setupDatabase()
