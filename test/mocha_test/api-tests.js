@@ -8,11 +8,11 @@ var chai   = require("chai");
 var expect = chai.expect;
 chai.use(require("chai-http"));
 
-var DB       = require('../lib/db/pgp.js');
+var DB       = require('../../lib/db/pgp.js');
 var Redis    = require('ioredis');
-var login    = require('../lib/login.js');
-var util     = require('../lib/test/test-util.js');
-var testData = require('../lib/test/test-data.js');
+var login    = require('../../lib/login.js');
+var util     = require('../../lib/test/test-util.js');
+var testData = require('../../lib/test/test-data.js');
 
 var PORT = process.env.PORT || 3000;
 var url = "localhost:" + PORT;

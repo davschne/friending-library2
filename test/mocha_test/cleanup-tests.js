@@ -1,11 +1,9 @@
 var chai = require("chai");
 var expect = chai.expect;
 
-var DB = require('../lib/db.js');
-
-var DB       = require('../lib/db/pgp.js');
-var login    = require('../lib/login.js');
-var testData = require('../lib/test/test-data.js');
+var DB       = require('../../lib/db/pgp.js');
+var login    = require('../../lib/login.js');
+var testData = require('../../lib/test/test-data.js');
 
 // database instance
 var db;

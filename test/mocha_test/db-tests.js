@@ -4,10 +4,10 @@ var chai = require("chai");
 var expect = chai.expect;
 var Promise = require("bluebird");
 
-var DB       = require('../lib/db/pgp.js');
-var login    = require('../lib/login.js');
-var util     = require('../lib/test/test-util.js');
-var testData = require('../lib/test/test-data.js');
+var DB       = require('../../lib/db/pgp.js');
+var login    = require('../../lib/login.js');
+var util     = require('../../lib/test/test-util.js');
+var testData = require('../../lib/test/test-data.js');
 
 // database instance
 var db;

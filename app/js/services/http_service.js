@@ -28,7 +28,7 @@ module.exports = function(app) {
 
     function handle(res, callback) {
       switch (res.status) {
-        // API call unauthorized because of invalid token (most likely expired)
+        // API call unauthorized because of invalid token
         case 401:
           $rootScope.clientLogout();
           break;
@@ -38,13 +38,9 @@ module.exports = function(app) {
     }
 
     return {
-      testAPI: function(token, callback) {
-        console.log('testAPI triggered');
-        APICall({ method: 'POST', url: '/test'}, token, callback);
-      },
 
-      getUser: function(token, callback) {
-        APICall({ method: 'GET', url: '/api/self' }, token, callback);
+      deleteUser: function(token, callback) {
+        APICall({ method: 'DELETE', url: '/api/self' }, token, callback);
       },
 
       getIncomingBookRequests: function(token, callback) {
@@ -59,77 +55,77 @@ module.exports = function(app) {
         }, token, callback);
       },
 
-      getBooksBorrowed: function(token, callback) {
+      getBorrowedBooks: function(token, callback) {
         APICall({
           method: 'GET', url: '/api/self/books_borrowed'
         }, token, callback);
       },
 
-      getBooksLent: function(token, callback) {
+      getLentBooks: function(token, callback) {
         APICall({
           method: 'GET', url: '/api/self/books_lent'
         }, token, callback);
       },
 
-      getBooks: function(token, callback) {
+      getOwnBooks: function(token, callback) {
         APICall({
           method: 'GET', url: '/api/self/books'
         }, token, callback);
       },
 
-      connectGoogleBooks: function(userData, callback) {
+      connectGoogleBooks: function(data, callback) {
         APICall({
           method: 'GET',
-          url: 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + userData + '&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0'
+          url: 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + data + '&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0'
         }, token, callback);
       },
 
-      createBook: function(token, userData, callback) {
+      createCopy: function(token, data, callback) {
         APICall({
-          method: 'POST', url: '/api/books', data: userData
+          method: 'POST', url: '/api/books', data: data
         }, token, callback);
       },
 
-      removeBook: function(token, bookId, callback) {
+      deleteCopy: function(token, copyid, callback) {
         APICall({
-          method: 'DELETE', url: '/api/books/' + bookId
+          method: 'DELETE', url: '/api/books/' + copyid
         }, token, callback);
       },
 
-      availableBooks: function(token, callback) {
+      getAvailableBooks: function(token, callback) {
         APICall({
           method: 'GET', url: '/api/books/available'
         }, token, callback);
       },
 
-      requestBook: function(token, bookId, callback) {
+      createBookRequest: function(token, copyid, callback) {
         APICall({
           method: 'POST', url: '/api/trans/request',
-          data: bookId
+          data: copyid
         }, token, callback);
       },
 
-      cancelRequest: function(token, bookId, callback) {
+      cancelBookRequest: function(token, copyid, callback) {
         APICall({
-          method: 'DELETE', url: '/api/trans/request/' + bookId
+          method: 'DELETE', url: '/api/trans/request/' + copyid
         }, token, callback);
       },
 
-      approveRequest: function(token, userData, callback) {
+      checkoutBook: function(token, data, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/checkout', data: userData
+          method: 'POST', url: '/api/trans/checkout', data: data
         }, token, callback);
       },
 
-      denyRequest: function(token, userData, callback) {
+      denyBookRequest: function(token, data, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/deny', data: userData
+          method: 'POST', url: '/api/trans/deny', data: data
         }, token, callback);
       },
 
-      bookReturn: function(token, userData, callback) {
+      checkinBook: function(token, data, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/checkin', data: userData
+          method: 'POST', url: '/api/trans/checkin', data: data
         }, token, callback);
       },
 

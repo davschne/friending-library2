@@ -1,13 +1,14 @@
 'use strict';
 
-var gulp       = require('gulp');
-var sass       = require('gulp-sass');
-var webpack    = require('gulp-webpack');
-var uglify     = require('gulp-uglify');
-var minifyCSS  = require('gulp-minify-css');
-var minifyHTML = require('gulp-minify-html');
-var mocha      = require("gulp-mocha");
-// var jshint = require("gulp-jshint");
+var gulp        = require('gulp');
+var sass        = require('gulp-sass');
+var webpack     = require('gulp-webpack');
+var uglify      = require('gulp-uglify');
+var minifyCSS   = require('gulp-minify-css');
+var minifyHTML  = require('gulp-minify-html');
+var mocha       = require("gulp-mocha");
+var KarmaServer = require("karma").Server;
+// var jshint      = require("gulp-jshint");
 
 gulp.task('sass', function() {
   gulp.src('./app/sass/**/*.scss')
@@ -20,8 +21,8 @@ gulp.task('sass:watch', function() {
   gulp.watch('./app/sass/**/*.scss', ['sass']);
 });
 
-gulp.task('webpack', function() {
-  return gulp.src('./app/js/**/*.js')
+gulp.task('webpack:dev', function() {
+  return gulp.src('./app/js/client.js')
     .pipe(webpack({
       output: {
         filename: 'bundle.js'
@@ -29,6 +30,16 @@ gulp.task('webpack', function() {
      }))
       // .pipe(uglify())
       .pipe(gulp.dest('./public/js/'));
+});
+
+gulp.task('webpack:test', function() {
+  return gulp.src('test/karma_test/entry.js')
+    .pipe(webpack({
+      output: {
+        filename: 'test_bundle.js'
+      }
+    }))
+    .pipe(gulp.dest('test/karma_test/'));
 });
 
 gulp.task('copy-html', function() {
@@ -51,7 +62,24 @@ gulp.task('copy', function() {
     .pipe(gulp.dest('./public/'));
 });
 
-gulp.task('build', ['sass', 'copy-html', 'copy', 'webpack']);
+gulp.task("server_test", function() {
+  return gulp.src([
+      "./test/mocha_test/setup-tests.js",
+      "./test/mocha_test/db-tests.js",
+      "./test/mocha_test/api-tests.js",
+      "./test/mocha_test/cleanup-tests.js"
+    ])
+    .pipe(mocha());
+});
+
+gulp.task("client_test", ['webpack:test'], function(done) {
+  new KarmaServer({
+    configFile: __dirname + '/karma.conf.js'
+  }, done)
+  .start();
+});
+
+gulp.task('build', ['sass', 'copy-html', 'copy', 'webpack:dev']);
 
 gulp.task('default', ['build']);
 
@@ -61,12 +89,3 @@ gulp.task('default', ['build']);
 //     .pipe(jshint.reporter("default"));
 // });
 
-gulp.task("test", function() {
-  return gulp.src([
-      "./test/setup-tests.js",
-      "./test/db-tests.js",
-      "./test/api-tests.js",
-      "./test/cleanup-tests.js"
-    ])
-    .pipe(mocha());
-});
