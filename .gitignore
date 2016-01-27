@@ -3,3 +3,4 @@ node_modules
 public
 credentials.sh
 dump.rdb
+test/karma_test/test_bundle.js

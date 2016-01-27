@@ -18,22 +18,24 @@ module.exports = function(app) {
         method: obj.method,
         url: obj.url,
         headers: {'Authorization': 'Bearer ' + token},
-        data: obj.data
+        data: obj.data || {}
       })
-      .success(callback)
-      .catch(function(res) {
-        handle(res, callback);
+      .success(function(data, status, headers, config) {
+        callback(data);
+      })
+      .error(function(data, status, headers, config) {
+        handle(err, status, callback);
       });
     }
 
-    function handle(res, callback) {
-      switch (res.status) {
+    function handle(err, status, callback) {
+      switch (status) {
         // API call unauthorized because of invalid token
         case 401:
           $rootScope.clientLogout();
           break;
         default:
-          console.log(res.data);
+          console.log(err.data);
       }
     }
 
@@ -111,21 +113,21 @@ module.exports = function(app) {
         }, token, callback);
       },
 
-      checkoutBook: function(token, data, callback) {
+      checkoutBook: function(token, copyid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/checkout', data: data
+          method: 'POST', url: '/api/trans/checkout', data: copyid
         }, token, callback);
       },
 
-      denyBookRequest: function(token, data, callback) {
+      denyBookRequest: function(token, copyid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/deny', data: data
+          method: 'POST', url: '/api/trans/deny', data: copyid
         }, token, callback);
       },
 
-      checkinBook: function(token, data, callback) {
+      checkinBook: function(token, copyid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/checkin', data: data
+          method: 'POST', url: '/api/trans/checkin', data: copyid
         }, token, callback);
       },
 
