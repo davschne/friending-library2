@@ -199,4 +199,25 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, response]);
     });
   });
+
+  describe("#getAvailableBooks", function() {
+    it("should make a GET request at /api/books/available that includes an access token and then call the callback function with the response object", function() {
+      var books = [
+        util.formatBook(
+          util.rand(testData.books),
+          {
+            copyid: 11,
+            ownerid: 2394872349,
+            owner_display_name: "Bob",
+          }
+        )
+      ];
+      $httpBackend.expect("GET", "/api/books/available", {}, checkToken).respond(200, books);
+      http.getAvailableBooks(token, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, books]);
+    });
+  });
 });
