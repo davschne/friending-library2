@@ -113,15 +113,19 @@ module.exports = function(app) {
         }, token, callback);
       },
 
-      checkoutBook: function(token, copyid, callback) {
+      checkoutBook: function(token, copyid, requesterid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/checkout', data: { copyid: copyid }
+          method: 'POST',
+          url: '/api/trans/checkout',
+          data: { copyid: copyid, requesterid: requesterid }
         }, token, callback);
       },
 
-      denyBookRequest: function(token, copyid, callback) {
+      denyBookRequest: function(token, copyid, requesterid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/deny', data: { copyid: copyid }
+          method: 'POST',
+          url: '/api/trans/deny',
+          data: { copyid: copyid, requesterid: requesterid }
         }, token, callback);
       },
 

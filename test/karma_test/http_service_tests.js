@@ -248,11 +248,36 @@ describe("http_service.js", function() {
   });
 
   describe("#checkoutBook", function() {
-    it("should make a POST request at /api/trans/checkout that includes an access token and the copyid and then call the callback function with the response object", function() {
+    it("should make a POST request at /api/trans/checkout that includes an access token in the headers and the copy ID and requester ID in the body, and then call the callback function with the response object", function() {
       var copyid = 13;
+      var requesterid = 234908374;
       var response = { message: "Book checked out" };
-      $httpBackend.expect("POST", "/api/trans/checkout", { copyid: copyid }, checkToken).respond(200, response);
-      http.checkoutBook(token, copyid, callback);
+      $httpBackend.expect(
+        "POST",
+        "/api/trans/checkout",
+        { copyid: copyid, requesterid: requesterid },
+        checkToken
+      ).respond(200, response);
+      http.checkoutBook(token, copyid, requesterid, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+    });
+  });
+
+  describe("#denyBookRequest", function() {
+    it("should make a POST request at /api/trans/deny that includes an access token and the copyid and then call the callback function with the response object", function() {
+      var copyid = 13;
+      var requesterid = 234908374;
+      var response = { message: "Book request deleted"};
+      $httpBackend.expect(
+        "POST",
+        "/api/trans/deny",
+        { copyid: copyid, requesterid: requesterid },
+        checkToken
+      ).respond(200, response);
+      http.denyBookRequest(token, copyid, requesterid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
