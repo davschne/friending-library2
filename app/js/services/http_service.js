@@ -131,7 +131,7 @@ module.exports = function(app) {
         }, token, callback);
       },
 
-      logOut: function(token, callback) {
+      logout: function(token, callback) {
         APICall({
           method: 'POST', url: '/logout'
         }, token, callback);

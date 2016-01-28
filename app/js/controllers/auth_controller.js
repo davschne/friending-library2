@@ -10,15 +10,13 @@ module.exports = function(app) {
 
       // check query string for token
       var token = $location.search().access_token;
-      console.log("token from query string: " + token)
 
       if (token) {
         // store it in a cookie
-        $cookies.put('tok', token);
+        $cookies.put("friending_library_access_token", token);
       } else {
         // check cookie for token
-        token = $cookies.get('tok');
-        console.log("token from cookie: " + token);
+        token = $cookies.get("friending_library_access_token");
       }
 
       return token;
@@ -30,29 +28,24 @@ module.exports = function(app) {
       // add token to $rootScope
       $rootScope.user = { access_token: token };
       // proceed to app
-      console.log("redirecting to /available_books");
       $location.url('/available_books');
     } else {
       // redirect to root for sign-in
-      console.log("redirecting to /");
       $location.url('/');
     }
 
     function clientLogout() {
       delete $rootScope.user;
-      $cookies.remove('tok');
+      $cookies.remove("friending_library_access_token");
       $location.url('/');
     }
 
-    function userLogOut(token) {
-      http.logOut(token, function(data) {
-        console.log('Logged Out');
-        console.log(data);
-      });
+    function serverLogout(token) {
+      http.logout(token, function() {});
       clientLogout();
     }
 
     $rootScope.clientLogout = clientLogout;
-    $rootScope.userLogOut = userLogOut;
+    $rootScope.serverLogout = serverLogout;
   }]);
 };
