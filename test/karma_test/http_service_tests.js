@@ -173,4 +173,17 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, books]);
     });
   });
+
+  describe("#createCopy", function() {
+    it("should make a POST request at /api/books that includes an access token and data about the book and then call the callback function with the response object", function() {
+      var book = util.rand(testData.books);
+      var response = [{ copyid: 19 }];
+      $httpBackend.expect("POST", "/api/books", book, checkToken).respond(200, response);
+      http.createCopy(token, book, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+    });
+  });
 });

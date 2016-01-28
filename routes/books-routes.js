@@ -19,7 +19,7 @@ module.exports = function(router, db, handle) {
       book.imageLinks.smallThumbnail
     )
     .then(function(db_res) {
-      res.json(db_res);
+      res.json(db_res); // send back copyid for inserted copy
     })
     .catch(function(err) {
       handle[500](err, res);
