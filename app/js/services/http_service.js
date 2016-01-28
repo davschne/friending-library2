@@ -21,21 +21,21 @@ module.exports = function(app) {
         data: obj.data || {}
       })
       .success(function(data, status, headers, config) {
-        callback(data);
+        callback(null, data);
       })
       .error(function(data, status, headers, config) {
-        handle(err, status, callback);
+        handle(status, callback);
       });
     }
 
-    function handle(err, status, callback) {
+    function handle(status, callback) {
       switch (status) {
         // API call unauthorized because of invalid token
         case 401:
           $rootScope.clientLogout();
           break;
         default:
-          console.log(err.data);
+          callback({ status: status }, null);
       }
     }
 
