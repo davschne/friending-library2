@@ -186,4 +186,17 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, response]);
     });
   });
+
+  describe("#deleteCopy", function() {
+    it("should make a POST request at /api/books/:copyid that includes an access token and then call the callback function with the response object", function() {
+      var copyid = 29;
+      var response = { message: "copy deleted" };
+      $httpBackend.expect("DELETE", "/api/books/" + copyid, {}, checkToken).respond(200, response);
+      http.deleteCopy(token, copyid, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+    });
+  });
 });
