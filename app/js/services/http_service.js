@@ -103,7 +103,7 @@ module.exports = function(app) {
       createBookRequest: function(token, copyid, callback) {
         APICall({
           method: 'POST', url: '/api/trans/request',
-          data: copyid
+          data: { copyid: copyid }
         }, token, callback);
       },
 
@@ -115,19 +115,19 @@ module.exports = function(app) {
 
       checkoutBook: function(token, copyid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/checkout', data: copyid
+          method: 'POST', url: '/api/trans/checkout', data: { copyid: copyid }
         }, token, callback);
       },
 
       denyBookRequest: function(token, copyid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/deny', data: copyid
+          method: 'POST', url: '/api/trans/deny', data: { copyid: copyid }
         }, token, callback);
       },
 
       checkinBook: function(token, copyid, callback) {
         APICall({
-          method: 'POST', url: '/api/trans/checkin', data: copyid
+          method: 'POST', url: '/api/trans/checkin', data: { copyid: copyid }
         }, token, callback);
       },
 

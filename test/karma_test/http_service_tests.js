@@ -220,4 +220,17 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, books]);
     });
   });
+
+  describe("#createBookRequest", function() {
+    it("should make a POST request at /api/trans/request that includes an access token and the copyid and then call the callback function with the response object", function() {
+      var copyid = 13;
+      var response = { message: "Book requested" };
+      $httpBackend.expect("POST", "/api/trans/request", { copyid: copyid }, checkToken).respond(200, response);
+      http.createBookRequest(token, copyid, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+    });
+  });
 });
