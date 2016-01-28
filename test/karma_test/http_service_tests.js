@@ -302,4 +302,18 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, response]);
     });
   });
+
+  describe("#logout", function() {
+    it("should make a POST request at /logout that includes an access token in the headers and then call the callback function with the response object", function() {
+      var copyid = 13;
+      var response = { message: "Logout successful" };
+      $httpBackend.expect("POST", "/logout", {}, checkToken)
+      .respond(200, response);
+      http.logout(token, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+    });
+  });
 });
