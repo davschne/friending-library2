@@ -284,4 +284,22 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, response]);
     });
   });
+
+  describe("#checkinBook", function() {
+    it("should make a POST request at /api/trans/checkin that includes an access token in the headers and the copy ID in the body and then call the callback function with the response object", function() {
+      var copyid = 13;
+      var response = { message: "Book checked in" };
+      $httpBackend.expect(
+        "POST",
+        "/api/trans/checkin",
+        { copyid: copyid },
+        checkToken
+      ).respond(200, response);
+      http.checkinBook(token, copyid, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+    });
+  });
 });
