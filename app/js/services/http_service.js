@@ -75,7 +75,7 @@ module.exports = function(app) {
         }, token, callback);
       },
 
-      connectGoogleBooks: function(data, callback) {
+      queryGoogleBooks: function(data, callback) {
         APICall({
           method: 'GET',
           url: 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + data + '&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0'

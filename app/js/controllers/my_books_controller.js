@@ -51,7 +51,7 @@ module.exports = function(app) {
     getUserBooks(token);
 
     $scope.askGoogle = function(userData) {
-      http.connectGoogleBooks(userData, function(data) {
+      http.queryGoogleBooks(userData, function(data) {
         console.log('Google Data Back');
         console.log(data);
 

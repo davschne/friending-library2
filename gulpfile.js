@@ -10,6 +10,8 @@ var mocha       = require("gulp-mocha");
 var KarmaServer = require("karma").Server;
 // var jshint      = require("gulp-jshint");
 
+var exec = require("child_process").exec;
+
 gulp.task('sass', function() {
   gulp.src('./app/sass/**/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
@@ -72,16 +74,30 @@ gulp.task("server_test", function() {
     .pipe(mocha());
 });
 
-gulp.task("client_test", ['webpack:test'], function(done) {
+gulp.task("client_test", ["webpack:test"], function(done) {
   new KarmaServer({
     configFile: __dirname + '/karma.conf.js'
   }, done)
   .start();
 });
 
-gulp.task('build', ['sass', 'copy-html', 'copy', 'webpack:dev']);
+gulp.task("run_server", function(done) {
+  var app = exec("node server");
+  app.stdout.on("data", function(data) {
+    console.log(data.toString());
+  });
+  app.stderr.on("data", function(data) {
+    console.error(data.toString());
+  });
+});
 
-gulp.task('default', ['build']);
+gulp.task("test", ["server_test", "client_test"]);
+
+gulp.task('compile', ['sass', 'copy-html', 'copy', 'webpack:dev']);
+
+gulp.task("build", ["test", "compile"])
+
+gulp.task('default', ['build', ]);
 
 // gulp.task("lint", function() {
 //   return gulp.src(["./routes/*.js", "./test/*.js", "./middleware/*.js", "./models/*.js", "./lib/*.js", "./server.js"])
