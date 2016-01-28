@@ -131,4 +131,43 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, bookRequests]);
     });
   });
+
+  describe("#getOutgoingBookRequests", function() {
+    it("should make a GET request at /api/self/book_requests/outgoing that includes an access token and then call the callback function with the response object", function() {
+      var book = testData.books[1];
+      var bookRequests = [
+        {
+          isbn: book.ISBN[13] || book.ISBN[10],
+          title: book.title,
+          subtitle: book.subtitle,
+          authors: book.authors,
+          categories: book.categories,
+          publisher: book.publisher,
+          publisheddate: book.publishedDate,
+          description: book.description,
+          pagecount: book.pageCount,
+          language: book.language,
+          imagelink: book.imageLinks.thumbnail,
+          imagelinksmall: book.imageLinks.smallThumbnail,
+          copyid: 23,
+          ownerid: 2187,
+          owner_display_name: "Finn",
+          request_date: "2016-01-27"
+        }
+      ];
+      $httpBackend.expect(
+        "GET",
+        "/api/self/book_requests/outgoing",
+        {},
+        function(headers) {
+          return headers.Authorization == "Bearer " + token;
+        }
+      ).respond(200, bookRequests);
+      http.getOutgoingBookRequests(token, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, bookRequests]);
+    });
+  });
 });
