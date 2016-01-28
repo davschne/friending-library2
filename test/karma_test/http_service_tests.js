@@ -233,4 +233,17 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, response]);
     });
   });
+
+  describe("#cancelBookRequest", function() {
+    it("should make a DELETE request at /api/trans/request/:copyid that includes an access token and then call the callback function with the response object", function() {
+      var copyid = 13;
+      var response = { message: "Book request deleted"};
+      $httpBackend.expect("DELETE", "/api/trans/request/" + copyid, {}, checkToken).respond(200, response);
+      http.cancelBookRequest(token, copyid, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+    });
+  });
 });
