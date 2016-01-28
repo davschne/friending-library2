@@ -3,6 +3,8 @@
 require('../../app/js/client.js'); // load app (the source code version)
 require('angular-mocks');
 
+var testData = require("../../lib/test/test-data.js");
+
 describe("http_service.js", function() {
 
   var $httpBackend;
@@ -74,7 +76,7 @@ describe("http_service.js", function() {
   });
 
   describe("#deleteUser", function() {
-    it("should make a DELETE request at /api/self that includes an access token and call the callback function with the response object", function() {
+    it("should make a DELETE request at /api/self that includes an access token and then call the callback function with the response object", function() {
       $httpBackend.expect(
         "DELETE",
         "/api/self",
@@ -88,6 +90,45 @@ describe("http_service.js", function() {
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
       expect(callback.calls.argsFor(0)).toEqual([null, { message: "user deleted" }]);
+    });
+  });
+
+  describe("#getIncomingBookRequests", function() {
+    it("should make a GET request at /api/self/book_requests/incoming that includes an access token and then call the callback function with the response object", function() {
+      var book = testData.books[0];
+      var bookRequests = [
+        {
+          isbn: book.ISBN[13] || book.ISBN[10],
+          title: book.title,
+          subtitle: book.subtitle,
+          authors: book.authors,
+          categories: book.categories,
+          publisher: book.publisher,
+          publisheddate: book.publishedDate,
+          description: book.description,
+          pagecount: book.pageCount,
+          language: book.language,
+          imagelink: book.imageLinks.thumbnail,
+          imagelinksmall: book.imageLinks.smallThumbnail,
+          copyid: 23,
+          requesterid: 2187,
+          requester_display_name: "Finn",
+          request_date: "2016-01-27"
+        }
+      ];
+      $httpBackend.expect(
+        "GET",
+        "/api/self/book_requests/incoming",
+        {},
+        function(headers) {
+          return headers.Authorization == "Bearer " + token;
+        }
+      ).respond(200, bookRequests);
+      http.getIncomingBookRequests(token, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, bookRequests]);
     });
   });
 });
