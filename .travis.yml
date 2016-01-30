@@ -9,4 +9,5 @@ services:
 before_script:
   - npm install -g gulp
 # test command
-script: gulp test
+script: gulp
+after_script: gulp db_breakdown

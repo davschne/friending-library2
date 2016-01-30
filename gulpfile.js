@@ -1,11 +1,12 @@
 'use strict';
 
-var gulp        = require('gulp');
-var sass        = require('gulp-sass');
-var webpack     = require('gulp-webpack');
-var uglify      = require('gulp-uglify');
-var minifyCSS   = require('gulp-minify-css');
-var minifyHTML  = require('gulp-minify-html');
+var gulp        = require("gulp");
+var del         = require("del");
+var sass        = require("gulp-sass");
+var webpack     = require("gulp-webpack");
+var uglify      = require("gulp-uglify");
+var minifyCSS   = require("gulp-minify-css");
+var minifyHTML  = require("gulp-minify-html");
 var mocha       = require("gulp-mocha");
 var KarmaServer = require("karma").Server;
 // var jshint      = require("gulp-jshint");
@@ -63,6 +64,10 @@ gulp.task('copy', function() {
     .pipe(gulp.dest('./public/'));
 });
 
+gulp.task("clean", function() {
+  del.sync(["./public/**", "!public"]);
+})
+
 gulp.task("server_test", function() {
   return gulp.src([
       "./test/mocha_test/setup-tests.js",
@@ -80,6 +85,22 @@ gulp.task("client_test", ["webpack:test"], function(done) {
   .start();
 });
 
+// create Postgres user, database, and schema
+gulp.task("db_setup", function(done) {
+  var setupUtil = exec("node lib/db/db_setup");
+  setupUtil.stdout.on("data", function(data) {
+    console.log(data.toString());
+  });
+});
+
+// drop Postgres database and user
+gulp.task("db_breakdown", function(done) {
+  var setupUtil = exec("node lib/db/db_breakdown");
+  setupUtil.stdout.on("data", function(data) {
+    console.log(data.toString());
+  });
+});
+
 // run server (as child process)
 gulp.task("start", function(done) {
   var app = exec("node server");
@@ -93,11 +114,11 @@ gulp.task("start", function(done) {
 
 gulp.task("test", ["server_test", "client_test"]);
 
-gulp.task("compile", ["sass", "copy-html", "copy", "webpack:dev"]);
+gulp.task("compile", ["clean", "sass", "copy-html", "copy", "webpack:dev"]);
 
-gulp.task("build", ["test", "compile"])
+gulp.task("build", ["test", "compile"]);
 
-gulp.task("default", ["build", "start"]);
+gulp.task("default", ["build", "db_setup"]);
 
 // gulp.task("lint", function() {
 //   return gulp.src(["./routes/*.js", "./test/*.js", "./middleware/*.js", "./models/*.js", "./lib/*.js", "./server.js"])
