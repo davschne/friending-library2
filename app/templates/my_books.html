@@ -13,11 +13,12 @@
   <section class="form">
     <section class="form__module">
       <h1 class="form__module__header">Add A Book</h1>
-      <form data-ng-submit="askGoogle(googlebook.isbn)">
+      <form data-ng-submit="askGoogle(query_isbn)">
         <p class="form__module__p">Enter 10- or 13-Digit ISBN</p>
         <section class="form__module-input-button">
-          <input type="text" data-ng-model="googlebook.isbn" required></input>
+          <input type="text" data-ng-model="query_isbn" required></input>
           <button type="submit">Find Book</button>
+          <p>{{query_isbn}}</p>
         </section>
       </form>
     </section>

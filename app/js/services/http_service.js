@@ -17,7 +17,7 @@ module.exports = function(app) {
       $http({
         method: obj.method,
         url: obj.url,
-        headers: {'Authorization': 'Bearer ' + token},
+        headers: token ? {'Authorization': 'Bearer ' + token} : {},
         data: obj.data || {}
       })
       .success(function(data, status, headers, config) {
@@ -72,13 +72,6 @@ module.exports = function(app) {
       getOwnBooks: function(token, callback) {
         APICall({
           method: 'GET', url: '/api/self/books'
-        }, token, callback);
-      },
-
-      queryGoogleBooks: function(data, callback) {
-        APICall({
-          method: 'GET',
-          url: 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + data + '&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0'
         }, token, callback);
       },
 
@@ -139,6 +132,13 @@ module.exports = function(app) {
         APICall({
           method: 'POST', url: '/logout'
         }, token, callback);
+      },
+
+      queryGoogleBooks: function(isbn, callback) {
+        APICall({
+          method: 'GET',
+          url: 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn + '&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0'
+        }, null, callback);
       }
     };
   }]);

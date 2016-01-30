@@ -7,16 +7,16 @@ module.exports = function(app) {
     var http = httpService;
     var token = $scope.user.access_token;
 
-    var getUserBooks = function(token) {
-      http.getBooks(token, function(data) {
+    $scope.bookRequests = [];
+    $scope.borrowedBooks = [];
+    $scope.availableBooks = [];
+
+    $scope.getOwnBooks = function() {
+      http.getOwnBooks(token, function(data) {
         console.log('Book Grab Success');
         console.log(data);
 
         $scope.userBooks = data;
-
-        $scope.bookRequests = [];
-        $scope.borrowedBooks = [];
-        $scope.availableBooks = [];
 
         for(var i = 0; i < $scope.userBooks.length; i++) {
           if ($scope.userBooks[i].request) {
@@ -48,9 +48,9 @@ module.exports = function(app) {
       });
     }
 
-    getUserBooks(token);
+    getOwnBooks();
 
-    $scope.askGoogle = function(userData) {
+    $scope.searchByISBN = function(userData) {
       http.queryGoogleBooks(userData, function(data) {
         console.log('Google Data Back');
         console.log(data);

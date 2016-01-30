@@ -316,4 +316,18 @@ describe("http_service.js", function() {
       expect(callback.calls.argsFor(0)).toEqual([null, response]);
     });
   });
+
+  describe("#queryGoogleBooks", function() {
+    it("should make a GET request to the Google Books API, querying by ISBN, and then call the callback function with the response object", function() {
+      var book = util.rand(testData.books);
+      var ISBN = book.ISBN[13] || book.ISBN[10];
+      $httpBackend.expect("GET", "https://www.googleapis.com/books/v1/volumes?q=isbn:" + ISBN + "&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0")
+      .respond(200, book);
+      http.queryGoogleBooks(ISBN, callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([null, book]);
+    });
+  });
 });

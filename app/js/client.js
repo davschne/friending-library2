@@ -12,7 +12,7 @@ var friendingLibrary = angular.module('friendingLibrary', ['ngRoute', 'ngCookies
 require('./services/http_service')(friendingLibrary);
 
 //controllers
-require('./controllers/auth_controller')(friendingLibrary);
+require('./controllers/root_controller')(friendingLibrary);
 require('./controllers/my_books_controller')(friendingLibrary);
 require('./controllers/available_books_controller')(friendingLibrary);
 require('./controllers/borrowing_and_lending_controller')(friendingLibrary);
@@ -21,8 +21,7 @@ require('./controllers/borrowing_and_lending_controller')(friendingLibrary);
 friendingLibrary.config(['$routeProvider', function($routeProvider) {
   $routeProvider
     .when('/', {
-      templateUrl: '/templates/sign_in.html',
-      controller: 'authController'
+      templateUrl: '/templates/sign_in.html'
     })
     .when('/available_books', {
       templateUrl: '/templates/available_books.html',

@@ -9,7 +9,6 @@ var minifyHTML  = require('gulp-minify-html');
 var mocha       = require("gulp-mocha");
 var KarmaServer = require("karma").Server;
 // var jshint      = require("gulp-jshint");
-
 var exec = require("child_process").exec;
 
 gulp.task('sass', function() {
@@ -30,8 +29,8 @@ gulp.task('webpack:dev', function() {
         filename: 'bundle.js'
       }
      }))
-      // .pipe(uglify())
-      .pipe(gulp.dest('./public/js/'));
+    // .pipe(uglify())
+    .pipe(gulp.dest('./public/js/'));
 });
 
 gulp.task('webpack:test', function() {
@@ -93,7 +92,7 @@ gulp.task("run_server", function(done) {
 
 gulp.task("test", ["server_test", "client_test"]);
 
-gulp.task('compile', ['sass', 'copy-html', 'copy', 'webpack:dev']);
+gulp.task("compile", ['sass', 'copy-html', 'copy', 'webpack:dev']);
 
 gulp.task("build", ["test", "compile"])
 
