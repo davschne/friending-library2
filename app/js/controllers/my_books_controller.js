@@ -11,7 +11,7 @@ module.exports = function(app) {
     $scope.borrowedBooks = [];
     $scope.availableBooks = [];
 
-    $scope.getOwnBooks = function() {
+    var getOwnBooks = function() {
       http.getOwnBooks(token, function(data) {
         console.log('Book Grab Success');
         console.log(data);
@@ -48,6 +48,10 @@ module.exports = function(app) {
       });
     }
 
+    $scope.getOwnBooks = getOwnBooks;
+    $scope.searchByISBN = searchByISBN;
+    $scope.createBook   = createBook;
+
     getOwnBooks();
 
     $scope.searchByISBN = function(userData) {
@@ -77,11 +81,11 @@ module.exports = function(app) {
       });
     };
 
-    $scope.submitBook = function(token, userData) {
-      http.createBook(token, userData, function(data) {
+    var createBook = function(bookObj) {
+      http.createBook(token, bookObj, function(data) {
         console.log('Submit Success');
         console.log(data);
-        getUserBooks(token);
+        getOwnBooks(token);
       });
 
       delete $scope.googleData;

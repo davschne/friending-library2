@@ -80,7 +80,8 @@ gulp.task("client_test", ["webpack:test"], function(done) {
   .start();
 });
 
-gulp.task("run_server", function(done) {
+// run server (as child process)
+gulp.task("start", function(done) {
   var app = exec("node server");
   app.stdout.on("data", function(data) {
     console.log(data.toString());
@@ -92,11 +93,11 @@ gulp.task("run_server", function(done) {
 
 gulp.task("test", ["server_test", "client_test"]);
 
-gulp.task("compile", ['sass', 'copy-html', 'copy', 'webpack:dev']);
+gulp.task("compile", ["sass", "copy-html", "copy", "webpack:dev"]);
 
 gulp.task("build", ["test", "compile"])
 
-gulp.task('default', ['build', ]);
+gulp.task("default", ["build", "start"]);
 
 // gulp.task("lint", function() {
 //   return gulp.src(["./routes/*.js", "./test/*.js", "./middleware/*.js", "./models/*.js", "./lib/*.js", "./server.js"])

@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "stable"
+  - "4.1"
+  - "0.12"
+services:
+  - postgresql
+  - redis-server
+before_script:
+  - npm install -g gulp
+# test command
+script: gulp test
