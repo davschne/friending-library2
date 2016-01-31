@@ -24,14 +24,14 @@ gulp.task('sass:watch', function() {
 });
 
 gulp.task('webpack:dev', function() {
-  return gulp.src('./app/js/client.js')
+  return gulp.src('./app/client.js')
     .pipe(webpack({
       output: {
         filename: 'bundle.js'
       }
      }))
     // .pipe(uglify())
-    .pipe(gulp.dest('./public/js/'));
+    .pipe(gulp.dest('./public/'));
 });
 
 gulp.task('webpack:test', function() {

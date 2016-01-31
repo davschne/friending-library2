@@ -108,7 +108,6 @@ describe('db.js', function() {
         book.imageLinks.smallThumbnail
       )
       .then(function(res) {
-        console.log("res:", res);
         expect(res).to.exist;
         expect(res[0]).to.have.property("copyid");
         expect(res[0].copyid).to.be.a("number");
