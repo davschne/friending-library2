@@ -4,14 +4,14 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
     'myLibraryController',
-    ['$scope', '$location', 'RESTService', '$cookies', function($scope, $location, REST, $cookies) {
+    ['$scope', 'rest', function($scope, rest) {
 
       $scope.bookRequests = [];
       $scope.borrowedBooks = [];
       $scope.availableBooks = [];
 
       var getOwnBooks = function() {
-        REST.getOwnBooks(function(data) {
+        rest.getOwnBooks(function(data) {
           console.log('Book Grab Success');
           console.log(data);
 
@@ -54,7 +54,7 @@ module.exports = function(friendingLibrary) {
       getOwnBooks();
 
       $scope.searchByISBN = function(userData) {
-        REST.queryGoogleBooks(userData, function(data) {
+        rest.queryGoogleBooks(userData, function(data) {
           console.log('Google Data Back');
           console.log(data);
 
@@ -81,7 +81,7 @@ module.exports = function(friendingLibrary) {
       };
 
       var createBook = function(bookObj) {
-        REST.createBook(bookObj, function(data) {
+        rest.createBook(bookObj, function(data) {
           console.log('Submit Success');
           console.log(data);
           getOwnBooks();
@@ -91,7 +91,7 @@ module.exports = function(friendingLibrary) {
       };
 
       $scope.destroyBook = function(bookId) {
-        REST.removeBook(bookId, function(data) {
+        rest.removeBook(bookId, function(data) {
           console.log('Removed Book!');
           console.log(data);
           getUserBooks();

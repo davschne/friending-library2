@@ -4,10 +4,10 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
     'findBooksController',
-    ['$scope', 'RESTService', '$cookies', '$location', function($scope, REST, $cookies, $location) {
+    ['$scope', 'REST', '$cookies', '$location', function($scope, rest, $cookies, $location) {
 
       var populateBookPile = function() {
-        REST.availableBooks(function(data) {
+        rest.availableBooks(function(data) {
           console.log("available books:", data);
 
           $scope.books = data;
@@ -35,7 +35,7 @@ module.exports = function(friendingLibrary) {
       };
 
       $scope.requestBook = function(bookId) {
-        REST.requestBook(bookId, function(data) {
+        rest.requestBook(bookId, function(data) {
           console.log('Checked Out');
           console.log(data);
 

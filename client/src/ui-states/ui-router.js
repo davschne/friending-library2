@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 module.exports = function(friendingLibrary, templates) {
 
   // UI routing
-  friendingLibrary.config(['$stateProvider', function($stateProvider) {
+  friendingLibrary.config(["$stateProvider", function($stateProvider) {
 
     $stateProvider
     .state("public", {

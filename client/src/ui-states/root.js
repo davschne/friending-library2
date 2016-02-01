@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
 module.exports = function(friendingLibrary) {
 
-  friendingLibrary.controller('rootController', ['$state', 'authService', function($state, auth) {
+  friendingLibrary.controller("rootController", ["$state", "token", function($state, token) {
 
     this.init = function() {
       // Try to retrieve access token.
       // If found, proceed to app; otherwise go to "public" state.
-      $state.go(auth.getToken() ? "app.find_books" : "public");
+      $state.go(token.get() ? "app.find_books" : "public");
     };
 
     // GO

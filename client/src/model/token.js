@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
 module.exports = function(friendingLibrary) {
 
   friendingLibrary.factory(
-    'authService',
-    ['$cookies', '$location', function($cookies, $location) {
+    "token",
+    ["$cookies", "$location", function($cookies, $location) {
 
       var token;
 
-      var getToken = function() {
+      var get = function() {
 
         if (!token) {
 
@@ -31,7 +31,7 @@ module.exports = function(friendingLibrary) {
         return token;
       };
 
-      var deauthorize = function() {
+      var del = function() {
 
         // delete private variable
         token = undefined;
@@ -41,8 +41,8 @@ module.exports = function(friendingLibrary) {
       };
 
       return {
-        getToken: getToken,
-        deauthorize: deauthorize
+        get: getToken,
+        del: deauthorize
       };
     }]
   );

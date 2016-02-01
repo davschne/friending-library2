@@ -4,10 +4,10 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
     'requestsController',
-    ['$scope', '$location', 'RESTService', '$cookies', function($scope, $location, REST, $cookies) {
+    ['$scope', 'REST', '$cookies', function($scope, rest, $cookies) {
 
       var getUserData = function() {
-        REST.getUser(function(data) {
+        rest.getUser(function(data) {
           console.log('User Grab Success');
           console.log(data);
 
@@ -31,7 +31,7 @@ module.exports = function(friendingLibrary) {
       getUserData();
 
       $scope.removeRequest = function(bookId, closure) {
-        REST.undoRequest(bookId, function(data) {
+        rest.undoRequest(bookId, function(data) {
           console.log('Undo Request');
           console.log(data);
           getUserData();
@@ -39,7 +39,7 @@ module.exports = function(friendingLibrary) {
       };
 
       $scope.acceptRequest = function(userData) {
-        REST.approveRequest(userData, function(data) {
+        rest.approveRequest(userData, function(data) {
           console.log('Request Accepted');
           console.log(data);
           getUserData();
@@ -47,7 +47,7 @@ module.exports = function(friendingLibrary) {
       };
 
       $scope.rejectRequest = function(userData) {
-        REST.denyRequest(userData, function(data) {
+        rest.denyRequest(userData, function(data) {
           console.log('Request Rejected');
           console.log(data);
           getUserData();
@@ -55,7 +55,7 @@ module.exports = function(friendingLibrary) {
       };
 
       $scope.returnBook = function(userData) {
-        REST.bookReturn(userData, function(data) {
+        rest.bookReturn(userData, function(data) {
           console.log('Book Returned');
           console.log(data);
           getUserData();
