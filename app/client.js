@@ -1,42 +1,35 @@
 'use strict';
 
-// debugger;
-
 require('angular/angular');
 require('angular-route');
 require('angular-cookies');
+require('angular-ui-router');
 
-var friendingLibrary = angular.module('friendingLibrary', ['ngRoute', 'ngCookies']);
+// paths to templates (relative to bundle.js)
+var templates = {
+  public     : "components/public/public.html",
+  app        : "components/app/app.html",
+  find_books : "components/app/find_books/find_books.html",
+  my_library : "components/app/my_library/my_library.html",
+  requests   : "components/app/requests/requests.html"
+};
 
-//services
-require('./components/http_service/http_service.js')(friendingLibrary);
+// create module
+var friendingLibrary = angular.module(
+  'friendingLibrary',
+  ['ngRoute', 'ngCookies', 'ui.router']
+);
 
-//controllers
-require('./root_controller')(friendingLibrary);
-require('./components/my_books/my_books_controller.js')(friendingLibrary);
-require('./components/available_books/available_books_controller.js')(friendingLibrary);
-require('./components/borrowing_and_lending/borrowing_and_lending_controller.js')(friendingLibrary);
+// load services
+require('./components/services/rest_service.js')(friendingLibrary);
+require('./components/services/auth_service.js')(friendingLibrary);
 
-//routes
-friendingLibrary.config(['$routeProvider', function($routeProvider) {
-  $routeProvider
-    .when('/', {
-      templateUrl: '/components/sign_in/sign_in.html'
-    })
-    .when('/available_books', {
-      templateUrl: '/components/available_books/available_books.html',
-      controller: 'availableBooksController'
-    })
-    .when('/my_books', {
-      templateUrl: '/components/my_books/my_books.html',
-      controller: 'myBooksController'
-    })
-    .when('/borrowing_and_lending', {
-      templateUrl: 'components/borrowing_and_lending/borrowing_and_lending.html',
-      controller: 'borrowingAndLendingController'
-    })
-    .otherwise({
-      redirectTo: '/'
-    });
+// load controllers
+require("./root_controller.js")(friendingLibrary);
+require("./components/app/app_controller.js")(friendingLibrary);
+require("./components/app/find_books/find_books_controller.js")(friendingLibrary);
+require("./components/app/my_library/my_library_controller.js")(friendingLibrary);
+require("./components/app/requests/requests_controller.js")(friendingLibrary);
 
-}]);
+// load UI routing
+require('./components/ui-router.js')(friendingLibrary, templates);

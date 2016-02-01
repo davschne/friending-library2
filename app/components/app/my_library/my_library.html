@@ -1,0 +1,56 @@
+<section class="form">
+  <section class="form__module">
+    <h1 class="form__module__header">Add A Book</h1>
+    <form data-ng-submit="askGoogle(query_isbn)">
+      <p class="form__module__p">Enter 10- or 13-Digit ISBN</p>
+      <section class="form__module-input-button">
+        <input type="text" data-ng-model="query_isbn" required></input>
+        <button type="submit">Find Book</button>
+        <p>{{query_isbn}}</p>
+      </section>
+    </form>
+  </section>
+</section>
+
+<section class="error__message" data-ng-if="checkResult">
+  <p class="error__message__p">Sorry, we could not find that book. Please verify that the ISBN is correct.</p>
+</section>
+
+<section class="list" data-ng-if="googleData">
+  <section class="book__list__section">
+    <section class="book__list__subsection" data-ng-if="googleData">
+      <img data-ng-src="{{googleData.images.smallThumbnail}}"/>
+    </section>
+    <section class="book__list__subsection" data-ng-if="googleData">
+      <ul>
+        <li><p>Title:</p>{{googleData.title}}</li>
+        <!-- TODO : If multiple authors, show them all -->
+        <li><p>Author:</p>{{googleData.author[0]}}</li>
+        <li><p>Genre:</p>{{googleData.genre[0]}}</li>
+      </ul>
+      <button data-ng-click="submitBook(user.access_token, {title: googleData.title, authors: googleData.author, imageLinks: googleData.images, categories: googleData.genre, description: googleData.description})">Post</button>
+    </section>
+  </section>
+</section>
+
+<h1 class="book__list__header">My Book Pile</h1>
+<section class="book__list">
+  <ul class="list">
+    <h2 class="book__list__none" data-ng-if="allRequested">All Books Out</h2>
+    <li class="list__item" data-ng-repeat="book in availableBooks">
+      <section class="book__list__section">
+        <section class="book__list__subsection">
+          <img data-ng-src="{{book.imageLinks.smallThumbnail}}">
+        </section>
+        <section class="book__list__subsection">
+          <ul>
+            <li><p>Title:</p>{{book.title}}</li>
+            <li><p>Author:</p>{{book.authors[0]}} </li>
+            <li><p>Genre:</p>{{book.categories[0]}} </li>
+          </ul>
+          <button data-ng-click="destroyBook(user.access_token, book._id)">Remove</button>
+        </section>
+      </section>
+    </li>
+  </ul>
+</section>

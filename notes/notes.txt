@@ -1,13 +1,52 @@
--Angular : if API call returns Unauthorized, return to login screen, delete cookie
+Angular structure
+-root
+  -public  : if no token
+    -description of app
+    -sign in button
+  -app     : if token
+    -Nav bar
+    -Main pane
+      -Find Books
+        -shows available books (paginated)
+        -allows searching for books
+        -allows requesting a book
+      -My Library
+        -shows borrowed books
+        -shows lent books
+          -allows checking in a returned book
+        -shows books owned
+          -allows adding and deleting books
+      -Requests
+        -shows requests for my books
+          -allows checking out a requested book (and setting a due date)
+        -shows my requests for books
+        (-shows outgoing friend requests)
+        (-shows incoming friend requests
+          -allows approving a friend request
+          -allows denying a friend request
+        )
+      (-Friends
+        -shows list of friends (and contact info?)
+        -allows searching for friends
+        -allows requesting a friend
+      )
+      -Account
+        -allows deleting an account
 
--setup
-  -move creation tasks to a .js file (not shell scripts)
-  -create user and database : database_creation.sql
-  -log in as user and set up database : database_setup.sql
-  -configure Redis (redis.conf?)
-    -incl. auth (see http://redis.io/topics/security)
-
--stream results from Postgres? Use package node-pg-query-stream?
+Services
+-http : for REST calls
+-auth($cookies, $location)
+  -getToken() : returns token (or null)
+    -retrieve from private var
+    -else:
+      -retrieve from query string
+        -store in cookie
+      -else:
+        -retrieve from cookie
+      -store in private var
+  -deleteToken()
+    -delete token
+    -delete cookie
 
 -friend deletion triggers:
   -delete relevant book requests
