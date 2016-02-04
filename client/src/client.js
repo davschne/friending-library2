@@ -23,7 +23,7 @@ var friendingLibrary = angular.module(
 // load services
 require("./shared/REST.js")(friendingLibrary);
 require("./shared/LoginLogout.js")(friendingLibrary);
-require("./model/Token.js")(friendingLibrary);
+require("./shared/Token.js")(friendingLibrary);
 
 // load controllers
 require("./ui/root.js")(friendingLibrary);

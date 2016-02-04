@@ -1,6 +1,6 @@
 'use strict';
 
-require('../../app/client.js'); // load app (the source code version)
+require('../../client/src/client.js'); // load app (the source code version)
 require('angular-mocks');
 
 var testData = require("../../lib/test/test-data.js");
@@ -8,31 +8,40 @@ var util     = require("../../lib/test/test-util.js");
 
 describe("REST.js", function() {
 
-  var $httpBackend;
-  // var $rootScope;
+  // the REST service under test
   var rest;
+  // mock callback function
   var callback;
+  // access token to use for API calls
   var access_token = "asdlfkJOWEIFJN485fvnj";
-  // check for token in HTTP headers
+  // utility to check for token in HTTP headers
   var checkToken = function(headers) {
     return headers.Authorization == "Bearer " + access_token;
   };
+  // mock REST service dependencies
+  var TokenMock = { get: function() { return access_token; } };
+  var LoginLogoutMock = { out: function() {} };
+  // mock backend
+  var $httpBackend;
 
   beforeEach(function() {
+    // create Jasmine spies
     callback = jasmine.createSpy("callback");
-    // mock "token" service
-    token        = {
-      get: function() { return access_token; }
-    };
-    spyOn(token, "get").and.callThrough();
+    spyOn(LoginLogoutMock, "out");
+
+    // mock the module
+    angular.mock.module("friendingLibrary");
+    // override REST's dependencies with mocks
+    angular.mock.module(function($provide) {
+      $provide.factory("Token", function() { return TokenMock; });
+      $provide.factory("LoginLogout", function() { return LoginLogoutMock; });
+    });
+
+    inject(function(_$httpBackend_, REST) {
+      $httpBackend = _$httpBackend_;
+      rest         = REST;
+    });
   });
-
-  beforeEach(angular.mock.module("friendingLibrary"));
-
-  beforeEach(angular.mock.inject(function(_$httpBackend_, REST) {
-    $httpBackend = _$httpBackend_;
-    rest         = REST;
-  }));
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
@@ -41,22 +50,22 @@ describe("REST.js", function() {
 
   describe("error handler", function() {
 
-    xit("401: should call $rootScope.clientLogout", function() {
-      $rootScope.clientLogout = function() {};
-      spyOn($rootScope, "clientLogout");
+    it("401: should call Log.out()", function() {
+      // $rootScope.clientLogout = function() {};
+      // spyOn($rootScope, "clientLogout");
       // Since the handler function will be called if there's an error on ANY
       // API call, we'll just choose one arbitrarily.
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(401);
-      rest.deleteUser(token, callback);
+      rest.deleteUser(callback);
       $httpBackend.flush();
       expect(callback).not.toHaveBeenCalled();
-      expect($rootScope.clientLogout).toHaveBeenCalled();
+      expect(LoginLogoutMock.out).toHaveBeenCalled();
     });
 
     it("any other error: should call the callback function with the response object", function() {
       var status = 500;
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(status);
-      rest.deleteUser(token, callback);
+      rest.deleteUser(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -67,7 +76,7 @@ describe("REST.js", function() {
   describe("#deleteUser", function() {
     it("should make a DELETE request at /api/self that includes an access token and then call the callback function with the response object", function() {
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(200, { message: "user deleted" });
-      rest.deleteUser(token, callback);
+      rest.deleteUser(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -90,7 +99,7 @@ describe("REST.js", function() {
       ];
       $httpBackend.expect(
         "GET", "/api/self/book_requests/incoming", {}, checkToken).respond(200, bookRequests);
-      rest.getIncomingBookRequests(token, callback);
+      rest.getIncomingBookRequests(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -112,7 +121,7 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/book_requests/outgoing", {}, checkToken).respond(200, bookRequests);
-      rest.getOutgoingBookRequests(token, callback);
+      rest.getOutgoingBookRequests(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -134,7 +143,7 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/books_borrowed", {}, checkToken).respond(200, borrowing);
-      rest.getBorrowedBooks(token, callback);
+      rest.getBorrowedBooks(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -156,7 +165,7 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/books_lent", {}, checkToken).respond(200, lending);
-      rest.getLentBooks(token, callback);
+      rest.getLentBooks(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -170,7 +179,7 @@ describe("REST.js", function() {
         util.formatBook(util.rand(testData.books), {copyids: [2, 3, 5, 7]})
       ];
       $httpBackend.expect("GET", "/api/self/books", {}, checkToken).respond(200, books);
-      rest.getOwnBooks(token, callback);
+      rest.getOwnBooks(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -183,7 +192,7 @@ describe("REST.js", function() {
       var book = util.rand(testData.books);
       var response = [{ copyid: 19 }];
       $httpBackend.expect("POST", "/api/books", book, checkToken).respond(200, response);
-      rest.createCopy(token, book, callback);
+      rest.createCopy(book, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -196,7 +205,7 @@ describe("REST.js", function() {
       var copyid = 29;
       var response = { message: "copy deleted" };
       $httpBackend.expect("DELETE", "/api/books/" + copyid, {}, checkToken).respond(200, response);
-      rest.deleteCopy(token, copyid, callback);
+      rest.deleteCopy(copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -217,7 +226,7 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/books/available", {}, checkToken).respond(200, books);
-      rest.getAvailableBooks(token, callback);
+      rest.getAvailableBooks(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -230,7 +239,7 @@ describe("REST.js", function() {
       var copyid = 13;
       var response = { message: "Book requested" };
       $httpBackend.expect("POST", "/api/trans/request", { copyid: copyid }, checkToken).respond(200, response);
-      rest.createBookRequest(token, copyid, callback);
+      rest.createBookRequest(copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -243,7 +252,7 @@ describe("REST.js", function() {
       var copyid = 13;
       var response = { message: "Book request deleted"};
       $httpBackend.expect("DELETE", "/api/trans/request/" + copyid, {}, checkToken).respond(200, response);
-      rest.cancelBookRequest(token, copyid, callback);
+      rest.cancelBookRequest(copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -262,7 +271,7 @@ describe("REST.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      rest.checkoutBook(token, copyid, requesterid, callback);
+      rest.checkoutBook(copyid, requesterid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -281,7 +290,7 @@ describe("REST.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      rest.denyBookRequest(token, copyid, requesterid, callback);
+      rest.denyBookRequest(copyid, requesterid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -299,7 +308,7 @@ describe("REST.js", function() {
         { copyid: copyid },
         checkToken
       ).respond(200, response);
-      rest.checkinBook(token, copyid, callback);
+      rest.checkinBook(copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -307,13 +316,15 @@ describe("REST.js", function() {
     });
   });
 
-  describe("#logout", function() {
+  // TODO : Move this test to LoginLogout service tests
+
+  xdescribe("#logout", function() {
     it("should make a POST request at /logout that includes an access token in the headers and then call the callback function with the response object", function() {
       var copyid = 13;
       var response = { message: "Logout successful" };
       $httpBackend.expect("POST", "/logout", {}, checkToken)
       .respond(200, response);
-      rest.logout(token, callback);
+      rest.logout(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -321,7 +332,9 @@ describe("REST.js", function() {
     });
   });
 
-  describe("#queryGoogleBooks", function() {
+  // TODO : This method may be moved to a different service
+
+  xdescribe("#queryGoogleBooks", function() {
     it("should make a GET request to the Google Books API, querying by ISBN, and then call the callback function with the response object", function() {
       var book = util.rand(testData.books);
       var ISBN = book.ISBN[13] || book.ISBN[10];
