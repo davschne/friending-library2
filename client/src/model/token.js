@@ -41,8 +41,8 @@ module.exports = function(friendingLibrary) {
       };
 
       return {
-        get: getToken,
-        del: deauthorize
+        get: get,
+        del: del
       };
     }]
   );

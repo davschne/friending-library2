@@ -42,61 +42,63 @@ Design ideas
   -performed immediately on the client (assuming success)
   -on success: do nothing
   -on failure: execute callback function (undo operation or throw error (to be caught by view controller?))
+-structure:
+  Interface service : conducts all transactions
+  lower-level services : store data, have getAll, add, delete methods
+    AvailableBooks
+    OutgoingBookRequests
+    Borrowing
+    ---
+    MyBooks
+    IncomingBookRequests
+    Lending
 
+-Controllers have read-only access to lower-level services: .getAll(). They can only initiate actions using the Interface service.
+
+
+Data Types
+----------
 copy obj:
   copyid
-  ISBN
   ownerid
+  ISBN
   ...
 
-users:
-  hash (by ID)
+user obj:
+  id
+  displayname
 
-copies:
-  hash table:
-    copyid : {
-      ISBN
-      owner
-    }
-
-books:
-  getByISBN
-  hash table:
-    ISBN : {
-
-      title,
-      authors,
-      ...
-    }
-
-bookRequests:
+bookRequest obj:
   copy
-  requester
+  requester : user
+  request date
 
-book_requests API:
-  getIncoming()
-  getOutgoing()
-  create(copy, requesterid)
-  delete(copy, requesterid)
-  update : refresh data model from server
+borrowingCard obj:
+  copy
+  owner    : user
+  borrower : user
 
-borrowed API:
-  get()
-  update()
-  borrow(copy)
-  return(copy)
-
-lent API
-  get()
-  update()
-  checkout(copy)
-  checkin(copy)
-
-my_books API
-  get()
-  update()
-  add(copy)
-  delete(copy)
+Interface service:
+  .requestBook(copy)
+    -add to OutgoingBookRequests
+    -remove from AvailableBooks
+  .cancelBookRequest(copy)
+    -add to AvailableBooks
+    -remove from OutgoingBookRequests
+  ---
+  .createCopy(data)
+    -add to MyBooks
+  .deleteCopy(copy)
+    -remove from MyBooks
+  .denyBookRequest(copy)
+    -add to MyBooks
+    -remove from IncomingBookRequests
+  .checkoutBook(copy)
+    -add to Lending
+    -remove from Borrowing
+  .checkinBook(copy)
+    -add to MyBooks
+    -remove from Lending
 
 -friend deletion triggers:
   -delete relevant book requests

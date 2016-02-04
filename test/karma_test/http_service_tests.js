@@ -9,25 +9,29 @@ var util     = require("../../lib/test/test-util.js");
 describe("http_service.js", function() {
 
   var $httpBackend;
-  var $rootScope;
-  var http;
+  // var $rootScope;
+  var rest;
   var callback;
-  var token = "asdlfkJOWEIFJN485fvnj";
+  var access_token = "asdlfkJOWEIFJN485fvnj";
   // check for token in HTTP headers
   var checkToken = function(headers) {
-    return headers.Authorization == "Bearer " + token;
+    return headers.Authorization == "Bearer " + access_token;
   };
 
   beforeEach(function() {
     callback = jasmine.createSpy("callback");
+    // mock "token" service
+    token        = {
+      get: function() { return access_token; }
+    };
+    spyOn(token, "get").and.callThrough();
   });
 
   beforeEach(angular.mock.module("friendingLibrary"));
 
-  beforeEach(angular.mock.inject(function(_$httpBackend_, _$rootScope_, httpService) {
+  beforeEach(angular.mock.inject(function(_$httpBackend_, REST) {
     $httpBackend = _$httpBackend_;
-    $rootScope   = _$rootScope_;
-    http         = httpService;
+    rest         = REST;
   }));
 
   afterEach(function() {
@@ -37,13 +41,13 @@ describe("http_service.js", function() {
 
   describe("error handler", function() {
 
-    it("401: should call $rootScope.clientLogout", function() {
+    xit("401: should call $rootScope.clientLogout", function() {
       $rootScope.clientLogout = function() {};
       spyOn($rootScope, "clientLogout");
       // Since the handler function will be called if there's an error on ANY
       // API call, we'll just choose one arbitrarily.
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(401);
-      http.deleteUser(token, callback);
+      rest.deleteUser(token, callback);
       $httpBackend.flush();
       expect(callback).not.toHaveBeenCalled();
       expect($rootScope.clientLogout).toHaveBeenCalled();
@@ -52,7 +56,7 @@ describe("http_service.js", function() {
     it("any other error: should call the callback function with the response object", function() {
       var status = 500;
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(status);
-      http.deleteUser(token, callback);
+      rest.deleteUser(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -63,7 +67,7 @@ describe("http_service.js", function() {
   describe("#deleteUser", function() {
     it("should make a DELETE request at /api/self that includes an access token and then call the callback function with the response object", function() {
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(200, { message: "user deleted" });
-      http.deleteUser(token, callback);
+      rest.deleteUser(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -86,7 +90,7 @@ describe("http_service.js", function() {
       ];
       $httpBackend.expect(
         "GET", "/api/self/book_requests/incoming", {}, checkToken).respond(200, bookRequests);
-      http.getIncomingBookRequests(token, callback);
+      rest.getIncomingBookRequests(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -108,7 +112,7 @@ describe("http_service.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/book_requests/outgoing", {}, checkToken).respond(200, bookRequests);
-      http.getOutgoingBookRequests(token, callback);
+      rest.getOutgoingBookRequests(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -130,7 +134,7 @@ describe("http_service.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/books_borrowed", {}, checkToken).respond(200, borrowing);
-      http.getBorrowedBooks(token, callback);
+      rest.getBorrowedBooks(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -152,7 +156,7 @@ describe("http_service.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/books_lent", {}, checkToken).respond(200, lending);
-      http.getLentBooks(token, callback);
+      rest.getLentBooks(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -166,7 +170,7 @@ describe("http_service.js", function() {
         util.formatBook(util.rand(testData.books), {copyids: [2, 3, 5, 7]})
       ];
       $httpBackend.expect("GET", "/api/self/books", {}, checkToken).respond(200, books);
-      http.getOwnBooks(token, callback);
+      rest.getOwnBooks(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -179,7 +183,7 @@ describe("http_service.js", function() {
       var book = util.rand(testData.books);
       var response = [{ copyid: 19 }];
       $httpBackend.expect("POST", "/api/books", book, checkToken).respond(200, response);
-      http.createCopy(token, book, callback);
+      rest.createCopy(token, book, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -192,7 +196,7 @@ describe("http_service.js", function() {
       var copyid = 29;
       var response = { message: "copy deleted" };
       $httpBackend.expect("DELETE", "/api/books/" + copyid, {}, checkToken).respond(200, response);
-      http.deleteCopy(token, copyid, callback);
+      rest.deleteCopy(token, copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -213,7 +217,7 @@ describe("http_service.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/books/available", {}, checkToken).respond(200, books);
-      http.getAvailableBooks(token, callback);
+      rest.getAvailableBooks(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -226,7 +230,7 @@ describe("http_service.js", function() {
       var copyid = 13;
       var response = { message: "Book requested" };
       $httpBackend.expect("POST", "/api/trans/request", { copyid: copyid }, checkToken).respond(200, response);
-      http.createBookRequest(token, copyid, callback);
+      rest.createBookRequest(token, copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -239,7 +243,7 @@ describe("http_service.js", function() {
       var copyid = 13;
       var response = { message: "Book request deleted"};
       $httpBackend.expect("DELETE", "/api/trans/request/" + copyid, {}, checkToken).respond(200, response);
-      http.cancelBookRequest(token, copyid, callback);
+      rest.cancelBookRequest(token, copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -258,7 +262,7 @@ describe("http_service.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      http.checkoutBook(token, copyid, requesterid, callback);
+      rest.checkoutBook(token, copyid, requesterid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -277,7 +281,7 @@ describe("http_service.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      http.denyBookRequest(token, copyid, requesterid, callback);
+      rest.denyBookRequest(token, copyid, requesterid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -295,7 +299,7 @@ describe("http_service.js", function() {
         { copyid: copyid },
         checkToken
       ).respond(200, response);
-      http.checkinBook(token, copyid, callback);
+      rest.checkinBook(token, copyid, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -309,7 +313,7 @@ describe("http_service.js", function() {
       var response = { message: "Logout successful" };
       $httpBackend.expect("POST", "/logout", {}, checkToken)
       .respond(200, response);
-      http.logout(token, callback);
+      rest.logout(token, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -323,7 +327,7 @@ describe("http_service.js", function() {
       var ISBN = book.ISBN[13] || book.ISBN[10];
       $httpBackend.expect("GET", "https://www.googleapis.com/books/v1/volumes?q=isbn:" + ISBN + "&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0")
       .respond(200, book);
-      http.queryGoogleBooks(ISBN, callback);
+      rest.queryGoogleBooks(ISBN, callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
