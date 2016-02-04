@@ -33,20 +33,70 @@ Angular structure
       -Account
         -allows deleting an account
 
-Services
--http : for REST calls
--auth($cookies, $location)
-  -getToken() : returns token (or null)
-    -retrieve from private var
-    -else:
-      -retrieve from query string
-        -store in cookie
-      -else:
-        -retrieve from cookie
-      -store in private var
-  -deleteToken()
-    -delete token
-    -delete cookie
+Design ideas
+-keep data model (relevant to view) on the client
+-data model populates views
+-AJAX to backend updates data model
+  -how to propagate changes to views asynchronously? Observables?
+-operations that require API call
+  -performed immediately on the client (assuming success)
+  -on success: do nothing
+  -on failure: execute callback function (undo operation or throw error (to be caught by view controller?))
+
+copy obj:
+  copyid
+  ISBN
+  ownerid
+  ...
+
+users:
+  hash (by ID)
+
+copies:
+  hash table:
+    copyid : {
+      ISBN
+      owner
+    }
+
+books:
+  getByISBN
+  hash table:
+    ISBN : {
+
+      title,
+      authors,
+      ...
+    }
+
+bookRequests:
+  copy
+  requester
+
+book_requests API:
+  getIncoming()
+  getOutgoing()
+  create(copy, requesterid)
+  delete(copy, requesterid)
+  update : refresh data model from server
+
+borrowed API:
+  get()
+  update()
+  borrow(copy)
+  return(copy)
+
+lent API
+  get()
+  update()
+  checkout(copy)
+  checkin(copy)
+
+my_books API
+  get()
+  update()
+  add(copy)
+  delete(copy)
 
 -friend deletion triggers:
   -delete relevant book requests
