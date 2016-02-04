@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-client/build
 credentials.sh
 dump.rdb
 test/karma_test/test_bundle.js
+client/build
