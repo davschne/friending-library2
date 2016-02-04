@@ -1,13 +1,104 @@
--Angular : if API call returns Unauthorized, return to login screen, delete cookie
+Angular structure
+-root
+  -public  : if no token
+    -description of app
+    -sign in button
+  -app     : if token
+    -Nav bar
+    -Main pane
+      -Find Books
+        -shows available books (paginated)
+        -allows searching for books
+        -allows requesting a book
+      -My Library
+        -shows borrowed books
+        -shows lent books
+          -allows checking in a returned book
+        -shows books owned
+          -allows adding and deleting books
+      -Requests
+        -shows requests for my books
+          -allows checking out a requested book (and setting a due date)
+        -shows my requests for books
+        (-shows outgoing friend requests)
+        (-shows incoming friend requests
+          -allows approving a friend request
+          -allows denying a friend request
+        )
+      (-Friends
+        -shows list of friends (and contact info?)
+        -allows searching for friends
+        -allows requesting a friend
+      )
+      -Account
+        -allows deleting an account
 
--setup
-  -move creation tasks to a .js file (not shell scripts)
-  -create user and database : database_creation.sql
-  -log in as user and set up database : database_setup.sql
-  -configure Redis (redis.conf?)
-    -incl. auth (see http://redis.io/topics/security)
+Design ideas
+-keep data model (relevant to view) on the client
+-data model populates views
+-AJAX to backend updates data model
+  -how to propagate changes to views asynchronously? Observables?
+-operations that require API call
+  -performed immediately on the client (assuming success)
+  -on success: do nothing
+  -on failure: execute callback function (undo operation or throw error (to be caught by view controller?))
+-structure:
+  Interface service : conducts all transactions
+  lower-level services : store data, have getAll, add, delete methods
+    AvailableBooks
+    OutgoingBookRequests
+    Borrowing
+    ---
+    MyBooks
+    IncomingBookRequests
+    Lending
 
--stream results from Postgres? Use package node-pg-query-stream?
+-Controllers have read-only access to lower-level services: .getAll(). They can only initiate actions using the Interface service.
+
+
+Data Types
+----------
+copy obj:
+  owner : user obj
+  copyid
+  ISBN
+  ...
+
+user obj:
+  id
+  displayname
+
+bookRequest obj:
+  copy
+  requester : user obj
+  request date
+
+borrowingCard obj:
+  copy
+  owner    : user
+  borrower : user
+
+Interface service:
+  .requestBook(copy)
+    -add to OutgoingBookRequests
+    -remove from AvailableBooks
+  .cancelBookRequest(copy)
+    -add to AvailableBooks
+    -remove from OutgoingBookRequests
+  ---
+  .createCopy(data)
+    -add to MyBooks
+  .deleteCopy(copy)
+    -remove from MyBooks
+  .denyBookRequest(copy)
+    -add to MyBooks
+    -remove from IncomingBookRequests
+  .checkoutBook(copy)
+    -add to Lending
+    -remove from Borrowing
+  .checkinBook(copy)
+    -add to MyBooks
+    -remove from Lending
 
 -friend deletion triggers:
   -delete relevant book requests
