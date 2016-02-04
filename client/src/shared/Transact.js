@@ -3,12 +3,12 @@
 module.exports = function(friendingLibrary) {
 
   friendingLibrary.factory(
-    "Interface",
+    "Transact",
     ["AvailableBooks", "OutgoingBookRequests", "Borrowing",
-      "MyBooks",       "IncomingBookRequests", "Lending",
+      "OwnBooks",      "IncomingBookRequests", "Lending",
       function(
         AvailableBooks, OutgoingBookRequests, Borrowing,
-        MyBooks,        IncomingBookRequests, Lending
+        OwnBooks,       IncomingBookRequests, Lending
       ) {
 
         return {
@@ -31,19 +31,19 @@ module.exports = function(friendingLibrary) {
           },
 
           createCopy: function(data) {
-            // add to MyBooks
+            // add to OwnBooks
             // this method makes an HTTP call to get a copyid
-            MyBooks.create(data);
+            OwnBooks.create(data);
           },
 
           deleteCopy: function(copy) {
-            // remove from MyBooks
-            MyBooks.del(copy.copyid);
+            // remove from OwnBooks
+            OwnBooks.del(copy.copyid);
           },
 
           denyBookRequest: function(bookrequest) {
-            // add to MyBooks
-            MyBooks.add(copy);
+            // add to OwnBooks
+            OwnBooks.add(copy);
             // remove from IncomingBookRequests
             IncomingBookRequests.del(bookrequest);
           },
@@ -56,8 +56,8 @@ module.exports = function(friendingLibrary) {
           },
 
           checkinBook: function(borrowing) {
-            // add to MyBooks
-            MyBooks.add(borrowing.copy);
+            // add to OwnBooks
+            OwnBooks.add(borrowing.copy);
             // remove from Lending
             Lending.del(borrowing);
           }

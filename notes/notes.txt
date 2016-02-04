@@ -59,8 +59,8 @@ Design ideas
 Data Types
 ----------
 copy obj:
+  owner : user obj
   copyid
-  ownerid
   ISBN
   ...
 
@@ -70,7 +70,7 @@ user obj:
 
 bookRequest obj:
   copy
-  requester : user
+  requester : user obj
   request date
 
 borrowingCard obj:

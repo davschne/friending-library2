@@ -4,9 +4,9 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.factory(
     "REST",
-    ["$http", "token", "login-logout", function($http, token, log) {
+    ["$http", "Token", "LoginLogout", function($http, Token, Log) {
 
-      function APICall(obj, token, callback) {
+      function APICall(obj, callback) {
         /*
         @param :  obj = {
                     url: <string>
@@ -18,7 +18,7 @@ module.exports = function(friendingLibrary) {
         $http({
           method: obj.method,
           url: obj.url,
-          headers: {"Authorization": "Bearer " + token.get()},
+          headers: {"Authorization": "Bearer " + Token.get()},
           data: obj.data || {}
         })
         .success(function(data, status, headers, config) {
@@ -33,7 +33,7 @@ module.exports = function(friendingLibrary) {
         switch (status) {
           // API call unauthorized because of invalid token
           case 401:
-            log.out();
+            Log.out();
             break;
           default:
             callback({ status: status }, null);

@@ -6,7 +6,7 @@ require('angular-mocks');
 var testData = require("../../lib/test/test-data.js");
 var util     = require("../../lib/test/test-util.js");
 
-describe("http_service.js", function() {
+describe("REST.js", function() {
 
   var $httpBackend;
   // var $rootScope;

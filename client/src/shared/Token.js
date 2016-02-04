@@ -3,7 +3,7 @@
 module.exports = function(friendingLibrary) {
 
   friendingLibrary.factory(
-    "token",
+    "Token",
     ["$cookies", "$location", function($cookies, $location) {
 
       var token;

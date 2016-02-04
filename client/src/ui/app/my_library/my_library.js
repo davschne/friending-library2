@@ -4,7 +4,7 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
     'myLibraryController',
-    ['$scope', 'rest', function($scope, rest) {
+    ['$scope', 'REST', function($scope, rest) {
 
       $scope.bookRequests = [];
       $scope.borrowedBooks = [];
