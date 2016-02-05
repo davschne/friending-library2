@@ -5,11 +5,11 @@ var app     = express();
 var DB      = require('./lib/db/pgp');
 var Redis   = require('ioredis');
 
-var login   = require('./lib/login.js');
+var config  = require('./config.js');
 
 // Create database interfaces
-var redis = new Redis(login.redis.prod.URI);
-var db    = new DB(login.pg.prod);
+var redis = new Redis(config.redis.prod.URI);
+var db    = new DB(config.pg.prod);
 
 // Middleware
 var bodyParser   = require('body-parser');

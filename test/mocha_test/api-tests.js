@@ -10,7 +10,7 @@ chai.use(require("chai-http"));
 
 var DB       = require('../../lib/db/pgp.js');
 var Redis    = require('ioredis');
-var login    = require('../../lib/login.js');
+var config    = require('../../config.js');
 var util     = require('../../lib/test/test-util.js');
 var testData = require('../../lib/test/test-data.js');
 
@@ -27,20 +27,20 @@ describe("root-routes.js", function() {
 
   before(function(done) {
     // get database connection instances
-    db    = new DB(login.pg.test);
-    redis = new Redis(login.redis.test.URI);
+    db    = new DB(config.pg.test);
+    redis = new Redis(config.redis.test.URI);
     // run server as child process
     app = spawn("node", ["server.js"],
       {
         env: {
           PATH: process.env.PATH,
           PORT: PORT,
-          PG_PROD_HOST: login.pg.test.host,
-          PG_PROD_PORT: login.pg.test.port,
-          PG_PROD_USER: login.pg.test.user,
-          PG_PROD_PW  : login.pg.test.password,
-          PG_PROD_DB  : login.pg.test.database,
-          REDIS_PROD_URI: login.redis.test.URI,
+          PG_PROD_HOST: config.pg.test.host,
+          PG_PROD_PORT: config.pg.test.port,
+          PG_PROD_USER: config.pg.test.user,
+          PG_PROD_PW  : config.pg.test.password,
+          PG_PROD_DB  : config.pg.test.database,
+          REDIS_PROD_URI: config.redis.test.URI,
           FB_ID: process.env.FB_ID,
           FB_SECRET: process.env.FB_SECRET,
           APP_URL: process.env.APP_URL

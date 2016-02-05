@@ -2,7 +2,7 @@ var chai = require("chai");
 var expect = chai.expect;
 
 var DB       = require('../../lib/db/pgp.js');
-var login    = require('../../lib/login.js');
+var config   = require('../../config.js');
 var testData = require('../../lib/test/test-data.js');
 
 // database instances
@@ -13,7 +13,7 @@ describe('db.js', function() {
 
   describe('Constructor', function() {
     it('should connect to a running Postgres server and return a connection instance', function() {
-      db_admin = DB(login.pg.admin);
+      db_admin = DB(config.pg.admin);
       expect(db_admin).to.exist;
     });
     // further tests for async functions generated from SQL files?
@@ -21,7 +21,7 @@ describe('db.js', function() {
 
   describe('#createDBUser', function() {
     it('should create a Postgres user/role', function(done) {
-      db_admin.createDBUser(login.pg.test.user, login.pg.test.password)
+      db_admin.createDBUser(config.pg.test.user, config.pg.test.password)
       .then(function(res) {
         expect(res).to.exist; // returns a response object
         done();
@@ -32,9 +32,9 @@ describe('db.js', function() {
   describe('#createDatabase', function() {
     it('should create a Postgres database', function(done) {
       db_admin.createDatabase(
-        login.pg.test.database,
-        login.pg.test.user,
-        login.pg.template
+        config.pg.test.database,
+        config.pg.test.user,
+        config.pg.template
       )
       .then(function(res) {
         expect(res).to.exist; // returns a response object
@@ -47,7 +47,7 @@ describe('db.js', function() {
   describe('#setupDatabase', function() {
     // connect to the new database and set it up
     before(function() {
-      db = new DB(login.pg.test);
+      db = new DB(config.pg.test);
     });
     it('should create the database tables', function(done) {
       db.setupDatabase()

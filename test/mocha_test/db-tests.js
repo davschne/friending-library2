@@ -5,7 +5,7 @@ var expect = chai.expect;
 var Promise = require("bluebird");
 
 var DB       = require('../../lib/db/pgp.js');
-var login    = require('../../lib/login.js');
+var config   = require('../../config.js');
 var util     = require('../../lib/test/test-util.js');
 var testData = require('../../lib/test/test-data.js');
 
@@ -16,7 +16,7 @@ describe('db.js', function() {
 
   // get database connection instance
   before(function() {
-    db = new DB(login.pg.test);
+    db = new DB(config.pg.test);
   });
 
   describe('#findOrCreateUser', function() {
