@@ -18,12 +18,12 @@ module.exports = function(friendingLibrary) {
           if (token) {
 
             // if it was in the query string, store it in a cookie
-            $cookies.put("friending_library_access_token", token);
+            $cookies.put("friendinglibrary.token", token);
 
           } else {
 
             // if it wasn't in the query string, check cookie
-            token = $cookies.get("friending_library_access_token");
+            token = $cookies.get("friendinglibrary.token");
           }
         }
 
@@ -37,7 +37,7 @@ module.exports = function(friendingLibrary) {
         token = undefined;
 
         // delete cookie
-        $cookies.remove("friending_library_access_token");
+        $cookies.remove("friendinglibrary.token");
       };
 
       return {

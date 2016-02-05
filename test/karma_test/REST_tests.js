@@ -1,7 +1,4 @@
-'use strict';
-
-require('../../client/src/client.js'); // load app (the source code version)
-require('angular-mocks');
+"use strict";
 
 var testData = require("../../lib/test/test-data.js");
 var util     = require("../../lib/test/test-util.js");
