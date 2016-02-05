@@ -18,7 +18,8 @@ module.exports = function(friendingLibrary) {
           $http({
             method: "POST",
             url: "/logout",
-            headers: {"Authorization": "Bearer " + Token.get()}
+            headers: {"Authorization": "Bearer " + Token.get()},
+            data: {}
           });
           // remove access token
           Token.del();
