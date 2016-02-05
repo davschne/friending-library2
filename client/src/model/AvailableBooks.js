@@ -51,7 +51,10 @@ module.exports = function(friendingLibrary) {
 
       return {
         refresh: refresh,
-        getAll: function() { return copies; },
+        getAll: function() {
+          refresh();
+          return copies;
+        },
         add: function(copy) { copies.push(copy); },
         del: function(copyid) { copies.splice(findIndexByID(copyid), 1); }
       };
