@@ -114,7 +114,7 @@ describe("Token.js", function() {
         // get   : function() { return undefined; },
         remove: jasmine.createSpy("$cookies.remove")
       };
-      spyOn($cookies, "get").and.callThrough();
+      // spyOn($cookies, "get").and.callThrough();
       // $location = { search: function() { return {}; } };
     });
 
