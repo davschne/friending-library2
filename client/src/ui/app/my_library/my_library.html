@@ -37,7 +37,7 @@
 <h1 class="book__list__header">Books I Own</h1>
 <section class="book__list">
   <ul class="list">
-    <h2 class="book__list__none" data-ng-if="(ownBooks.length == 0)">All Books Out</h2>
+    <h2 class="book__list__none" data-ng-if="(ownBooks.length == 0)">No books registered</h2>
     <li class="list__item" data-ng-repeat="copy in ownBooks">
       <section class="book__list__section">
         <section class="book__list__subsection">
@@ -58,7 +58,7 @@
 
 <h1 class="book__list__header">Books Lent</h1>
 <ul class="list">
-  <h2 class="book__list__none" data-ng-if="(lent.lenth == 0)">No Books Lent</h2>
+  <h2 class="book__list__none" data-ng-if="(lent.length == 0)">Not lending any books</h2>
   <li class="list__item" data-ng-repeat="borrowing in lent">
     <section class="book__list__section">
       <section class="book__list__subsection">
