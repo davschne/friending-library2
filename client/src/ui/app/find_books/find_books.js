@@ -1,47 +1,26 @@
-'use strict';
+"use strict";
 
 module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
-    'findBooksController',
-    ['$scope', 'REST', '$cookies', '$location', function($scope, rest, $cookies, $location) {
+    "findBooksController", ["$scope", "Transact", "AvailableBooks",
+    function($scope, Transact, AvailableBooks) {
 
-      var populateBookPile = function() {
-        rest.availableBooks(function(data) {
-          console.log("available books:", data);
+      // in this view, users can:
+      // - view books available to request
+      // - request books
 
-          $scope.books = data;
+      $scope.availableBooks = AvailableBooks.getAll();
 
-          for(var i = 0; i < $scope.books.length; i++) {
-            $scope.books[i].showDescription = false;
-          }
+      $scope.requestBook = Transact.requestBook;
 
-          if($scope.books.length === 0) {
-            $scope.noBooks = true;
-          } else {
-            $scope.noBooks = false;
-          }
-        });
-      };
-
-      populateBookPile();
-
-      $scope.toggleDescription = function(choice, bookObj) {
-        if(choice === 1) {
-          bookObj.showDescription = true;
-        } else {
-          bookObj.showDescription = false;
-        }
-      };
-
-      $scope.requestBook = function(bookId) {
-        rest.requestBook(bookId, function(data) {
-          console.log('Checked Out');
-          console.log(data);
-
-          populateBookPile();
-        });
-      };
+      // $scope.toggleDescription = function(choice, bookObj) {
+      //   if(choice === 1) {
+      //     bookObj.showDescription = true;
+      //   } else {
+      //     bookObj.showDescription = false;
+      //   }
+      // };
     }]
   );
 };

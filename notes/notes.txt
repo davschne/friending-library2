@@ -62,9 +62,11 @@ Design ideas
 Data Types
 ----------
 copy obj:
-  owner : user obj
   copyid
   book  : book obj
+  owner : user obj
+  requests : number
+  checked_out : bool
 
 book obj:
   ISBN,
@@ -87,13 +89,14 @@ user obj:
 bookRequest obj:
   copy
   requester : user obj
-  requestdate
+  request_date   : date
+  queue_position : number
 
-borrowingCard obj:
+borrowing obj:
   copy
   borrower : user
-  checkoutdate
-  duedate (optional)
+  checkout_date
+  due_date (optional)
 
 Interface service:
   .requestBook(copy)
