@@ -3,7 +3,7 @@
 module.exports = function(friendingLibrary) {
 
   friendingLibrary.factory(
-    "AvailableBooks", ["REST", {function(rest) {
+    "AvailableBooks", ["REST", function(rest) {
 
       var copies = [];
 
@@ -60,6 +60,6 @@ module.exports = function(friendingLibrary) {
         add: function(copy) { copies.push(copy); },
         del: function(copy) { copies.splice(indexOf(copy), 1); }
       };
-    }}]
+    }]
   );
 };

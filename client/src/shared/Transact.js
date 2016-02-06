@@ -6,7 +6,7 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.factory(
     "Transact",
-    ["AvailableBooks", "OutgoingBookRequests", "OwnBooks", "IncomingBookRequests", "Lent", "REST"
+    ["AvailableBooks", "OutgoingBookRequests", "OwnBooks", "IncomingBookRequests", "Lent", "REST",
       function(
         AvailableBooks, OutgoingBookRequests, OwnBooks, IncomingBookRequests, Lent, rest
       ) {
@@ -17,7 +17,7 @@ module.exports = function(friendingLibrary) {
             // add (a bookrequest object) to OutgoingBookRequests
             var bookrequest = {
               copy: copy,
-              requestdate: new Date();
+              requestdate: new Date()
             };
             OutgoingBookRequests.add(bookrequest);
             // remove from AvailableBooks
@@ -80,7 +80,7 @@ module.exports = function(friendingLibrary) {
             var borrowing = {
               copy : bookrequest.copy,
               borrower : bookrequest.requester,
-              checkoutdate : new Date();
+              checkoutdate : new Date()
             };
             // add to Lent
             Lent.add(borrowing);
