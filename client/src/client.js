@@ -27,12 +27,13 @@ require("./shared/Token.js")(friendingLibrary);
 require("./shared/Transact.js")(friendingLibrary);
 
 // load data models
-require("./model/AvailableBooks.js")(friendingLibrary);
-// require("./model/OutgoingBookRequests.js")(friendingLibrary);
-// require("./model/Borrowed.js")(friendingLibrary);
-// require("./model/OwnBooks.js")(friendingLibrary);
-// require("./model/IncomingBookRequests.js")(friendingLibrary);
-// require("./model/Lent.js")(friendingLibrary);
+var DataModel = require("./model/DataModel.js"); // should return a constructor
+require("./model/AvailableBooks.js")(friendingLibrary, DataModel);
+require("./model/OutgoingBookRequests.js")(friendingLibrary, DataModel);
+require("./model/Borrowed.js")(friendingLibrary, DataModel);
+require("./model/OwnBooks.js")(friendingLibrary, DataModel);
+require("./model/IncomingBookRequests.js")(friendingLibrary, DataModel);
+require("./model/Lent.js")(friendingLibrary, DataModel);
 
 // load controllers
 require("./ui/root.js")(friendingLibrary);

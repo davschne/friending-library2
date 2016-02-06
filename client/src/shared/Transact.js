@@ -16,8 +16,8 @@ module.exports = function(friendingLibrary) {
           requestBook: function(copy) {
             // add (a bookrequest object) to OutgoingBookRequests
             var bookrequest = {
-              copy: copy,
-              requestdate: new Date()
+              copy         : copy,
+              request_date : new Date()
             };
             OutgoingBookRequests.add(bookrequest);
             // remove from AvailableBooks
@@ -45,10 +45,13 @@ module.exports = function(friendingLibrary) {
             });
           },
 
+
+          // TODO :
+
           createCopy: function(data) {
             // add to OwnBooks
             // this method makes an HTTP call to get a copyid
-            OwnBooks.create(data);
+            // OwnBooks.create(data);
           },
 
           deleteCopy: function(copy) {
@@ -78,9 +81,11 @@ module.exports = function(friendingLibrary) {
 
           checkoutBook: function(bookrequest) {
             var borrowing = {
-              copy : bookrequest.copy,
-              borrower : bookrequest.requester,
-              checkoutdate : new Date()
+              copy          : bookrequest.copy,
+              borrower      : bookrequest.requester,
+              checkout_date : new Date(),
+              // TO BE IMPLEMENTED
+              // due_date      : due_date
             };
             // add to Lent
             Lent.add(borrowing);

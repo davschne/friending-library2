@@ -56,6 +56,9 @@ Design ideas
 -Controllers have read-only access to lower-level services: .getAll(). They can only initiate actions using the Interface service.
 
 
+-The data model services could all be built using the same code.
+
+
 Data Types
 ----------
 copy obj:
