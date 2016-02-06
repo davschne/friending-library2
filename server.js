@@ -15,7 +15,7 @@ var db    = new DB(config.pg.prod);
 var bodyParser   = require('body-parser');
 var passport     = require('passport');
 var authenticate = require('./lib/middleware/auth-bearer')(redis, passport);
-app.use(express.static("public"));
+app.use(express.static("client/build"));
 app.use(bodyParser.json());
 app.use(passport.initialize());
 

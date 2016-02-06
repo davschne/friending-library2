@@ -41,6 +41,12 @@ module.exports = function(friendingLibrary) {
           return APICall({ method: "DELETE", url: "/api/self" });
         },
 
+        getAvailableBooks: function() {
+          return APICall({
+            method: "GET", url: "/api/books/available"
+          });
+        },
+
         getIncomingBookRequests: function() {
           return APICall({
             method: "GET", url: "/api/self/book_requests/incoming"
@@ -80,12 +86,6 @@ module.exports = function(friendingLibrary) {
         deleteCopy: function(copy) {
           return APICall({
             method: "DELETE", url: "/api/books/" + copy.copyid
-          });
-        },
-
-        getAvailableBooks: function() {
-          return APICall({
-            method: "GET", url: "/api/books/available"
           });
         },
 

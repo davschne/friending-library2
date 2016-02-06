@@ -19,6 +19,8 @@ module.exports = function(friendingLibrary) {
 
             // if it was in the query string, store it in a cookie
             $cookies.put("friendinglibrary.token", token);
+            // and remove it from browser's URL display
+            $location.url("/");
 
           } else {
 

@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(friendingLibrary) {
+module.exports = function(friendingLibrary, DataModel) {
 
   friendingLibrary.factory(
     "Lent", ["REST", function(rest) {

@@ -12,7 +12,7 @@ module.exports = function(friendingLibrary, templates) {
     })
     .state("app", {
       abstract: true,
-      controller: "appController",
+      // controller: "appController",
       templateUrl: templates.app
     })
     .state("app.find_books", {

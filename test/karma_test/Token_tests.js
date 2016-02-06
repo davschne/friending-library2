@@ -30,7 +30,8 @@ describe("Token.js", function() {
 
       beforeAll(function() {
         $location = {
-          search: function() { return { access_token: access_token }; }
+          search: function() { return { access_token: access_token }; },
+          url: jasmine.createSpy("$location.url")
         };
         spyOn($location, "search").and.callThrough();
 
@@ -48,6 +49,8 @@ describe("Token.js", function() {
         expect($cookies.put).toHaveBeenCalled();
         expect($cookies.put.calls.count()).toEqual(1);
         expect($cookies.put.calls.argsFor(0)).toEqual([token_name, access_token]);
+        expect($location.url).toHaveBeenCalled();
+        expect($location.url.calls.argsFor(0)).toEqual(["/"]);
         expect(result1).toEqual(access_token);
 
         // second call : retrieve from local variable
