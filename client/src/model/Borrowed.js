@@ -1,11 +1,9 @@
 "use strict";
 
-module.exports = function(friendingLibrary) {
+module.exports = function(friendingLibrary, DataModel) {
 
   friendingLibrary.factory(
     "Borrowed", ["REST", function(rest) {
-
-      var borrowing = [];
 
       var createBorrowingObject = function(r) {
         return {
@@ -41,35 +39,39 @@ module.exports = function(friendingLibrary) {
         };
       };
 
-      var refresh = function() {
-        rest.getBorrowedBooks(function(records) {
-          // create copy objects
-          records.map(createBorrowingObject);
-          borrowing = records;
-        });
-      };
+      return DataModel(rest.getBorrowedBooks, createBorrowingObject);
 
-      // utility to find the index of a copy in the array by its copyid
-      // could speed this up to lg N if the array is sorted by copyid
+      // var borrowing = [];
 
-      // var findIndexByID = function(copyid) {
-      //   for (var i = 0; i < borrowing.length; i++) {
-      //     if (borrowing[i].copyid === copyid) return i;
-      //   }
-      //   return null;
+      // var refresh = function() {
+      //   rest.getBorrowedBooks(function(records) {
+      //     // create copy objects
+      //     records.map(createBorrowingObject);
+      //     borrowing = records;
+      //   });
       // };
 
-      // on loading the service, populate the borrowing array
-      refresh();
+      // // utility to find the index of a copy in the array by its copyid
+      // // could speed this up to lg N if the array is sorted by copyid
 
-      return {
-        getAll: function() {
-          refresh();
-          return borrowing;
-        },
-        add: function(copy) { borrowing.push(copy); },
-        del: function(copy) { borrowing.splice(indexOf(copy), 1); }
-      };
+      // // var findIndexByID = function(copyid) {
+      // //   for (var i = 0; i < borrowing.length; i++) {
+      // //     if (borrowing[i].copyid === copyid) return i;
+      // //   }
+      // //   return null;
+      // // };
+
+      // // on loading the service, populate the borrowing array
+      // refresh();
+
+      // return {
+      //   getAll: function() {
+      //     refresh();
+      //     return borrowing;
+      //   },
+      //   add: function(copy) { borrowing.push(copy); },
+      //   del: function(copy) { borrowing.splice(indexOf(copy), 1); }
+      // };
     }]
   );
 };
