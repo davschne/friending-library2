@@ -84,12 +84,13 @@ user obj:
 bookRequest obj:
   copy
   requester : user obj
-  request date
+  requestdate
 
 borrowingCard obj:
   copy
-  owner    : user
   borrower : user
+  checkoutdate
+  duedate (optional)
 
 Interface service:
   .requestBook(copy)

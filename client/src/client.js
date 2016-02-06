@@ -20,10 +20,19 @@ var friendingLibrary = angular.module(
   ["ngRoute", "ngCookies", "ui.router"]
 );
 
-// load services
+// load shared services
 require("./shared/REST.js")(friendingLibrary);
 require("./shared/LoginLogout.js")(friendingLibrary);
 require("./shared/Token.js")(friendingLibrary);
+require("./shared/Transact.js")(friendingLibrary);
+
+// load data models
+require("./model/AvailableBooks.js")(friendingLibrary);
+// require("./model/OutgoingBookRequests.js")(friendingLibrary);
+// require("./model/Borrowed.js")(friendingLibrary);
+// require("./model/OwnBooks.js")(friendingLibrary);
+// require("./model/IncomingBookRequests.js")(friendingLibrary);
+// require("./model/Lent.js")(friendingLibrary);
 
 // load controllers
 require("./ui/root.js")(friendingLibrary);
