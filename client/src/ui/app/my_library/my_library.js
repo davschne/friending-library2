@@ -1,102 +1,123 @@
-'use strict';
+"use strict";
 
 module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
-    'myLibraryController',
-    ['$scope', 'REST', function($scope, rest) {
+    "myLibraryController",
+    ["$scope", "Transact", "OwnBooks", "Borrowed", "Lent",
+    function($scope, Transact, OwnBooks, Borrowed, Lent) {
 
-      $scope.bookRequests = [];
-      $scope.borrowedBooks = [];
-      $scope.availableBooks = [];
+      // in this view, a user can:
+      //  -view books owned
+      //  -view books lent
+      //  -view books borrowed
+      //  -check in a lent book
+      //  -look up books using the Google Books API
+      //  -add books
+      //  -delete books
 
-      var getOwnBooks = function() {
-        rest.getOwnBooks(function(data) {
-          console.log('Book Grab Success');
-          console.log(data);
+      $scope.ownBooks = OwnBooks.getAll();
+      $scope.borrowed = Borrowed.getAll();
+      $scope.lent     = Lent.getAll();
 
-          $scope.userBooks = data;
+      $scope.checkinBook = Transact.checkinBook;
+      $scope.createCopy  = Transact.createCopy;
+      $scope.deleteCopy  = Transact.deleteCopy;
 
-          for(var i = 0; i < $scope.userBooks.length; i++) {
-            if ($scope.userBooks[i].request) {
-              $scope.bookRequests.push($scope.userBooks[i]);
-            } else if ($scope.userBooks[i].borrower) {
-              $scope.borrowedBooks.push($scope.userBooks[i]);
-            } else {
-              $scope.availableBooks.push($scope.userBooks[i]);
-            }
-          }
+      // TODO : add method to look up a book on Google Books
 
-          if ($scope.availableBooks.length === 0) {
-            $scope.allRequested = true;
-          } else {
-            $scope.allRequested = false;
-          }
+      // $scope.bookRequests = [];
+      // $scope.borrowedBooks = [];
+      // $scope.availableBooks = [];
 
-          if ($scope.borrowedBooks.length === 0) {
-            $scope.noneBorrowed = true;
-          } else {
-            $scope.noneBorrowed = false;
-          }
+      // var getOwnBooks = function() {
+      //   rest.getOwnBooks(function(data) {
+      //     console.log("Book Grab Success");
+      //     console.log(data);
 
-          if ($scope.bookRequests.length === 0) {
-            $scope.noRequests = true;
-          } else {
-            $scope.noRequests = false;
-          }
-        });
-      }
+      //     $scope.userBooks = data;
 
-      $scope.getOwnBooks = getOwnBooks;
-      $scope.searchByISBN = searchByISBN;
-      $scope.createBook   = createBook;
+      //     for(var i = 0; i < $scope.userBooks.length; i++) {
+      //       if ($scope.userBooks[i].request) {
+      //         $scope.bookRequests.push($scope.userBooks[i]);
+      //       } else if ($scope.userBooks[i].borrower) {
+      //         $scope.borrowedBooks.push($scope.userBooks[i]);
+      //       } else {
+      //         $scope.availableBooks.push($scope.userBooks[i]);
+      //       }
+      //     }
 
-      getOwnBooks();
+      //     if ($scope.availableBooks.length === 0) {
+      //       $scope.allRequested = true;
+      //     } else {
+      //       $scope.allRequested = false;
+      //     }
 
-      $scope.searchByISBN = function(userData) {
-        rest.queryGoogleBooks(userData, function(data) {
-          console.log('Google Data Back');
-          console.log(data);
+      //     if ($scope.borrowedBooks.length === 0) {
+      //       $scope.noneBorrowed = true;
+      //     } else {
+      //       $scope.noneBorrowed = false;
+      //     }
 
-          var rawData = data.items;
-          console.log(rawData);
+      //     if ($scope.bookRequests.length === 0) {
+      //       $scope.noRequests = true;
+      //     } else {
+      //       $scope.noRequests = false;
+      //     }
+      //   });
+      // }
 
-          $scope.checkResult = false;
+      // $scope.searchByISBN = searchByISBN;
 
-          if(!(rawData)) {
-            $scope.checkResult = true;
-          } else {
-            var usefulInfo = {
-              "author" : data.items[0].volumeInfo.authors,
-              "title" : data.items[0].volumeInfo.title,
-              "genre" : data.items[0].volumeInfo.categories,
-              "images" : data.items[0].volumeInfo.imageLinks,
-              "description" : data.items[0].volumeInfo.description
-            };
+      // $scope.getOwnBooks = getOwnBooks;
+      // $scope.createBook   = createBook;
 
-            $scope.googleData = usefulInfo;
-            delete $scope.googlebook;
-          }
-        });
-      };
+      // getOwnBooks();
 
-      var createBook = function(bookObj) {
-        rest.createBook(bookObj, function(data) {
-          console.log('Submit Success');
-          console.log(data);
-          getOwnBooks();
-        });
+      // $scope.searchByISBN = function(userData) {
+      //   rest.queryGoogleBooks(userData, function(data) {
+      //     console.log("Google Data Back");
+      //     console.log(data);
 
-        delete $scope.googleData;
-      };
+      //     var rawData = data.items;
+      //     console.log(rawData);
 
-      $scope.destroyBook = function(bookId) {
-        rest.removeBook(bookId, function(data) {
-          console.log('Removed Book!');
-          console.log(data);
-          getUserBooks();
-        });
-      };
+      //     $scope.checkResult = false;
+
+      //     if(!(rawData)) {
+      //       $scope.checkResult = true;
+      //     } else {
+      //       var usefulInfo = {
+      //         "author" : data.items[0].volumeInfo.authors,
+      //         "title" : data.items[0].volumeInfo.title,
+      //         "genre" : data.items[0].volumeInfo.categories,
+      //         "images" : data.items[0].volumeInfo.imageLinks,
+      //         "description" : data.items[0].volumeInfo.description
+      //       };
+
+      //       $scope.googleData = usefulInfo;
+      //       delete $scope.googlebook;
+      //     }
+      //   });
+      // };
+
+      // var createBook = function(bookObj) {
+      //   rest.createBook(bookObj, function(data) {
+      //     console.log("Submit Success");
+      //     console.log(data);
+      //     getOwnBooks();
+      //   });
+
+      //   delete $scope.googleData;
+      // };
+
+      // $scope.destroyBook = function(bookId) {
+      //   rest.removeBook(bookId, function(data) {
+      //     console.log("Removed Book!");
+      //     console.log(data);
+      //     getUserBooks();
+      //   });
+      // };
     }]
   );
 };

@@ -6,7 +6,7 @@ module.exports = function(friendingLibrary) {
     "findBooksController", ["$scope", "Transact", "AvailableBooks",
     function($scope, Transact, AvailableBooks) {
 
-      // in this view, users can:
+      // in this view, a user can:
       // - view books available to request
       // - request books
 

@@ -1,4 +1,4 @@
-<section class="form">
+<!-- <section class="form">
   <section class="form__module">
     <h1 class="form__module__header">Add A Book</h1>
     <form data-ng-submit="askGoogle(query_isbn)">
@@ -6,7 +6,6 @@
       <section class="form__module-input-button">
         <input type="text" data-ng-model="query_isbn" required></input>
         <button type="submit">Find Book</button>
-        <p>{{query_isbn}}</p>
       </section>
     </form>
   </section>
@@ -23,32 +22,79 @@
     </section>
     <section class="book__list__subsection" data-ng-if="googleData">
       <ul>
-        <li><p>Title:</p>{{googleData.title}}</li>
+        <li><p>Title:</p>{{googleData.title}}</li> -->
+
         <!-- TODO : If multiple authors, show them all -->
-        <li><p>Author:</p>{{googleData.author[0]}}</li>
+
+<!--         <li><p>Author:</p>{{googleData.author[0]}}</li>
         <li><p>Genre:</p>{{googleData.genre[0]}}</li>
       </ul>
       <button data-ng-click="submitBook(user.access_token, {title: googleData.title, authors: googleData.author, imageLinks: googleData.images, categories: googleData.genre, description: googleData.description})">Post</button>
     </section>
   </section>
-</section>
+</section> -->
 
-<h1 class="book__list__header">My Book Pile</h1>
+<h1 class="book__list__header">Books I Own</h1>
 <section class="book__list">
   <ul class="list">
-    <h2 class="book__list__none" data-ng-if="allRequested">All Books Out</h2>
-    <li class="list__item" data-ng-repeat="book in availableBooks">
+    <h2 class="book__list__none" data-ng-if="(ownBooks.length == 0)">All Books Out</h2>
+    <li class="list__item" data-ng-repeat="copy in ownBooks">
       <section class="book__list__section">
         <section class="book__list__subsection">
-          <img data-ng-src="{{book.imageLinks.smallThumbnail}}">
+          <img data-ng-src="{{copy.book.imagelinksmall}}">
         </section>
         <section class="book__list__subsection">
           <ul>
-            <li><p>Title:</p>{{book.title}}</li>
-            <li><p>Author:</p>{{book.authors[0]}} </li>
-            <li><p>Genre:</p>{{book.categories[0]}} </li>
+            <li><p>Title:</p>{{copy.book.title}}</li>
+            <li><p>Authors:</p>{{copy.book.authors}} </li>
+            <li><p>Genres:</p>{{copy.book.categories}} </li>
           </ul>
-          <button data-ng-click="destroyBook(user.access_token, book._id)">Remove</button>
+          <button data-ng-click="deleteCopy(copy)">Remove</button>
+        </section>
+      </section>
+    </li>
+  </ul>
+</section>
+
+<h1 class="book__list__header">Books Lent</h1>
+<ul class="list">
+  <h2 class="book__list__none" data-ng-if="(lent.lenth == 0)">No Books Lent</h2>
+  <li class="list__item" data-ng-repeat="borrowing in lent">
+    <section class="book__list__section">
+      <section class="book__list__subsection">
+        <img data-ng-src="{{borrowing.copy.book.imagelinksmall}}"/>
+      </section>
+      <section class="book__list__subsection">
+        <ul>
+          <li><p>Title:</p>{{borrowing.copy.book.title}}</li>
+          <li><p>Authors:</p>{{borrowing.copy.book.authors}}</li>
+          <li><p>Genres:</p>{{borrowing.copy.book.categories}}</li>
+          <li><p>Borrower:</p>{{borrowing.borrower.display_name}}</li>
+        </ul>
+        <button data-ng-click="checkinBook(borrowing)">Returned</button>
+      </section>
+    </section>
+  </li>
+</ul>
+
+<h1 class="book__list__header">Currently Borrowing</h1>
+<section class="book__list">
+  <ul class="list">
+    <h2 class="book__list__none" data-ng-if="(borrowed.length == 0)">
+      Not borrowing any books
+    </h2>
+    <li class="list__item" data-ng-repeat="borrowing in borrowed">
+      <section class="book__list__section">
+        <section class="book__list__subsection">
+          <img data-ng-src="{{borrowing.copy.book.imagelinksmall}}">
+        </section>
+        <section class="book__list__subsection">
+          <ul>
+            <li><p>Title:</p>{{borrowing.copy.book.title}}</li>
+            <li><p>Authors:</p>{{borrowing.copy.book.authors}}</li>
+            <li><p>Genres:</p>{{borrowing.copy.book.categories}}</li>
+            <li><p>Owner:</p>{{borrowing.copy.owner.display_name}}</li>
+          </ul>
         </section>
       </section>
     </li>
