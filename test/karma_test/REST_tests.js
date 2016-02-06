@@ -7,8 +7,9 @@ describe("REST.js", function() {
 
   // the REST service under test
   var rest;
-  // mock callback function
+  // mock callback functions
   var callback;
+  var errorCallback;
   // access token to use for API calls
   var access_token = "asdlfkJOWEIFJN485fvnj";
   // utility to check for token in HTTP headers
@@ -24,6 +25,7 @@ describe("REST.js", function() {
   beforeEach(function() {
     // create Jasmine spies
     callback = jasmine.createSpy("callback");
+    errorCallback = jasmine.createSpy("errorCallback")/*.and.throwError("error")*/;
     spyOn(LoginLogoutMock, "out");
 
     // mock the module
@@ -45,39 +47,38 @@ describe("REST.js", function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  describe("error handler", function() {
+  describe("error handling:", function() {
 
-    it("401: should call Log.out()", function() {
-      // $rootScope.clientLogout = function() {};
-      // spyOn($rootScope, "clientLogout");
+    it("on response status 401, should call Log.out()", function() {
       // Since the handler function will be called if there's an error on ANY
       // API call, we'll just choose one arbitrarily.
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(401);
-      rest.deleteUser(callback);
+      rest.deleteUser().then(callback).catch(errorCallback);
       $httpBackend.flush();
-      expect(callback).not.toHaveBeenCalled();
+      expect(callback).toHaveBeenCalled();
+      expect(errorCallback).not.toHaveBeenCalled();
       expect(LoginLogoutMock.out).toHaveBeenCalled();
     });
 
-    it("any other error: should call the callback function with the response object", function() {
+    it("any other error: should rethrow error to be handled by caller", function() {
       var status = 500;
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(status);
-      rest.deleteUser(callback);
+      rest.deleteUser().then(callback).catch(errorCallback);
       $httpBackend.flush();
-      expect(callback).toHaveBeenCalled();
-      expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([{ status: status }, null]);
+      expect(callback).not.toHaveBeenCalled();
+      expect(errorCallback).toHaveBeenCalled();
+      expect(errorCallback.calls.argsFor(0)[0].status).toEqual(status);
     });
   });
 
   describe("#deleteUser", function() {
     it("should make a DELETE request at /api/self that includes an access token and then call the callback function with the response object", function() {
       $httpBackend.expect("DELETE", "/api/self", {}, checkToken).respond(200, { message: "user deleted" });
-      rest.deleteUser(callback);
+      rest.deleteUser().then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, { message: "user deleted" }]);
+      expect(callback.calls.argsFor(0)).toEqual([{ message: "user deleted" }]);
     });
   });
 
@@ -96,11 +97,11 @@ describe("REST.js", function() {
       ];
       $httpBackend.expect(
         "GET", "/api/self/book_requests/incoming", {}, checkToken).respond(200, bookRequests);
-      rest.getIncomingBookRequests(callback);
+      rest.getIncomingBookRequests().then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, bookRequests]);
+      expect(callback.calls.argsFor(0)).toEqual([bookRequests]);
     });
   });
 
@@ -118,11 +119,11 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/book_requests/outgoing", {}, checkToken).respond(200, bookRequests);
-      rest.getOutgoingBookRequests(callback);
+      rest.getOutgoingBookRequests().then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, bookRequests]);
+      expect(callback.calls.argsFor(0)).toEqual([bookRequests]);
     });
   });
 
@@ -140,11 +141,11 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/books_borrowed", {}, checkToken).respond(200, borrowing);
-      rest.getBorrowedBooks(callback);
+      rest.getBorrowedBooks().then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, borrowing]);
+      expect(callback.calls.argsFor(0)).toEqual([borrowing]);
     });
   });
 
@@ -162,11 +163,11 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/self/books_lent", {}, checkToken).respond(200, lending);
-      rest.getLentBooks(callback);
+      rest.getLentBooks().then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, lending]);
+      expect(callback.calls.argsFor(0)).toEqual([lending]);
     });
   });
 
@@ -176,11 +177,11 @@ describe("REST.js", function() {
         util.formatBook(util.rand(testData.books), {copyids: [2, 3, 5, 7]})
       ];
       $httpBackend.expect("GET", "/api/self/books", {}, checkToken).respond(200, books);
-      rest.getOwnBooks(callback);
+      rest.getOwnBooks().then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, books]);
+      expect(callback.calls.argsFor(0)).toEqual([books]);
     });
   });
 
@@ -189,11 +190,11 @@ describe("REST.js", function() {
       var book = util.rand(testData.books);
       var response = [{ copyid: 19 }];
       $httpBackend.expect("POST", "/api/books", book, checkToken).respond(200, response);
-      rest.createCopy(book, callback);
+      rest.createCopy(book).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
     });
   });
 
@@ -202,11 +203,11 @@ describe("REST.js", function() {
       var copyid = 29;
       var response = { message: "copy deleted" };
       $httpBackend.expect("DELETE", "/api/books/" + copyid, {}, checkToken).respond(200, response);
-      rest.deleteCopy(copyid, callback);
+      rest.deleteCopy(copyid).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
     });
   });
 
@@ -223,11 +224,11 @@ describe("REST.js", function() {
         )
       ];
       $httpBackend.expect("GET", "/api/books/available", {}, checkToken).respond(200, books);
-      rest.getAvailableBooks(callback);
+      rest.getAvailableBooks().then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, books]);
+      expect(callback.calls.argsFor(0)).toEqual([books]);
     });
   });
 
@@ -236,11 +237,11 @@ describe("REST.js", function() {
       var copyid = 13;
       var response = { message: "Book requested" };
       $httpBackend.expect("POST", "/api/trans/request", { copyid: copyid }, checkToken).respond(200, response);
-      rest.createBookRequest(copyid, callback);
+      rest.createBookRequest(copyid).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
     });
   });
 
@@ -249,11 +250,11 @@ describe("REST.js", function() {
       var copyid = 13;
       var response = { message: "Book request deleted"};
       $httpBackend.expect("DELETE", "/api/trans/request/" + copyid, {}, checkToken).respond(200, response);
-      rest.cancelBookRequest(copyid, callback);
+      rest.cancelBookRequest(copyid).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
     });
   });
 
@@ -268,11 +269,11 @@ describe("REST.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      rest.checkoutBook(copyid, requesterid, callback);
+      rest.checkoutBook(copyid, requesterid).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
     });
   });
 
@@ -287,11 +288,11 @@ describe("REST.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      rest.denyBookRequest(copyid, requesterid, callback);
+      rest.denyBookRequest(copyid, requesterid).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
     });
   });
 
@@ -305,27 +306,11 @@ describe("REST.js", function() {
         { copyid: copyid },
         checkToken
       ).respond(200, response);
-      rest.checkinBook(copyid, callback);
+      rest.checkinBook(copyid).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
-    });
-  });
-
-  // TODO : Move this test to LoginLogout service tests
-
-  xdescribe("#logout", function() {
-    it("should make a POST request at /logout that includes an access token in the headers and then call the callback function with the response object", function() {
-      var copyid = 13;
-      var response = { message: "Logout successful" };
-      $httpBackend.expect("POST", "/logout", {}, checkToken)
-      .respond(200, response);
-      rest.logout(callback);
-      $httpBackend.flush();
-      expect(callback).toHaveBeenCalled();
-      expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, response]);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
     });
   });
 

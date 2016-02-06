@@ -4,17 +4,17 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.factory(
     "REST",
-    ["$http", "Token", "LoginLogout", function($http, Token, Log) {
+    ["$q", "$http", "Token", "LoginLogout", function($q, $http, Token, Log) {
 
-      var checkFor401 = function(err, status) {
-        if (status === 401) {
+      var checkFor401 = function(res) {
+        if (res.status === 401) {
           // API call unauthorized because of invalid token
           // Logout
           Log.out();
           return;
         }
         // otherwise delegate error handling to caller
-        else throw err;
+        return $q.reject(res);
       };
 
       var APICall = function(obj) {
@@ -31,7 +31,8 @@ module.exports = function(friendingLibrary) {
           headers: {"Authorization": "Bearer " + Token.get()},
           data: obj.data || {}
         })
-        .error(checkFor401);
+        .then(function(res) { return res.data; })
+        .catch(checkFor401);
       };
 
       return {
