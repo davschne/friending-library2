@@ -258,29 +258,6 @@ describe("REST.js", function() {
     });
   });
 
-  describe("#checkoutBook", function() {
-    it("should make a POST request at /api/trans/checkout that includes an access token in the headers and the copy ID and requester ID in the body, and then call the callback function with the response object", function() {
-      var copyid = 13;
-      var requesterid = 234908374;
-      var bookrequest = {
-        copy: { copyid : copyid },
-        requester: { id : requesterid }
-      };
-      var response = { message: "Book checked out" };
-      $httpBackend.expect(
-        "POST",
-        "/api/trans/checkout",
-        { copyid: copyid, requesterid: requesterid },
-        checkToken
-      ).respond(200, response);
-      rest.checkoutBook(bookrequest).then(callback);
-      $httpBackend.flush();
-      expect(callback).toHaveBeenCalled();
-      expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([response]);
-    });
-  });
-
   describe("#denyBookRequest", function() {
     it("should make a POST request at /api/trans/deny that includes an access token and the copyid and then call the callback function with the response object", function() {
       var copyid = 13;
@@ -304,9 +281,33 @@ describe("REST.js", function() {
     });
   });
 
+  describe("#checkoutBook", function() {
+    it("should make a POST request at /api/trans/checkout that includes an access token in the headers and the copy ID and requester ID in the body, and then call the callback function with the response object", function() {
+      var copyid = 13;
+      var requesterid = 234908374;
+      var borrowing = {
+        copy: { copyid : copyid },
+        borrower: { id : requesterid }
+      };
+      var response = { message: "Book checked out" };
+      $httpBackend.expect(
+        "POST",
+        "/api/trans/checkout",
+        { copyid: copyid, requesterid: requesterid },
+        checkToken
+      ).respond(200, response);
+      rest.checkoutBook(borrowing).then(callback);
+      $httpBackend.flush();
+      expect(callback).toHaveBeenCalled();
+      expect(callback.calls.count()).toEqual(1);
+      expect(callback.calls.argsFor(0)).toEqual([response]);
+    });
+  });
+
   describe("#checkinBook", function() {
     it("should make a POST request at /api/trans/checkin that includes an access token in the headers and the copy ID in the body and then call the callback function with the response object", function() {
       var copyid = 13;
+      var borrowing = { copy: { copyid : copyid } };
       var response = { message: "Book checked in" };
       $httpBackend.expect(
         "POST",
@@ -314,7 +315,7 @@ describe("REST.js", function() {
         { copyid: copyid },
         checkToken
       ).respond(200, response);
-      rest.checkinBook(copyid).then(callback);
+      rest.checkinBook(borrowing).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
