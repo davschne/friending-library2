@@ -77,9 +77,9 @@ module.exports = function(friendingLibrary) {
           });
         },
 
-        deleteCopy: function(copyid) {
+        deleteCopy: function(copy) {
           return APICall({
-            method: "DELETE", url: "/api/books/" + copyid
+            method: "DELETE", url: "/api/books/" + copy.copyid
           });
         },
 
@@ -89,20 +89,23 @@ module.exports = function(friendingLibrary) {
           });
         },
 
-        createBookRequest: function(copyid) {
+        createBookRequest: function(copy) {
           return APICall({
             method: "POST", url: "/api/trans/request",
-            data: { copyid: copyid }
+            data: { copyid: copy.copyid }
           });
         },
 
-        cancelBookRequest: function(copyid) {
+        cancelBookRequest: function(bookrequest) {
+          var copyid = bookrequest.copy.copyid;
           return APICall({
             method: "DELETE", url: "/api/trans/request/" + copyid
           });
         },
 
-        checkoutBook: function(copyid, requesterid) {
+        checkoutBook: function(bookrequest) {
+          var copyid = bookrequest.copy.copyid;
+          var requesterid = bookrequest.requester.id;
           return APICall({
             method: "POST",
             url: "/api/trans/checkout",
@@ -110,7 +113,9 @@ module.exports = function(friendingLibrary) {
           });
         },
 
-        denyBookRequest: function(copyid, requesterid) {
+        denyBookRequest: function(bookrequest) {
+          var copyid = bookrequest.copy.copyid;
+          var requesterid = bookrequest.requester.id;
           return APICall({
             method: "POST",
             url: "/api/trans/deny",

@@ -203,7 +203,7 @@ describe("REST.js", function() {
       var copyid = 29;
       var response = { message: "copy deleted" };
       $httpBackend.expect("DELETE", "/api/books/" + copyid, {}, checkToken).respond(200, response);
-      rest.deleteCopy(copyid).then(callback);
+      rest.deleteCopy({ copyid: copyid }).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -237,7 +237,7 @@ describe("REST.js", function() {
       var copyid = 13;
       var response = { message: "Book requested" };
       $httpBackend.expect("POST", "/api/trans/request", { copyid: copyid }, checkToken).respond(200, response);
-      rest.createBookRequest(copyid).then(callback);
+      rest.createBookRequest({ copyid: copyid }).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -250,7 +250,7 @@ describe("REST.js", function() {
       var copyid = 13;
       var response = { message: "Book request deleted"};
       $httpBackend.expect("DELETE", "/api/trans/request/" + copyid, {}, checkToken).respond(200, response);
-      rest.cancelBookRequest(copyid).then(callback);
+      rest.cancelBookRequest({ copy: { copyid: copyid } }).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -262,6 +262,10 @@ describe("REST.js", function() {
     it("should make a POST request at /api/trans/checkout that includes an access token in the headers and the copy ID and requester ID in the body, and then call the callback function with the response object", function() {
       var copyid = 13;
       var requesterid = 234908374;
+      var bookrequest = {
+        copy: { copyid : copyid },
+        requester: { id : requesterid }
+      };
       var response = { message: "Book checked out" };
       $httpBackend.expect(
         "POST",
@@ -269,7 +273,7 @@ describe("REST.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      rest.checkoutBook(copyid, requesterid).then(callback);
+      rest.checkoutBook(bookrequest).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -281,6 +285,10 @@ describe("REST.js", function() {
     it("should make a POST request at /api/trans/deny that includes an access token and the copyid and then call the callback function with the response object", function() {
       var copyid = 13;
       var requesterid = 234908374;
+      var bookrequest = {
+        copy: { copyid : copyid },
+        requester: { id : requesterid }
+      };
       var response = { message: "Book request deleted"};
       $httpBackend.expect(
         "POST",
@@ -288,7 +296,7 @@ describe("REST.js", function() {
         { copyid: copyid, requesterid: requesterid },
         checkToken
       ).respond(200, response);
-      rest.denyBookRequest(copyid, requesterid).then(callback);
+      rest.denyBookRequest(bookrequest).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
