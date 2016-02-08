@@ -1,38 +1,38 @@
-<!-- <section class="form">
+<section class="form">
   <section class="form__module">
     <h1 class="form__module__header">Add A Book</h1>
-    <form data-ng-submit="askGoogle(query_isbn)">
+    <form data-ng-submit="getBookRecordByISBN(isbn)">
       <p class="form__module__p">Enter 10- or 13-Digit ISBN</p>
       <section class="form__module-input-button">
-        <input type="text" data-ng-model="query_isbn" required></input>
+        <input type="text" data-ng-model="isbn" required></input>
         <button type="submit">Find Book</button>
       </section>
     </form>
   </section>
 </section>
 
-<section class="error__message" data-ng-if="checkResult">
+<!-- <section class="error__message" data-ng-if="checkResult">
   <p class="error__message__p">Sorry, we could not find that book. Please verify that the ISBN is correct.</p>
-</section>
+</section> -->
 
-<section class="list" data-ng-if="googleData">
+<section class="list" data-ng-if="queryResult">
   <section class="book__list__section">
-    <section class="book__list__subsection" data-ng-if="googleData">
-      <img data-ng-src="{{googleData.images.smallThumbnail}}"/>
+    <section class="book__list__subsection" data-ng-if="queryResult">
+      <img data-ng-src="{{queryResult.imagelink}}"/>
     </section>
-    <section class="book__list__subsection" data-ng-if="googleData">
+    <section class="book__list__subsection" data-ng-if="queryResult">
       <ul>
-        <li><p>Title:</p>{{googleData.title}}</li> -->
+        <li><p>Title:</p>{{queryResult.title}}</li>
 
         <!-- TODO : If multiple authors, show them all -->
 
-<!--         <li><p>Author:</p>{{googleData.author[0]}}</li>
-        <li><p>Genre:</p>{{googleData.genre[0]}}</li>
+        <li><p>Authors:</p>{{queryResult.authors}}</li>
+        <li><p>Genres:</p>{{queryResult.categories}}</li>
       </ul>
-      <button data-ng-click="submitBook(user.access_token, {title: googleData.title, authors: googleData.author, imageLinks: googleData.images, categories: googleData.genre, description: googleData.description})">Post</button>
+      <button data-ng-click="createCopy(queryResult)">Post</button>
     </section>
   </section>
-</section> -->
+</section>
 
 <h1 class="book__list__header">Books I Own</h1>
 <section class="book__list">

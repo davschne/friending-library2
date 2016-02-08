@@ -45,31 +45,26 @@ module.exports = function(friendingLibrary) {
             });
           },
 
-
-          // TODO :
-
           createCopy: function(book) {
             // add to OwnBooks
+
+            var copy = {
+              // copyid property will be added when Promise resolves
+              book : book
+            };
+            OwnBooks.add(copy);
+
             // make an HTTP call to:
             // -update backend data model
             // -get a copyid in the response
-
-            // Promise that will resolve to the copyid:
-            var copyid = rest.createCopy(book)
+            rest.createCopy(book)
             .then(function(data) {
-              return data.copyid;
+              copy.copyid = data.copyid;
             })
-            .catch(function() {
-              // roll back if error
+            .catch(function(res) {
+              // roll back
               OwnBooks.del(copy);
-              return null;
             });
-            // NB : controller needs to be able to deal with a Promise value
-            var copy = {
-              copyid: copyid, // Promise
-              book  : book
-            };
-            OwnBooks.add(copy);
           },
 
           deleteCopy: function(copy) {

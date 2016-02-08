@@ -10,9 +10,9 @@ module.exports = function(friendingLibrary) {
 
         // convention : use only 13-digit ISBNs
         var getISBN_13 = function(array) {
-          array.forEach(function(element) {
-            if (element.type == "ISBN_13") return element.identifier;
-          });
+          for (var i = 0; i < array.length; i++) {
+            if (array[i].type == "ISBN_13") return array[i].identifier;
+          }
         };
 
         // info on Google Books' resource representation:
