@@ -1,2 +1,2 @@
-INSERT INTO Borrowing (borrowerID, copyID, checkout_date)
-VALUES ($1, $2, CURRENT_TIMESTAMP);
+INSERT INTO Borrowing (borrowerid, copyid, checkout_date)
+VALUES ($1, $2, $3);

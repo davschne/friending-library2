@@ -81,7 +81,7 @@ describe('db.js', function() {
 
     var user = util.rand(testData.users);
     var book = util.rand(testData.books);
-    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var isbn = book.isbn;
 
     // setup: create user to own the copy
     before(function(done) {
@@ -92,21 +92,7 @@ describe('db.js', function() {
     });
 
     it("should return a response object containing the copyid", function(done) {
-      db.createCopy(
-        user.uid,
-        ISBN,
-        book.title,
-        book.subtitle,
-        book.authors,
-        book.categories,
-        book.publisher,
-        book.publishedDate,
-        book.description,
-        book.pageCount,
-        book.language,
-        book.imageLinks.thumbnail,
-        book.imageLinks.smallThumbnail
-      )
+      db.createCopy(user.uid, book)
       .then(function(res) {
         expect(res).to.exist;
         expect(res[0]).to.have.property("copyid");
@@ -116,7 +102,7 @@ describe('db.js', function() {
     });
 
     it("should create a tuple in the Copies table", function(done) {
-      db.query("SELECT ownerid FROM Copies WHERE ownerid=$1 AND isbn=$2;", [user.uid, ISBN])
+      db.query("SELECT ownerid FROM Copies WHERE ownerid=$1 AND isbn=$2;", [user.uid, isbn])
       .then(function(res) {
         expect(res[0].ownerid).to.equal(user.uid.toString());
         done();
@@ -124,9 +110,9 @@ describe('db.js', function() {
     });
 
     it("should create a tuple in the Books table if it doesn't already exist", function(done) {
-      db.query("SELECT isbn FROM Books WHERE isbn=$1;", [ISBN])
+      db.query("SELECT isbn FROM Books WHERE isbn=$1;", [isbn])
       .then(function(res) {
-        expect(res[0].isbn).to.equal(ISBN);
+        expect(res[0].isbn).to.equal(isbn);
         done();
       });
     });
@@ -145,7 +131,7 @@ describe('db.js', function() {
 
     var user = util.rand(testData.users);
     var book = util.rand(testData.books);
-    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var isbn = book.isbn;
     var copyid;
 
     // setup: insert user, book, and copy; retrieve and store copyid
@@ -222,10 +208,10 @@ describe('db.js', function() {
       db.getOwnBooks(user.uid)
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
-        expect(res).to.have.length(2);
-        expect(res[0].isbn).to.equal(books[0].ISBN[13] || books[0].ISBN[10]);
-        expect(res[1].isbn).to.equal(books[1].ISBN[13] || books[1].ISBN[10]);
-        expect(res[0].copyids).to.have.length(2);
+        expect(res).to.have.length(3);
+        expect(res[0].isbn).to.equal(books[0].isbn);
+        expect(res[1].isbn).to.equal(books[0].isbn);
+        expect(res[2].isbn).to.equal(books[1].isbn);
         done();
       });
     });
@@ -245,8 +231,9 @@ describe('db.js', function() {
     var owner = testData.users[0];
     var requester = testData.users[1];
     var book = util.rand(testData.books);
-    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var isbn = book.isbn;
     var copyid;
+    var request_date = new Date();
 
     // setup: create users, book, copy, store copyid for later
     before(function(done) {
@@ -261,7 +248,7 @@ describe('db.js', function() {
     });
 
     it("should return a response object", function(done) {
-      db.createBookRequest(requester.uid, copyid)
+      db.createBookRequest(requester.uid, copyid, request_date)
       .then(function(res) {
         expect(res).to.exist;
         done();
@@ -276,6 +263,9 @@ describe('db.js', function() {
         expect(res[0].requesterid).to.equal(requester.uid.toString());
         expect(res[0]).to.have.property("copyid");
         expect(res[0].copyid).to.equal(copyid);
+        expect(res[0]).to.have.property("request_date");
+        var rounding_error = res[0].request_date.valueOf() - request_date.valueOf();
+        expect(Math.abs(rounding_error)).to.be.below(1000);
         done();
       });
     });
@@ -293,7 +283,7 @@ describe('db.js', function() {
     var owner = testData.users[0];
     var requester = testData.users[1];
     var book = util.rand(testData.books);
-    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var isbn = book.isbn;
     var copyid;
 
     // setup: create users, book, copy, bookrequest, store copyid for later
@@ -337,7 +327,8 @@ describe('db.js', function() {
     var owner = testData.users[0];
     var requester = testData.users[1];
     var book = util.rand(testData.books);
-    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var isbn = book.isbn;
+    var checkout_date = new Date();
     var copyid;
 
     // setup: create users, book, copy, bookrequest, store copyid for later
@@ -348,13 +339,13 @@ describe('db.js', function() {
       .then(util.insertCopy.bind(null, db, book, owner))
       .then(function(res) {
         copyid = res[0].copyid;
-        return util.insertBookRequest(db, requester, copyid);
+        return util.insertBookRequest(db, requester, copyid, new Date());
       })
       .then(done.bind(null, null));
     });
 
     it("should return a response object", function(done) {
-      db.checkoutBook(requester.uid, copyid)
+      db.checkoutBook(requester.uid, copyid, checkout_date)
       .then(function(res) {
         expect(res).to.exist;
         done();
@@ -377,6 +368,9 @@ describe('db.js', function() {
         expect(res[0].borrowerid).to.equal(requester.uid.toString());
         expect(res[0]).to.have.property("copyid");
         expect(res[0].copyid).to.equal(copyid);
+        expect(res[0]).to.have.property("checkout_date");
+        var rounding_error = res[0].checkout_date.valueOf() - checkout_date.valueOf();
+        expect(Math.abs(rounding_error)).to.be.below(1000);
         done();
       });
     });
@@ -394,7 +388,7 @@ describe('db.js', function() {
     var owner = testData.users[0];
     var borrower = testData.users[1];
     var book = util.rand(testData.books);
-    var ISBN = book.ISBN[13] || book.ISBN[10];
+    var isbn = book.isbn;
     var copyid;
 
     // setup: create users, book, copy, borrowing, store copyid for later
@@ -473,7 +467,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert BookRequests tuples
       .then(requests.reduce.bind(requests, function(seq, request) {
-        return seq.then(util.insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
+        return seq.then(util.insertBookRequest.bind(null, db, request.requester, request.copy.copyid, new Date()));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -483,12 +477,24 @@ describe('db.js', function() {
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(2);
-        expect(res[0].copyid).to.equal(requests[1].copy.copyid);
-        expect(res[0].requesterid).to.equal(requests[1].requester.uid.toString());
-        expect(res[0].isbn).to.equal(requests[1].copy.book.ISBN[13] || requests[1].copy.book.ISBN[10]);
-        expect(res[1].copyid).to.equal(requests[2].copy.copyid);
-        expect(res[1].requesterid).to.equal(requests[2].requester.uid.toString());
-        expect(res[1].isbn).to.equal(requests[2].copy.book.ISBN[13] || requests[2].copy.book.ISBN[10]);
+        res.forEach(function(element) {
+          expect(element).to.have.property("copyid");
+          expect(element).to.have.property("requesterid");
+          expect(element).to.have.property("requester_display_name");
+          expect(element).to.have.property("request_date");
+          expect(element).to.have.property("isbn");
+          expect(element).to.have.property("title");
+          expect(element).to.have.property("subtitle");
+          expect(element).to.have.property("authors");
+          expect(element).to.have.property("categories");
+          expect(element).to.have.property("publisher");
+          expect(element).to.have.property("publisheddate");
+          expect(element).to.have.property("description");
+          expect(element).to.have.property("pagecount");
+          expect(element).to.have.property("language");
+          expect(element).to.have.property("imagelink");
+          expect(element).to.have.property("volumelink");
+        });
         done();
       });
     });
@@ -539,7 +545,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert BookRequests tuples
       .then(requests.reduce.bind(requests, function(seq, request) {
-        return seq.then(util.insertBookRequest.bind(null, db, request.requester, request.copy.copyid));
+        return seq.then(util.insertBookRequest.bind(null, db, request.requester, request.copy.copyid, new Date()));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -549,12 +555,22 @@ describe('db.js', function() {
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(2);
-        expect(res[0].copyid).to.equal(requests[0].copy.copyid);
-        expect(res[0].ownerid).to.equal(requests[0].copy.owner.uid.toString());
-        expect(res[0].isbn).to.equal(requests[0].copy.book.ISBN[13] || requests[0].copy.book.ISBN[10]);
-        expect(res[1].copyid).to.equal(requests[1].copy.copyid);
-        expect(res[1].ownerid).to.equal(requests[1].copy.owner.uid.toString());
-        expect(res[1].isbn).to.equal(requests[1].copy.book.ISBN[13] || requests[1].copy.book.ISBN[10]);
+        res.forEach(function(element) {
+          expect(element).to.have.property("copyid");
+          expect(element).to.have.property("request_date");
+          expect(element).to.have.property("isbn");
+          expect(element).to.have.property("title");
+          expect(element).to.have.property("subtitle");
+          expect(element).to.have.property("authors");
+          expect(element).to.have.property("categories");
+          expect(element).to.have.property("publisher");
+          expect(element).to.have.property("publisheddate");
+          expect(element).to.have.property("description");
+          expect(element).to.have.property("pagecount");
+          expect(element).to.have.property("language");
+          expect(element).to.have.property("imagelink");
+          expect(element).to.have.property("volumelink");
+        });
         done();
       });
     });
@@ -606,7 +622,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert Borrowing tuples
       .then(borrowing.reduce.bind(borrowing, function(seq, borrowing) {
-        return seq.then(util.insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid));
+        return seq.then(util.insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid, new Date()));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -616,12 +632,24 @@ describe('db.js', function() {
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(2);
-        expect(res[0].copyid).to.equal(borrowing[1].copy.copyid);
-        expect(res[0].borrowerid).to.equal(borrowing[1].borrower.uid.toString());
-        expect(res[0].isbn).to.equal(borrowing[1].copy.book.ISBN[13] || borrowing[1].copy.book.ISBN[10]);
-        expect(res[1].copyid).to.equal(borrowing[2].copy.copyid);
-        expect(res[1].borrowerid).to.equal(borrowing[2].borrower.uid.toString());
-        expect(res[1].isbn).to.equal(borrowing[2].copy.book.ISBN[13] || borrowing[2].copy.book.ISBN[10]);
+        res.forEach(function(element) {
+          expect(element).to.have.property("copyid");
+          expect(element).to.have.property("borrowerid");
+          expect(element).to.have.property("borrower_display_name");
+          expect(element).to.have.property("checkout_date");
+          expect(element).to.have.property("isbn");
+          expect(element).to.have.property("title");
+          expect(element).to.have.property("subtitle");
+          expect(element).to.have.property("authors");
+          expect(element).to.have.property("categories");
+          expect(element).to.have.property("publisher");
+          expect(element).to.have.property("publisheddate");
+          expect(element).to.have.property("description");
+          expect(element).to.have.property("pagecount");
+          expect(element).to.have.property("language");
+          expect(element).to.have.property("imagelink");
+          expect(element).to.have.property("volumelink");
+        });
         done();
       });
     });
@@ -673,7 +701,7 @@ describe('db.js', function() {
       }, Promise.resolve()))
       // insert Borrowing tuples
       .then(borrowing.reduce.bind(borrowing, function(seq, borrowing) {
-        return seq.then(util.insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid));
+        return seq.then(util.insertBorrowing.bind(null, db, borrowing.borrower, borrowing.copy.copyid, new Date()));
       }, Promise.resolve()))
       .then(done.bind(null, null));
     });
@@ -683,12 +711,24 @@ describe('db.js', function() {
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(2);
-        expect(res[0].copyid).to.equal(borrowing[0].copy.copyid);
-        expect(res[0].ownerid).to.equal(borrowing[0].copy.owner.uid.toString());
-        expect(res[0].isbn).to.equal(borrowing[0].copy.book.ISBN[13] || borrowing[0].copy.book.ISBN[10]);
-        expect(res[1].copyid).to.equal(borrowing[1].copy.copyid);
-        expect(res[1].ownerid).to.equal(borrowing[1].copy.owner.uid.toString());
-        expect(res[1].isbn).to.equal(borrowing[1].copy.book.ISBN[13] || borrowing[1].copy.book.ISBN[10]);
+        res.forEach(function(element) {
+          expect(element).to.have.property("copyid");
+          expect(element).to.have.property("ownerid");
+          expect(element).to.have.property("owner_display_name");
+          expect(element).to.have.property("checkout_date");
+          expect(element).to.have.property("isbn");
+          expect(element).to.have.property("title");
+          expect(element).to.have.property("subtitle");
+          expect(element).to.have.property("authors");
+          expect(element).to.have.property("categories");
+          expect(element).to.have.property("publisher");
+          expect(element).to.have.property("publisheddate");
+          expect(element).to.have.property("description");
+          expect(element).to.have.property("pagecount");
+          expect(element).to.have.property("language");
+          expect(element).to.have.property("imagelink");
+          expect(element).to.have.property("volumelink");
+        });
         done();
       });
     });
@@ -753,7 +793,7 @@ describe('db.js', function() {
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(1);
-        expect(res[0].isbn).to.equal(copies[3].book.ISBN[13] || copies[3].book.ISBN[10]);
+        expect(res[0].isbn).to.equal(copies[3].book.isbn || copies[3].book.isbn[10]);
         expect(res[0]).to.have.property("title");
         expect(res[0]).to.have.property("subtitle");
         expect(res[0]).to.have.property("authors");
@@ -764,7 +804,7 @@ describe('db.js', function() {
         expect(res[0]).to.have.property("pagecount");
         expect(res[0]).to.have.property("language");
         expect(res[0]).to.have.property("imagelink");
-        expect(res[0]).to.have.property("imagelinksmall");
+        expect(res[0]).to.have.property("volumelink");
         expect(res[0].copyid).to.equal(copies[3].copyid);
         expect(res[0].ownerid).to.equal(copies[3].owner.uid.toString());
         expect(res[0].owner_display_name).to.equal(copies[3].owner.display_name);

@@ -3,21 +3,7 @@ module.exports = function(router, db, handle) {
   router.post("/", function(req, res) {
     console.log("Received POST request at /api/books");
     var book = req.body;
-    db.createCopy(
-      req.user.uid,
-      book.ISBN[13] || book.ISBN[10],
-      book.title,
-      book.subtitle,
-      book.authors,
-      book.categories,
-      book.publisher,
-      book.publishedDate,
-      book.description,
-      book.pageCount,
-      book.language,
-      book.imageLinks.thumbnail,
-      book.imageLinks.smallThumbnail
-    )
+    db.createCopy(req.user.uid, book)
     .then(function(db_res) {
       res.json(db_res); // send back copyid for inserted copy
     })
