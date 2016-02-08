@@ -64,20 +64,21 @@ Data Types
 copy obj:
   copyid
   book  : book obj
-  owner : user obj
-  requests : number
+[if user is not owner:]
+  owner       : user obj
+  requests    : number
   checked_out : bool
 
 book obj:
-  ISBN,
+  isbn,
   title,
   subtitle,
   authors,
   categories,
   publisher,
-  publishedDate,
+  publisheddate,
   description,
-  pageCount,
+  pagecount,
   language,
   imagelink,
   volumelink
@@ -88,9 +89,10 @@ user obj:
 
 bookRequest obj:
   copy
-  requester : user obj
   request_date   : date
   queue_position : number
+[if user is not requester:]
+  requester : user obj
 
 borrowing obj:
   copy

@@ -131,15 +131,6 @@ module.exports = function(friendingLibrary) {
             method: "POST", url: "/api/trans/checkin", data: { copyid: copyid }
           });
         },
-
-        // TODO : Move this function to its own service
-
-        // queryGoogleBooks: function(isbn) {
-        //   APICall({
-        //     method: "GET",
-        //     url: "https://www.googleapis.com/books/v1/volumes?q=isbn:" + isbn + "&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0"
-        //   });
-        // }
       };
     }]
   );

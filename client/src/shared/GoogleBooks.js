@@ -21,7 +21,7 @@ module.exports = function(friendingLibrary) {
         var v = data.volumeInfo;
 
         return {
-          ISBN          : getISBN_13(v.industryIdentifiers),
+          isbn          : getISBN_13(v.industryIdentifiers),
           title         : v.title,
           subtitle      : v.subtitle,
           authors       : v.authors,
