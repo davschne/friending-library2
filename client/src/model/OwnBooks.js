@@ -26,7 +26,7 @@ module.exports = function(friendingLibrary, DataModel) {
             pagecount     : r.pagecount,
             language      : r.language,
             imagelink     : r.imagelink,
-            imagelinksmall: r.imagelinksmall
+            volumelink    : r.volumelink
           }
         };
       };

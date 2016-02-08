@@ -4,8 +4,8 @@ module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
     "myLibraryController",
-    ["$scope", "Transact", "OwnBooks", "Borrowed", "Lent",
-    function($scope, Transact, OwnBooks, Borrowed, Lent) {
+    ["$scope", "Transact", "OwnBooks", "Borrowed", "Lent", "GoogleBooks",
+    function($scope, Transact, OwnBooks, Borrowed, Lent, GoogleBooks) {
 
       // in this view, a user can:
       //  -view books owned
@@ -16,15 +16,21 @@ module.exports = function(friendingLibrary) {
       //  -add books
       //  -delete books
 
+      // populate fields
       $scope.ownBooks = OwnBooks.getAll();
       $scope.borrowed = Borrowed.getAll();
       $scope.lent     = Lent.getAll();
 
+      // transaction utilities
       $scope.checkinBook = Transact.checkinBook;
       $scope.createCopy  = Transact.createCopy;
       $scope.deleteCopy  = Transact.deleteCopy;
 
-      // TODO : add method to look up a book on Google Books
+      // look up a book on Google Books (returns a Promise)
+      //  CAN ANGULAR DIRECTIVE DEAL WITH A PROMISE VALUE
+      //  OR IS IT NECESSARY TO SET SOME PROPERTY ON THE SCOPE
+      //  IN A CALLBACK ?
+      $scope.getBookRecordByISBN = GoogleBooks.queryByISBN;
 
       // $scope.bookRequests = [];
       // $scope.borrowedBooks = [];

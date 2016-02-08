@@ -25,6 +25,7 @@ require("./shared/REST.js")(friendingLibrary);
 require("./shared/LoginLogout.js")(friendingLibrary);
 require("./shared/Token.js")(friendingLibrary);
 require("./shared/Transact.js")(friendingLibrary);
+require("./shared/GoogleBooks.js")(friendingLibrary);
 
 // load data models
 var DataModel = require("./model/DataModel.js"); // should return a constructor

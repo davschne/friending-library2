@@ -48,10 +48,28 @@ module.exports = function(friendingLibrary) {
 
           // TODO :
 
-          createCopy: function(data) {
+          createCopy: function(book) {
             // add to OwnBooks
-            // this method makes an HTTP call to get a copyid
-            // OwnBooks.create(data);
+            // make an HTTP call to:
+            // -update backend data model
+            // -get a copyid in the response
+
+            // Promise that will resolve to the copyid:
+            var copyid = rest.createCopy(book)
+            .then(function(data) {
+              return data.copyid;
+            })
+            .catch(function() {
+              // roll back if error
+              OwnBooks.del(copy);
+              return null;
+            });
+            // NB : controller needs to be able to deal with a Promise value
+            var copy = {
+              copyid: copyid, // Promise
+              book  : book
+            };
+            OwnBooks.add(copy);
           },
 
           deleteCopy: function(copy) {

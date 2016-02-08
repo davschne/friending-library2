@@ -77,9 +77,9 @@ module.exports = function(friendingLibrary) {
           });
         },
 
-        createCopy: function(data) {
+        createCopy: function(book) {
           return APICall({
-            method: "POST", url: "/api/books", data: data
+            method: "POST", url: "/api/books", data: book
           });
         },
 

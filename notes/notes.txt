@@ -79,8 +79,8 @@ book obj:
   description,
   pageCount,
   language,
-  imageLink,
-  imageLinkSmall
+  imagelink,
+  volumelink
 
 user obj:
   id
