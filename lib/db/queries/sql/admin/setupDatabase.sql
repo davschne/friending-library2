@@ -1,89 +1,89 @@
 BEGIN;
 
 CREATE TABLE Users (
-  uID bigint,
+  uid bigint,
   display_name varchar,
   -- given_name varchar,
   -- surname varchar,
-  PRIMARY KEY (uID)
+  PRIMARY KEY (uid)
 );
 
 -- index for user searches
 -- CREATE INDEX UserNames ON Users (surname, given_name);
 
 -- CREATE TABLE Friendships (
---   uID1 bigint REFERENCES Users (uID) ON DELETE CASCADE,
---   uID2 bigint REFERENCES Users (uID) ON DELETE CASCADE,
---   PRIMARY KEY (uID1, uID2)
+--   uid1 bigint REFERENCES Users (uid) ON DELETE CASCADE,
+--   uid2 bigint REFERENCES Users (uid) ON DELETE CASCADE,
+--   PRIMARY KEY (uid1, uid2)
 -- );
 
 CREATE TABLE Books (
-  ISBN varchar,
+  isbn varchar,
   title varchar,
   subtitle varchar,
   authors varchar ARRAY,    -- (denormalized)
   categories varchar ARRAY, -- (denormalized)
   publisher varchar,
-  publishedDate varchar,
+  publisheddate varchar,
   description varchar,
-  pageCount integer,
+  pagecount integer,
   language varchar,
-  imageLink varchar,
-  imageLinkSmall varchar,
-  PRIMARY KEY (ISBN)
+  imagelink varchar,
+  volumelink varchar,
+  PRIMARY KEY (isbn)
 );
 
 -- CREATE TABLE Authors (
---   aID serial,
+--   aid serial,
 --   surname varchar,
 --   given_name varchar,
---   PRIMARY KEY (aID)
+--   PRIMARY KEY (aid)
 -- );
 
 -- -- for searching books by author name
 -- CREATE INDEX AuthorNames ON Authors (surname, given_name);
 
 -- CREATE TABLE Wrote (
---   aID integer REFERENCES Authors ON DELETE CASCADE,
---   ISBN varchar REFERENCES Books ON DELETE CASCADE,
---   PRIMARY KEY (aID, ISBN)
+--   aid integer REFERENCES Authors ON DELETE CASCADE,
+--   isbn varchar REFERENCES Books ON DELETE CASCADE,
+--   PRIMARY KEY (aid, isbn)
 -- );
 
 -- for searching books by category
 -- CREATE TABLE BooksToCategories (
 --   category varchar,
---   ISBN varchar REFERENCES Books ON DELETE CASCADE,
---   PRIMARY KEY (category, ISBN)
+--   isbn varchar REFERENCES Books ON DELETE CASCADE,
+--   PRIMARY KEY (category, isbn)
 -- );
 
 CREATE TABLE Copies (
-  copyID serial,
-  ISBN varchar REFERENCES Books ON DELETE CASCADE,
-  ownerID bigint REFERENCES Users (uID) ON DELETE CASCADE,
-  PRIMARY KEY (copyID),
-  UNIQUE (ownerID, ISBN, copyID)
+  copyid serial,
+  isbn varchar REFERENCES Books ON DELETE CASCADE,
+  ownerid bigint REFERENCES Users (uid) ON DELETE CASCADE,
+  PRIMARY KEY (copyid),
+  UNIQUE (ownerid, isbn, copyid)
 );
 
 CREATE TABLE Borrowing (
-  borrowerID bigint REFERENCES Users (uID) ON DELETE RESTRICT,
-  copyID integer REFERENCES Copies ON DELETE CASCADE,
+  borrowerid bigint REFERENCES Users (uid) ON DELETE RESTRICT,
+  copyid integer REFERENCES Copies ON DELETE CASCADE,
   checkout_date TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY (borrowerID, copyID)
+  PRIMARY KEY (borrowerid, copyid)
 );
 
 CREATE TABLE BookRequests (
-  requesterID bigint REFERENCES Users (uID) ON DELETE CASCADE,
-  copyID integer REFERENCES Copies ON DELETE CASCADE,
+  requesterid bigint REFERENCES Users (uid) ON DELETE CASCADE,
+  copyid integer REFERENCES Copies ON DELETE CASCADE,
   request_date TIMESTAMP WITH TIME ZONE,
-  PRIMARY KEY (requesterID, copyID)
+  PRIMARY KEY (requesterid, copyid)
   -- optimized for requester's view. possible to optimize for book owner?
   -- separate indexes on the columns?
 );
 
 -- CREATE TABLE FriendRequests (
---   requesterID bigint REFERENCES Users ON DELETE CASCADE,
+--   requesterid bigint REFERENCES Users ON DELETE CASCADE,
 --   inviteeID bigint REFERENCES Users ON DELETE CASCADE,
---   PRIMARY KEY (requesterID, inviteeID)
+--   PRIMARY KEY (requesterid, inviteeID)
 --   -- optimized for requester's view. possible to optimize for invitee?
 --   -- separate indexes on the columns?
 -- );

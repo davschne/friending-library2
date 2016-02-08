@@ -1,2 +1,2 @@
-INSERT INTO BookRequests (requesterID, copyID, request_date)
-VALUES ($1, $2, CURRENT_TIMESTAMP);
+INSERT INTO BookRequests (requesterid, copyid, request_date)
+VALUES ($1, $2, $3);

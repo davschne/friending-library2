@@ -1,21 +1,16 @@
-SELECT  b.ISBN AS ISBN,
+SELECT  b.isbn AS isbn,
         title,
         subtitle,
         authors,
         categories,
         publisher,
-        publishedDate,
+        publisheddate,
         description,
-        pageCount,
+        pagecount,
         language,
-        imageLink,
-        imageLinkSmall,
-        ARRAY(
-          SELECT copyid FROM Copies c
-          WHERE c.ISBN = b.ISBN
-        ) AS copyids
-FROM Books b
-WHERE ISBN IN (
-  SELECT ISBN FROM Copies
-  WHERE ownerid = $1
-);
+        imagelink,
+        volumelink,
+        copyid
+FROM Books b, Copies c
+WHERE ownerid = $1
+  AND b.isbn = c.isbn;

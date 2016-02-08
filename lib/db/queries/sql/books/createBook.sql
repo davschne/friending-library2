@@ -1,20 +1,20 @@
 INSERT INTO Books (
-  ISBN,
+  isbn,
   title,
   subtitle,
   authors,
   categories,
   publisher,
-  publishedDate,
+  publisheddate,
   description,
-  pageCount,
+  pagecount,
   language,
-  imageLink,
-  imageLinkSmall
+  imagelink,
+  volumelink
 )
 SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 WHERE NOT EXISTS (
-  SELECT ISBN
+  SELECT isbn
   FROM Books
-  WHERE ISBN = CAST($1 AS varchar)
+  WHERE isbn = CAST($1 AS varchar)
 );

@@ -47,7 +47,6 @@ module.exports = function(friendingLibrary) {
 
           createCopy: function(book) {
             // add to OwnBooks
-
             var copy = {
               // copyid property will be added when Promise resolves
               book : book
@@ -79,8 +78,10 @@ module.exports = function(friendingLibrary) {
           },
 
           denyBookRequest: function(bookrequest) {
+
             // add to OwnBooks
-            OwnBooks.add(bookrequest.copy);
+            // OwnBooks.add(bookrequest.copy);
+
             // remove from IncomingBookRequests
             IncomingBookRequests.del(bookrequest);
             // API call
@@ -88,7 +89,7 @@ module.exports = function(friendingLibrary) {
             .catch(function(res) {
               // roll back
               IncomingBookRequests.add(bookrequest);
-              OwnBooks.del(bookrequest.copy);
+              // OwnBooks.del(bookrequest.copy);
             });
           },
 
@@ -115,7 +116,8 @@ module.exports = function(friendingLibrary) {
 
           checkinBook: function(borrowing) {
             // add to OwnBooks
-            OwnBooks.add(borrowing.copy);
+            // OwnBooks.add(borrowing.copy);
+
             // remove from Lent
             Lent.del(borrowing);
             // API call
@@ -123,7 +125,7 @@ module.exports = function(friendingLibrary) {
             .catch(function(res) {
               // roll back
               Lent.add(borrowing);
-              OwnBooks.del(borrowing.copy);
+              // OwnBooks.del(borrowing.copy);
             });
           }
         };

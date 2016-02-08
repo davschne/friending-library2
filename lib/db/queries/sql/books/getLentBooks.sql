@@ -1,25 +1,25 @@
-SELECT  b.ISBN AS ISBN,
+SELECT  b.isbn AS isbn,
         title,
         subtitle,
         authors,
         categories,
         publisher,
-        publishedDate,
+        publisheddate,
         description,
-        pageCount,
+        pagecount,
         language,
-        imageLink,
-        imageLinkSmall,
-        brw.copyID AS copyID,
-        borrowerID,
+        imagelink,
+        volumelink,
+        brw.copyid AS copyid,
+        borrowerid,
         u.display_name AS borrower_display_name,
         checkout_date
 FROM Borrowing brw, Users u, Copies c, Books b
-WHERE brw.copyID IN (
-    SELECT copyID
+WHERE brw.copyid IN (
+    SELECT copyid
     FROM   Copies
-    WHERE  ownerID = $1
+    WHERE  ownerid = $1
   )
-  AND c.copyID = brw.copyID
-  AND u.uID    = brw.borrowerID
-  AND b.ISBN   = c.ISBN;
+  AND c.copyid = brw.copyid
+  AND u.uid    = brw.borrowerid
+  AND b.isbn   = c.isbn;
