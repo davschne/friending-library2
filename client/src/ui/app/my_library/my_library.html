@@ -19,7 +19,8 @@
     <li>by {{queryResult.authors.join(", ")}}</li>
     <li>{{queryResult.categories.join(", ")}}</li>
   </ul>
-  <button data-ng-click="createCopy(queryResult)">Post</button>
+  <button data-ng-click="createCopy(queryResult)">Add Book</button>
+  <button data-ng-click="cancelAdd()">Cancel</button>
 </section>
 
 <section class="book__list">

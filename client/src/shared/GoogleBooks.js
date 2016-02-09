@@ -49,6 +49,7 @@ module.exports = function(friendingLibrary) {
     return {
       // returns Promise resolving to book object
       queryByISBN: function(isbn) {
+        isbn = isbn.split("-").join(""); // remove hyphens, if any
         var querystring = "isbn:" + isbn;
         return getBook(querystring);
       }

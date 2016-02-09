@@ -244,7 +244,7 @@ describe("self-routes.js", function() {
         expect(res).to.have.status(200);
         expect(res).to.be.json;
         expect(res.body).to.be.an("array");
-        expect(res.body).to.have.length(4);
+        expect(res.body).to.have.length(testData.books.length);
         res.body.forEach(function(record) {
           expect(record).to.have.property("copyid");
           expect(record).to.have.deep.property("book.isbn");
@@ -716,7 +716,7 @@ describe("books-routes.js", function() {
         expect(res).to.have.status(200);
         expect(res).to.be.json;
         expect(res.body).to.be.an("array");
-        expect(res.body).to.have.length(4);
+        expect(res.body).to.have.length(testData.books.length);
         res.body.forEach(function(record) {
           expect(record).to.have.property("copyid");
           expect(record).to.have.deep.property("book.isbn");

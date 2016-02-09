@@ -37,8 +37,12 @@ module.exports = function(friendingLibrary) {
         $scope.isbn = "";
       };
 
-      $scope.createCopy  = function(book) {
+      $scope.createCopy = function(book) {
         Transact.createCopy(book);
+        $scope.queryResult = null;
+      };
+
+      $scope.cancelAdd = function() {
         $scope.queryResult = null;
       };
     }]
