@@ -1,13 +1,12 @@
 "use strict";
 
-module.exports = function(getItemsFromBackend, createItem) {
+module.exports = function(getItemsFromBackend) {
 
   var items = [];
 
   var refresh = function() {
     getItemsFromBackend().then(function(records) {
-      // create objects
-      items = records.map(createItem);
+      items = records;
     });
   };
 
