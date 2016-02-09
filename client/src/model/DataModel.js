@@ -6,7 +6,7 @@ module.exports = function(getItemsFromBackend) {
 
   var refresh = function() {
     getItemsFromBackend().then(function(records) {
-      items = records;
+      angular.copy(records, items);
     });
   };
 
