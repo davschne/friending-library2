@@ -19,6 +19,6 @@ module.exports = function(getItemsFromBackend) {
       return items;
     },
     add: function(item) { items.push(item); },
-    del: function(item) { items.splice(indexOf(item), 1); }
+    del: function(item) { items.splice(items.indexOf(item), 1); }
   };
 };
