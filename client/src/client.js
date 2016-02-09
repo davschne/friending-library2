@@ -29,12 +29,7 @@ require("./shared/GoogleBooks.js")(friendingLibrary);
 
 // load data model
 var DataModel = require("./model/DataModel.js"); // should return a constructor
-require("./model/AvailableBooks.js")(friendingLibrary, DataModel);
-require("./model/OutgoingBookRequests.js")(friendingLibrary, DataModel);
-require("./model/Borrowed.js")(friendingLibrary, DataModel);
-require("./model/OwnBooks.js")(friendingLibrary, DataModel);
-require("./model/IncomingBookRequests.js")(friendingLibrary, DataModel);
-require("./model/Lent.js")(friendingLibrary, DataModel);
+require("./model/model-services.js")(friendingLibrary, DataModel);
 
 // load controllers
 require("./ui/root.js")(friendingLibrary);
