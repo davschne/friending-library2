@@ -802,23 +802,23 @@ describe('db.js', function() {
       .then(function(res) {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(2);
-        res.forEach(function(element) {
-          expect(element).to.have.property("checkout_date");
-          expect(element).to.have.deep.property("borrower.id");
-          expect(element).to.have.deep.property("borrower.display_name");
-          expect(element).to.have.deep.property("copy.copyid");
-          expect(element).to.have.deep.property("copy.book.isbn");
-          expect(element).to.have.deep.property("copy.book.title");
-          expect(element).to.have.deep.property("copy.book.subtitle");
-          expect(element).to.have.deep.property("copy.book.authors");
-          expect(element).to.have.deep.property("copy.book.categories");
-          expect(element).to.have.deep.property("copy.book.publisher");
-          expect(element).to.have.deep.property("copy.book.publisheddate");
-          expect(element).to.have.deep.property("copy.book.description");
-          expect(element).to.have.deep.property("copy.book.pagecount");
-          expect(element).to.have.deep.property("copy.book.language");
-          expect(element).to.have.deep.property("copy.book.imagelink");
-          expect(element).to.have.deep.property("copy.book.volumelink");
+        res.forEach(function(record) {
+          expect(record).to.have.property("checkout_date");
+          expect(record).to.have.deep.property("borrower.id");
+          expect(record).to.have.deep.property("borrower.display_name");
+          expect(record).to.have.deep.property("copy.copyid");
+          expect(record).to.have.deep.property("copy.book.isbn");
+          expect(record).to.have.deep.property("copy.book.title");
+          expect(record).to.have.deep.property("copy.book.subtitle");
+          expect(record).to.have.deep.property("copy.book.authors");
+          expect(record).to.have.deep.property("copy.book.categories");
+          expect(record).to.have.deep.property("copy.book.publisher");
+          expect(record).to.have.deep.property("copy.book.publisheddate");
+          expect(record).to.have.deep.property("copy.book.description");
+          expect(record).to.have.deep.property("copy.book.pagecount");
+          expect(record).to.have.deep.property("copy.book.language");
+          expect(record).to.have.deep.property("copy.book.imagelink");
+          expect(record).to.have.deep.property("copy.book.volumelink");
         });
         done();
       });

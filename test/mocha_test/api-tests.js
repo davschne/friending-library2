@@ -246,21 +246,19 @@ describe("self-routes.js", function() {
         expect(res.body).to.be.an("array");
         expect(res.body).to.have.length(4);
         res.body.forEach(function(record) {
-          expect(record).to.contain.keys(
-            "isbn",
-            "title",
-            "subtitle",
-            "authors",
-            "categories",
-            "publisher",
-            "publisheddate",
-            "description",
-            "pagecount",
-            "language",
-            "imagelink",
-            "imagelinksmall",
-            "copyids"
-          );
+          expect(record).to.have.property("copyid");
+          expect(record).to.have.deep.property("book.isbn");
+          expect(record).to.have.deep.property("book.title");
+          expect(record).to.have.deep.property("book.subtitle");
+          expect(record).to.have.deep.property("book.authors");
+          expect(record).to.have.deep.property("book.categories");
+          expect(record).to.have.deep.property("book.publisher");
+          expect(record).to.have.deep.property("book.publisheddate");
+          expect(record).to.have.deep.property("book.description");
+          expect(record).to.have.deep.property("book.pagecount");
+          expect(record).to.have.deep.property("book.language");
+          expect(record).to.have.deep.property("book.imagelink");
+          expect(record).to.have.deep.property("book.volumelink");
         });
         done();
       });
@@ -305,7 +303,7 @@ describe("self-routes.js", function() {
         .then(function(res) {
           var copyid = res[0].copyid;
           copies[index].copyid = copyid;
-          return util.insertBookRequest(db, users[1], copyid);
+          return util.insertBookRequest(db, users[1], copyid, new Date());
         });
       }, Promise.resolve()))
       .then(done.bind(null, null));
@@ -322,24 +320,22 @@ describe("self-routes.js", function() {
         expect(res.body).to.be.an("array");
         expect(res.body).to.have.length(2);
         res.body.forEach(function(record) {
-          expect(record).to.contain.keys(
-            "isbn",
-            "title",
-            "subtitle",
-            "authors",
-            "categories",
-            "publisher",
-            "publisheddate",
-            "description",
-            "pagecount",
-            "language",
-            "imagelink",
-            "imagelinksmall",
-            "copyid",
-            "requesterid",
-            "requester_display_name",
-            "request_date"
-          );
+          expect(record).to.have.property("request_date");
+          expect(record).to.have.deep.property("requester.id");
+          expect(record).to.have.deep.property("requester.display_name");
+          expect(record).to.have.deep.property("copy.copyid");
+          expect(record).to.have.deep.property("copy.book.isbn");
+          expect(record).to.have.deep.property("copy.book.title");
+          expect(record).to.have.deep.property("copy.book.subtitle");
+          expect(record).to.have.deep.property("copy.book.authors");
+          expect(record).to.have.deep.property("copy.book.categories");
+          expect(record).to.have.deep.property("copy.book.publisher");
+          expect(record).to.have.deep.property("copy.book.publisheddate");
+          expect(record).to.have.deep.property("copy.book.description");
+          expect(record).to.have.deep.property("copy.book.pagecount");
+          expect(record).to.have.deep.property("copy.book.language");
+          expect(record).to.have.deep.property("copy.book.imagelink");
+          expect(record).to.have.deep.property("copy.book.volumelink");
         });
         done();
       });
@@ -382,7 +378,7 @@ describe("self-routes.js", function() {
         .then(function(res) {
           var copyid = res[0].copyid;
           copies[index].copyid = copyid;
-          return util.insertBookRequest(db, users[1], copyid);
+          return util.insertBookRequest(db, users[1], copyid, new Date());
         });
       }, Promise.resolve()))
       .then(done.bind(null, null));
@@ -399,24 +395,20 @@ describe("self-routes.js", function() {
         expect(res.body).to.be.an("array");
         expect(res.body).to.have.length(2);
         res.body.forEach(function(record) {
-          expect(record).to.contain.keys(
-            "isbn",
-            "title",
-            "subtitle",
-            "authors",
-            "categories",
-            "publisher",
-            "publisheddate",
-            "description",
-            "pagecount",
-            "language",
-            "imagelink",
-            "imagelinksmall",
-            "copyid",
-            "ownerid",
-            "owner_display_name",
-            "request_date"
-          );
+          expect(record).to.have.property("request_date");
+          expect(record).to.have.deep.property("copy.copyid");
+          expect(record).to.have.deep.property("copy.book.isbn");
+          expect(record).to.have.deep.property("copy.book.title");
+          expect(record).to.have.deep.property("copy.book.subtitle");
+          expect(record).to.have.deep.property("copy.book.authors");
+          expect(record).to.have.deep.property("copy.book.categories");
+          expect(record).to.have.deep.property("copy.book.publisher");
+          expect(record).to.have.deep.property("copy.book.publisheddate");
+          expect(record).to.have.deep.property("copy.book.description");
+          expect(record).to.have.deep.property("copy.book.pagecount");
+          expect(record).to.have.deep.property("copy.book.language");
+          expect(record).to.have.deep.property("copy.book.imagelink");
+          expect(record).to.have.deep.property("copy.book.volumelink");
         });
         done();
       });
@@ -459,7 +451,7 @@ describe("self-routes.js", function() {
         .then(function(res) {
           var copyid = res[0].copyid;
           copies[index].copyid = copyid;
-          return util.insertBorrowing(db, users[1], copyid);
+          return util.insertBorrowing(db, users[1], copyid, new Date());
         });
       }, Promise.resolve()))
       .then(done.bind(null, null));
@@ -476,24 +468,22 @@ describe("self-routes.js", function() {
         expect(res.body).to.be.an("array");
         expect(res.body).to.have.length(2);
         res.body.forEach(function(record) {
-          expect(record).to.contain.keys(
-            "isbn",
-            "title",
-            "subtitle",
-            "authors",
-            "categories",
-            "publisher",
-            "publisheddate",
-            "description",
-            "pagecount",
-            "language",
-            "imagelink",
-            "imagelinksmall",
-            "copyid",
-            "borrowerid",
-            "borrower_display_name",
-            "checkout_date"
-          );
+          expect(record).to.have.property("checkout_date");
+          expect(record).to.have.deep.property("borrower.id");
+          expect(record).to.have.deep.property("borrower.display_name");
+          expect(record).to.have.deep.property("copy.copyid");
+          expect(record).to.have.deep.property("copy.book.isbn");
+          expect(record).to.have.deep.property("copy.book.title");
+          expect(record).to.have.deep.property("copy.book.subtitle");
+          expect(record).to.have.deep.property("copy.book.authors");
+          expect(record).to.have.deep.property("copy.book.categories");
+          expect(record).to.have.deep.property("copy.book.publisher");
+          expect(record).to.have.deep.property("copy.book.publisheddate");
+          expect(record).to.have.deep.property("copy.book.description");
+          expect(record).to.have.deep.property("copy.book.pagecount");
+          expect(record).to.have.deep.property("copy.book.language");
+          expect(record).to.have.deep.property("copy.book.imagelink");
+          expect(record).to.have.deep.property("copy.book.volumelink");
         });
         done();
       });
@@ -537,7 +527,7 @@ describe("self-routes.js", function() {
         .then(function(res) {
           var copyid = res[0].copyid;
           copies[index].copyid = copyid;
-          return util.insertBorrowing(db, users[1], copyid);
+          return util.insertBorrowing(db, users[1], copyid, new Date());
         });
       }, Promise.resolve()))
       .then(done.bind(null, null));
@@ -554,24 +544,23 @@ describe("self-routes.js", function() {
         expect(res.body).to.be.an("array");
         expect(res.body).to.have.length(2);
         res.body.forEach(function(record) {
-          expect(record).to.contain.keys(
-            "isbn",
-            "title",
-            "subtitle",
-            "authors",
-            "categories",
-            "publisher",
-            "publisheddate",
-            "description",
-            "pagecount",
-            "language",
-            "imagelink",
-            "imagelinksmall",
-            "copyid",
-            "ownerid",
-            "owner_display_name",
-            "checkout_date"
-          );
+          expect(record).to.have.property("checkout_date");
+          expect(record).to.have.deep.property("copy.copyid");
+          expect(record).to.have.deep.property("copy.owner.id");
+          expect(record).to.have.deep.property("copy.owner.display_name");
+          expect(record).to.have.deep.property("copy.copyid");
+          expect(record).to.have.deep.property("copy.book.isbn");
+          expect(record).to.have.deep.property("copy.book.title");
+          expect(record).to.have.deep.property("copy.book.subtitle");
+          expect(record).to.have.deep.property("copy.book.authors");
+          expect(record).to.have.deep.property("copy.book.categories");
+          expect(record).to.have.deep.property("copy.book.publisher");
+          expect(record).to.have.deep.property("copy.book.publisheddate");
+          expect(record).to.have.deep.property("copy.book.description");
+          expect(record).to.have.deep.property("copy.book.pagecount");
+          expect(record).to.have.deep.property("copy.book.language");
+          expect(record).to.have.deep.property("copy.book.imagelink");
+          expect(record).to.have.deep.property("copy.book.volumelink");
         });
         done();
       });
@@ -729,23 +718,19 @@ describe("books-routes.js", function() {
         expect(res.body).to.be.an("array");
         expect(res.body).to.have.length(4);
         res.body.forEach(function(record) {
-          expect(record).to.contain.keys(
-            "isbn",
-            "title",
-            "subtitle",
-            "authors",
-            "categories",
-            "publisher",
-            "publisheddate",
-            "description",
-            "pagecount",
-            "language",
-            "imagelink",
-            "imagelinksmall",
-            "copyid",
-            "ownerid",
-            "owner_display_name"
-          );
+          expect(record).to.have.property("copyid");
+          expect(record).to.have.deep.property("book.isbn");
+          expect(record).to.have.deep.property("book.title");
+          expect(record).to.have.deep.property("book.subtitle");
+          expect(record).to.have.deep.property("book.authors");
+          expect(record).to.have.deep.property("book.categories");
+          expect(record).to.have.deep.property("book.publisher");
+          expect(record).to.have.deep.property("book.publisheddate");
+          expect(record).to.have.deep.property("book.description");
+          expect(record).to.have.deep.property("book.pagecount");
+          expect(record).to.have.deep.property("book.language");
+          expect(record).to.have.deep.property("book.imagelink");
+          expect(record).to.have.deep.property("book.volumelink");
         });
         done();
       });
