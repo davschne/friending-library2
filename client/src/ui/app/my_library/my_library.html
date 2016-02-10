@@ -43,19 +43,21 @@
 <section class="book__list">
   <h1 class="book__list__header">Books Lent</h1>
   <h2 class="book__list__none" data-ng-if="(lent.length == 0)">Not lending any books</h2>
-  <li class="list__item" data-ng-repeat="borrowing in lent">
-    <img data-ng-src="{{borrowing.copy.book.imagelink}}"/>
-    <ul>
-      <li><strong>{{borrowing.copy.book.title}}</strong></li>
-      <li ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
-      <li>by {{borrowing.copy.book.authors.join(", ")}}</li>
-      <li>{{borrcopy.book.categories.join(", ")}}</li>
-      <li>Borrower: {{borrowing.borrower.display_name}}</li>
-      <li>Checked Out: {{borrowing.checkout_date.valueOf}}</li>
-    </ul>
-    <button data-ng-click="checkinBook(borrowing)">Returned</button>
-  </li>
-</ul>
+  <ul class="list">
+    <li class="list__item" data-ng-repeat="borrowing in lent">
+      <img data-ng-src="{{borrowing.copy.book.imagelink}}"/>
+      <ul>
+        <li><strong>{{borrowing.copy.book.title}}</strong></li>
+        <li ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
+        <li>by {{borrowing.copy.book.authors.join(", ")}}</li>
+        <li>{{borrcopy.book.categories.join(", ")}}</li>
+        <li>Borrower: {{borrowing.borrower.display_name}}</li>
+        <li>Checked Out: {{borrowing.checkout_date}}</li>
+      </ul>
+      <button data-ng-click="checkinBook(borrowing)">Check In</button>
+    </li>
+  </ul>
+</section>
 
 <section class="book__list">
   <h1 class="book__list__header">Currently Borrowing</h1>
@@ -64,14 +66,14 @@
   </h2>
   <ul class="list">
     <li class="list__item" data-ng-repeat="borrowing in borrowed">
-      <img data-ng-src="{{borrowing.copy.book.imagelinksmall}}">
+      <img data-ng-src="{{borrowing.copy.book.imagelink}}">
       <ul>
         <li><strong>{{borrowing.copy.book.title}}</strong></li>
         <li ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
         <li>by {{borrowing.copy.book.authors.join(", ")}}</li>
         <li>{{borrcopy.book.categories.join(", ")}}</li>
         <li>Owner: {{borrowing.copy.owner.display_name}}</li>
-        <li>Checked Out: {{borrowing.checkout_date.valueOf}}</li>
+        <li>Checked Out: {{borrowing.checkout_date}}</li>
       </ul>
     </li>
   </ul>

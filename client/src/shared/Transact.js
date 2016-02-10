@@ -105,10 +105,13 @@ module.exports = function(friendingLibrary) {
             Lent.add(borrowing);
             // remove from IncomingBookRequests
             IncomingBookRequests.del(bookrequest);
+            // remove from OwnBooks
+            OwnBooks.del(bookrequest.copy);
             // API call
             rest.checkoutBook(borrowing)
             .catch(function(res) {
               // roll back
+              OwnBooks.add(bookrequest.copy);
               IncomingBookRequests.add(bookrequest);
               Lent.del(borrowing);
             });
@@ -116,7 +119,7 @@ module.exports = function(friendingLibrary) {
 
           checkinBook: function(borrowing) {
             // add to OwnBooks
-            // OwnBooks.add(borrowing.copy);
+            OwnBooks.add(borrowing.copy);
 
             // remove from Lent
             Lent.del(borrowing);
@@ -125,7 +128,7 @@ module.exports = function(friendingLibrary) {
             .catch(function(res) {
               // roll back
               Lent.add(borrowing);
-              // OwnBooks.del(borrowing.copy);
+              OwnBooks.del(borrowing.copy);
             });
           }
         };
