@@ -68,7 +68,7 @@ gulp.task("clean", function() {
   del.sync(["./client/build/**", "!client/build"]);
 })
 
-gulp.task("server_test", function() {
+gulp.task("server-test", function() {
   return gulp.src([
       "./test/mocha_test/setup-tests.js",
       "./test/mocha_test/db-tests.js",
@@ -78,7 +78,7 @@ gulp.task("server_test", function() {
     .pipe(mocha());
 });
 
-gulp.task("client_test", ["webpack:test"], function(done) {
+gulp.task("client-test", ["webpack:test"], function(done) {
   new KarmaServer({
     configFile: __dirname + "/karma.conf.js"
   }, done)
@@ -86,23 +86,39 @@ gulp.task("client_test", ["webpack:test"], function(done) {
 });
 
 // create Postgres user, database, and schema
-gulp.task("db_setup", function(done) {
-  var setupUtil = exec("node lib/db/db_setup");
-  setupUtil.stdout.on("data", function(data) {
+gulp.task("db-setup", function() {
+  var setup = exec("node lib/db/db-setup");
+  setup.stdout.on("data", function(data) {
     console.log(data.toString());
   });
 });
 
 // drop Postgres database and user
-gulp.task("db_breakdown", function(done) {
-  var setupUtil = exec("node lib/db/db_breakdown");
-  setupUtil.stdout.on("data", function(data) {
+gulp.task("db-breakdown", function() {
+  var breakdown = exec("node lib/db/db-breakdown");
+  breakdown.stdout.on("data", function(data) {
+    console.log(data.toString());
+  });
+});
+
+// populate Postgres and Redis databases with test data
+gulp.task("test-populate", function() {
+  var populate = exec("node lib/test/populate-db");
+  populate.stdout.on("data", function(data) {
+    console.log(data.toString());
+  });
+});
+
+// empty Postgres and Redis databases
+gulp.task("test-empty", function() {
+  var empty = exec("node lib/test/empty-db");
+  empty.stdout.on("data", function(data) {
     console.log(data.toString());
   });
 });
 
 // run server (as child process)
-gulp.task("start", function(done) {
+gulp.task("start", function() {
   var app = exec("node server");
   app.stdout.on("data", function(data) {
     console.log(data.toString());
@@ -112,13 +128,13 @@ gulp.task("start", function(done) {
   });
 });
 
-gulp.task("test", ["server_test", "client_test"]);
+gulp.task("test", ["server-test", "client-test"]);
 
 gulp.task("compile", ["clean", "sass", "copy-html", "copy", "webpack:dev"]);
 
 gulp.task("build", ["test", "compile"]);
 
-gulp.task("default", ["build", "db_setup"]);
+gulp.task("default", ["build", "db-setup"]);
 
 // gulp.task("lint", function() {
 //   return gulp.src(["./routes/*.js", "./test/*.js", "./middleware/*.js", "./models/*.js", "./lib/*.js", "./server.js"])
