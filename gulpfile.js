@@ -19,9 +19,6 @@ gulp.task("sass", function() {
     .pipe(gulp.dest("./client/build/css/"));
 });
 
-gulp.task("sass:watch", function() {
-  gulp.watch("./client/src/sass/**/*.scss", ["sass"]);
-});
 
 gulp.task("webpack:dev", function() {
   return gulp.src("./client/src/client.js")
@@ -133,6 +130,10 @@ gulp.task("test", ["server-test", "client-test"]);
 gulp.task("compile", ["clean", "sass", "copy-html", "copy", "webpack:dev"]);
 
 gulp.task("build", ["test", "compile"]);
+
+gulp.task("watch", function() {
+  gulp.watch("./client/src/**/*", ["compile"]);
+});
 
 gulp.task("default", ["build", "db-setup"]);
 

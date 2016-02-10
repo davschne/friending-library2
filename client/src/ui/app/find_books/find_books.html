@@ -1,26 +1,23 @@
-<h1 class="book__list__header">Available Books</h1>
-<ul class="list">
+<section class="book__list">
+  <h1 class="book__list__header">Available Books</h1>
   <h2 class="book__list__none" data-ng-if="(availableBooks.length == 0)">No books available to borrow</h2>
-  <li class="list__item" data-ng-repeat="copy in availableBooks">
-    <section class="book__list__section">
-      <section class="book__list__subsection">
-        <img data-ng-src="{{copy.imagelinksmall}}">
-      </section>
-      <section class="book__list__subsection">
-        <ul>
-          <li><p>Title:</p>{{copy.book.title}}</li>
-          <li><p>Authors:</p>{{copy.book.authors}}</li>
-          <li><p>Genre:</p>{{copy.book.categories}}</li>
-          <li><p>Owner:</p>{{copy.owner.display_name}}</li>
-        </ul>
-        <button data-ng-click="toggleDescription(1, book)">Show Description</button>
-        <button data-ng-click="requestBook(copy)">Request Book</button>
-      </section>
-<!--       <section class="description" data-ng-if="book.showDescription">
-        <h2 class="description__header">Description:</h2>
-        <p class="description__p">{{copy.book.description}}</p>
-        <button data-ng-click="toggleDescription(2, book)">Hide</button>
-      </section> -->
+  <ul class="list">
+    <li class="list__item" data-ng-repeat="copy in availableBooks">
+      <img data-ng-src="{{copy.book.imagelink}}">
+      <ul>
+        <li><strong>{{copy.book.title}}</strong></li>
+        <li ng-if="copy.book.subtitle">{{copy.book.subtitle}}</li>
+        <li>by {{copy.book.authors.join(", ")}}</li>
+        <li>{{copy.book.categories.join(", ")}}</li>
+        <li>Owner: {{copy.owner.display_name}}</li>
+      </ul>
+      <!-- <button data-ng-click="toggleDescription(1, book)">Show Details</button> -->
+      <button data-ng-click="requestBook(copy)">Request Book</button>
+      <!-- <section class="description" data-ng-if="book.showDescription">
+      <h2 class="description__header">Description:</h2>
+      <p class="description__p">{{copy.book.description}}</p>
+      <button data-ng-click="toggleDescription(2, book)">Hide</button> -->
     </section>
-  </li>
-</ul>
+    </li>
+  </ul>
+</section>

@@ -1,48 +1,40 @@
-<h1 class="book__list__header">My Book Requests</h1>
 <section class="book__list">
+  <h1 class="book__list__header">My Book Requests</h1>
+  <h2 class="book__list__none" data-ng-if="(outgoingBookRequests.length == 0)">
+    No books requested
+  </h2>
   <ul class="list">
-    <h2 class="book__list__none" data-ng-if="(outgoingBookRequests.length == 0)">
-      No books requested
-    </h2>
     <li class="list__item" data-ng-repeat="bookrequest in outgoingBookRequests">
-      <section class="book__list__section">
-        <section class="book__list__subsection">
-          <img data-ng-src="{{bookrequest.copy.book.imagelinksmall}}">
-        </section>
-        <section class="book__list__subsection">
-          <ul>
-            <li><p>Title:</p>{{bookrequest.copy.book.title}}</li>
-            <li><p>Authors:</p>{{bookrequest.copy.book.authors}}</li>
-            <li><p>Genres:</p>{{bookrequest.copy.book.categories}}</li>
-            <li><p>Owner:</p>{{bookrequest.copy.owner.display_name}}</li>
-          </ul>
-          <button data-ng-click="cancelBookRequest(bookrequest)">Undo</button>
-        </section>
-      </section>
+      <img data-ng-src="{{bookrequest.copy.book.imagelink}}">
+      <ul>
+        <li>{{bookrequest.copy.book.title}}</li>
+        <li ng-if="bookrequest.copy.book.subtitle">{{bookrequest.copy.book.subtitle}}</li>
+        <li>by: {{bookrequest.copy.book.authors.join(", ")}}</li>
+        <li>{{bookrequest.copy.book.categories.join(", ")}}</li>
+        <li>Owner: {{bookrequest.copy.owner.display_name}}</li>
+      </ul>
+      <button data-ng-click="cancelBookRequest(bookrequest)">Undo</button>
     </li>
   </ul>
 </section>
 
-<h1 class="book__list__header">Requests For My Books</h1>
-<ul class="list">
+<section class="book__list">
+  <h1 class="book__list__header">Requests For My Books</h1>
   <h2 class="book__list__none" data-ng-if="(incomingBookRequests.length == 0)">
     No books requested
   </h2>
-  <li class="list__item" data-ng-repeat="bookrequest in incomingBookRequests">
-    <section class="book__list__section">
-      <section class="book__list__subsection">
-        <img data-ng-src="{{bookrequest.copy.book.imagelinksmall}}">
-      </section>
-      <section class="book__list__subsection">
-        <ul>
-          <li><p>Title:</p>{{bookrequest.copy.book.title}}</li>
-          <li><p>Authors:</p>{{bookrequest.copy.book.authors}} </li>
-          <li><p>Genres:</p>{{bookrequest.copy.book.categories}} </li>
-          <li><p>Requester:</p>{{bookrequest.requester.display_name}}</li>
-        </ul>
-        <button data-ng-click="checkoutBook(bookrequest)">Approve</button>
-        <button data-ng-click="denyBookRequest(bookrequest)">Deny</button>
-      </section>
-    </section>
-  </li>
-</ul>
+  <ul class="list">
+    <li class="list__item" data-ng-repeat="bookrequest in incomingBookRequests">
+      <img data-ng-src="{{bookrequest.copy.book.imagelink}}">
+      <ul>
+        <li>{{bookrequest.copy.book.title}}</li>
+        <li ng-if="bookrequest.copy.book.subtitle">{{bookrequest.copy.book.subtitle}}</li>
+        <li>by: {{bookrequest.copy.book.authors.join(", ")}}</li>
+        <li>{{bookrequest.copy.book.categories.join(", ")}}</li>
+        <li>Requester: {{bookrequest.copy.owner.display_name}}</li>
+      </ul>
+      <button data-ng-click="checkoutBook(bookrequest)">Check Out</button>
+      <button data-ng-click="denyBookRequest(bookrequest)">Deny</button>
+    </li>
+  </ul>
+</section>
