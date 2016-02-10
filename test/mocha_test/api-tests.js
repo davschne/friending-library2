@@ -321,7 +321,7 @@ describe("self-routes.js", function() {
         expect(res.body).to.have.length(2);
         res.body.forEach(function(record) {
           expect(record).to.have.property("request_date");
-          expect(record).to.have.deep.property("requester.id");
+          expect(record).to.have.deep.property("requester.uid");
           expect(record).to.have.deep.property("requester.display_name");
           expect(record).to.have.deep.property("copy.copyid");
           expect(record).to.have.deep.property("copy.book.isbn");
@@ -469,7 +469,7 @@ describe("self-routes.js", function() {
         expect(res.body).to.have.length(2);
         res.body.forEach(function(record) {
           expect(record).to.have.property("checkout_date");
-          expect(record).to.have.deep.property("borrower.id");
+          expect(record).to.have.deep.property("borrower.uid");
           expect(record).to.have.deep.property("borrower.display_name");
           expect(record).to.have.deep.property("copy.copyid");
           expect(record).to.have.deep.property("copy.book.isbn");
@@ -546,7 +546,7 @@ describe("self-routes.js", function() {
         res.body.forEach(function(record) {
           expect(record).to.have.property("checkout_date");
           expect(record).to.have.deep.property("copy.copyid");
-          expect(record).to.have.deep.property("copy.owner.id");
+          expect(record).to.have.deep.property("copy.owner.uid");
           expect(record).to.have.deep.property("copy.owner.display_name");
           expect(record).to.have.deep.property("copy.copyid");
           expect(record).to.have.deep.property("copy.book.isbn");

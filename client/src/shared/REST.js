@@ -105,7 +105,7 @@ module.exports = function(friendingLibrary) {
 
         denyBookRequest: function(bookrequest) {
           var copyid = bookrequest.copy.copyid;
-          var requesterid = bookrequest.requester.id;
+          var requesterid = bookrequest.requester.uid;
           return APICall({
             method: "POST",
             url: "/api/trans/deny",
@@ -115,7 +115,7 @@ module.exports = function(friendingLibrary) {
 
         checkoutBook: function(borrowing) {
           var copyid = borrowing.copy.copyid;
-          var requesterid = borrowing.borrower.id;
+          var requesterid = borrowing.borrower.uid;
           // var checkoutdate = borrowing.checkoutdate;
           // var duedate = borrowing.duedate;
           return APICall({

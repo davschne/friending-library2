@@ -425,7 +425,7 @@ describe('db.js', function() {
         expect(res).to.be.an.instanceof(Array);
         expect(res).to.have.length(1);
         expect(res[0].copyid).to.equal(copies[3].copyid);
-        expect(res[0]).to.have.deep.property("owner.id", copies[3].owner.uid.toString());
+        expect(res[0]).to.have.deep.property("owner.uid", copies[3].owner.uid.toString());
         expect(res[0]).to.have.deep.property("owner.display_name", copies[3].owner.display_name);
         expect(res[0]).to.have.property("book");
         expect(res[0].book).to.deep.equal(books[3]);
@@ -642,7 +642,7 @@ describe('db.js', function() {
         expect(res).to.have.length(2);
         res.forEach(function(record) {
           expect(record).to.have.property("request_date");
-          expect(record).to.have.deep.property("requester.id");
+          expect(record).to.have.deep.property("requester.uid");
           expect(record).to.have.deep.property("requester.display_name");
           expect(record).to.have.deep.property("copy.copyid");
           expect(record).to.have.deep.property("copy.book.isbn");
@@ -723,7 +723,7 @@ describe('db.js', function() {
         res.forEach(function(record) {
           expect(record).to.have.property("checkout_date");
           expect(record).to.have.deep.property("copy.copyid");
-          expect(record).to.have.deep.property("copy.owner.id");
+          expect(record).to.have.deep.property("copy.owner.uid");
           expect(record).to.have.deep.property("copy.owner.display_name");
           expect(record).to.have.deep.property("copy.book.isbn");
           expect(record).to.have.deep.property("copy.book.title");
@@ -804,7 +804,7 @@ describe('db.js', function() {
         expect(res).to.have.length(2);
         res.forEach(function(record) {
           expect(record).to.have.property("checkout_date");
-          expect(record).to.have.deep.property("borrower.id");
+          expect(record).to.have.deep.property("borrower.uid");
           expect(record).to.have.deep.property("borrower.display_name");
           expect(record).to.have.deep.property("copy.copyid");
           expect(record).to.have.deep.property("copy.book.isbn");

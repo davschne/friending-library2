@@ -264,7 +264,7 @@ describe("REST.js", function() {
       var requesterid = 234908374;
       var bookrequest = {
         copy: { copyid : copyid },
-        requester: { id : requesterid }
+        requester: { uid : requesterid }
       };
       var response = { message: "Book request deleted"};
       $httpBackend.expect(
@@ -287,7 +287,7 @@ describe("REST.js", function() {
       var requesterid = 234908374;
       var borrowing = {
         copy: { copyid : copyid },
-        borrower: { id : requesterid }
+        borrower: { uid : requesterid }
       };
       var response = { message: "Book checked out" };
       $httpBackend.expect(
