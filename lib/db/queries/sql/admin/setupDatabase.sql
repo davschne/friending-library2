@@ -1,22 +1,19 @@
 BEGIN;
 
 CREATE TABLE Users (
-  uid serial,
-  facebookid bigint,
+  uid bigint,
   display_name varchar,
   -- given_name varchar,
   -- surname varchar,
-  PRIMARY KEY (uid),
-  -- index for quick login
-  UNIQUE (facebookid)
+  PRIMARY KEY (uid)
 );
 
 -- index for user searches
 -- CREATE INDEX UserNames ON Users (surname, given_name);
 
 -- CREATE TABLE Friendships (
---   uid1 integer REFERENCES Users (uid) ON DELETE CASCADE,
---   uid2 integer REFERENCES Users (uid) ON DELETE CASCADE,
+--   uid1 bigint REFERENCES Users (uid) ON DELETE CASCADE,
+--   uid2 bigint REFERENCES Users (uid) ON DELETE CASCADE,
 --   PRIMARY KEY (uid1, uid2)
 -- );
 
@@ -62,20 +59,20 @@ CREATE TABLE Books (
 CREATE TABLE Copies (
   copyid serial,
   isbn varchar REFERENCES Books ON DELETE CASCADE,
-  ownerid integer REFERENCES Users (uid) ON DELETE CASCADE,
+  ownerid bigint REFERENCES Users (uid) ON DELETE CASCADE,
   PRIMARY KEY (copyid),
   UNIQUE (ownerid, isbn, copyid)
 );
 
 CREATE TABLE Borrowing (
-  borrowerid integer REFERENCES Users (uid) ON DELETE RESTRICT,
+  borrowerid bigint REFERENCES Users (uid) ON DELETE RESTRICT,
   copyid integer REFERENCES Copies ON DELETE CASCADE,
   checkout_date TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (borrowerid, copyid)
 );
 
 CREATE TABLE BookRequests (
-  requesterid integer REFERENCES Users (uid) ON DELETE CASCADE,
+  requesterid bigint REFERENCES Users (uid) ON DELETE CASCADE,
   copyid integer REFERENCES Copies ON DELETE CASCADE,
   request_date TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (requesterid, copyid)
@@ -84,8 +81,8 @@ CREATE TABLE BookRequests (
 );
 
 -- CREATE TABLE FriendRequests (
---   requesterid integer REFERENCES Users ON DELETE CASCADE,
---   inviteeID integer REFERENCES Users ON DELETE CASCADE,
+--   requesterid bigint REFERENCES Users ON DELETE CASCADE,
+--   inviteeID bigint REFERENCES Users ON DELETE CASCADE,
 --   PRIMARY KEY (requesterid, inviteeID)
 --   -- optimized for requester's view. possible to optimize for invitee?
 --   -- separate indexes on the columns?

@@ -22,28 +22,22 @@ describe('db.js', function() {
   describe('#findOrCreateUser', function() {
 
     var user = util.rand(testData.users);
-    var uid; // will store user ID once retrieved
 
-    it("should return a response object containing the user ID", function(done) {
-      db.findOrCreateUser(user.facebookid, user.display_name)
+    it("should return a response object", function(done) {
+      db.findOrCreateUser(user.uid, user.display_name)
       .then(function(res) {
         expect(res).to.exist;
-        expect(res[0]).to.have.property("uid");
         done();
       });
     });
 
     it("should create a tuple in the Users table if it doesn't already exist", function(done) {
-      db.query("SELECT * FROM Users WHERE facebookid=$1;", [user.facebookid])
+      db.query("SELECT uid FROM Users WHERE uid=$1;", [user.uid])
       .then(function(res) {
-        expect(res[0]).to.have.property("display_name", user.display_name);
-        expect(res[0]).to.have.property("uid");
-        expect(res[0]).to.have.property("facebookid");
+        expect(res[0].uid).to.equal(user.uid.toString());
         done();
       });
     });
-
-    // TODO : test for retrieving a user that already exists
 
     // cleanup: delete the user
     after(function(done) {
@@ -54,7 +48,7 @@ describe('db.js', function() {
     })
   });
 
-  xdescribe('#deleteUser', function() {
+  describe('#deleteUser', function() {
 
     var user = util.rand(testData.users);
 
@@ -83,7 +77,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe('#createCopy', function() {
+  describe('#createCopy', function() {
 
     var user = util.rand(testData.users);
     var book = util.rand(testData.books);
@@ -133,7 +127,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#deleteCopy", function() {
+  describe("#deleteCopy", function() {
 
     var user = util.rand(testData.users);
     var book = util.rand(testData.books);
@@ -177,7 +171,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#createBookRequest", function() {
+  describe("#createBookRequest", function() {
 
     var owner = testData.users[0];
     var requester = testData.users[1];
@@ -229,7 +223,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#deleteBookRequest", function() {
+  describe("#deleteBookRequest", function() {
 
     var owner = testData.users[0];
     var requester = testData.users[1];
@@ -274,7 +268,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#checkoutBook", function() {
+  describe("#checkoutBook", function() {
     var owner = testData.users[0];
     var requester = testData.users[1];
     var book = util.rand(testData.books);
@@ -335,7 +329,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#checkinBook", function(done) {
+  describe("#checkinBook", function(done) {
     var owner = testData.users[0];
     var borrower = testData.users[1];
     var book = util.rand(testData.books);
@@ -379,7 +373,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#getAvailableBooks", function() {
+  describe("#getAvailableBooks", function() {
     // one copy is currently borrowed
     // one is already requested by user
     // one belongs to user
@@ -448,7 +442,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#getOwnBooks", function() {
+  describe("#getOwnBooks", function() {
 
     var user = util.rand(testData.users);
     var books = testData.books;
@@ -518,7 +512,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#getOutgoingBookRequests", function() {
+  describe("#getOutgoingBookRequests", function() {
     // users[0] is requester for outgoing book requests
     var users = testData.users;
     var books = testData.books;
@@ -595,7 +589,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#getIncomingBookRequests", function() {
+  describe("#getIncomingBookRequests", function() {
 
     // users[0] is target for incoming book requests
     var users = testData.users;
@@ -677,7 +671,7 @@ describe('db.js', function() {
   });
 
 
-  xdescribe("#getBorrowedBooks", function() {
+  describe("#getBorrowedBooks", function() {
     // users[0] is borrower
     var users = testData.users;
     var books = testData.books;
@@ -757,7 +751,7 @@ describe('db.js', function() {
     });
   });
 
-  xdescribe("#getLentBooks", function() {
+  describe("#getLentBooks", function() {
 
     // users[0] is lender
     var users = testData.users;

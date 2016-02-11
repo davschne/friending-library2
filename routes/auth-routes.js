@@ -15,18 +15,15 @@ module.exports = function(router, db, redis, handle, passport) {
     },
     function(access_token, refreshToken, profile, done) {
 
-      var facebookid  = profile.id;
+      var id = profile.id;
       var displayName = profile.displayName;
 
       // create user tuple in Postgres (if it doesn't exist already)
-      db.findOrCreateUser(facebookid, displayName)
-      .then(function(res) {
-        console.log("findOrCreateUser response:", res);
-        // db returns user ID in response
-        var uid = res[0].uid;
-        // store in Redis (key: token, value: user ID)
+      db.findOrCreateUser(id, displayName)
+      .then(function() {
+        // store in Redis (key: token, value: userID)
         // tokens expire after two hours
-        return redis.set(access_token, uid, 'ex', 7200);
+        return redis.set(access_token, id, 'ex', 7200);
       })
       .then(function() {
         // if successful, continue
