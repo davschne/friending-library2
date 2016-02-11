@@ -1,7 +1,12 @@
-INSERT INTO Users (uID, display_name)
+-- create user if not found
+INSERT INTO Users (facebookid, display_name)
 SELECT $1, $2
 WHERE NOT EXISTS (
-  SELECT uID
+  SELECT facebookid
   FROM Users
-  WHERE uID = $1
+  WHERE facebookid = $1
 );
+-- return user ID regardless
+SELECT uid
+FROM Users
+WHERE facebookid = $1;
