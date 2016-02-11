@@ -9,7 +9,7 @@
       <ul>
         <li>{{bookrequest.copy.book.title}}</li>
         <li ng-if="bookrequest.copy.book.subtitle">{{bookrequest.copy.book.subtitle}}</li>
-        <li>by: {{bookrequest.copy.book.authors.join(", ")}}</li>
+        <li>by {{bookrequest.copy.book.authors.join(", ")}}</li>
         <li>{{bookrequest.copy.book.categories.join(", ")}}</li>
         <li>Owner: {{bookrequest.copy.owner.display_name}}</li>
       </ul>
@@ -29,9 +29,9 @@
       <ul>
         <li>{{bookrequest.copy.book.title}}</li>
         <li ng-if="bookrequest.copy.book.subtitle">{{bookrequest.copy.book.subtitle}}</li>
-        <li>by: {{bookrequest.copy.book.authors.join(", ")}}</li>
+        <li>by {{bookrequest.copy.book.authors.join(", ")}}</li>
         <li>{{bookrequest.copy.book.categories.join(", ")}}</li>
-        <li>Requester: {{bookrequest.copy.owner.display_name}}</li>
+        <li>Requester: {{bookrequest.requester.display_name}}</li>
       </ul>
       <button data-ng-click="checkoutBook(bookrequest)">Check Out</button>
       <button data-ng-click="denyBookRequest(bookrequest)">Deny</button>
