@@ -23,7 +23,7 @@ module.exports = function(friendingLibrary) {
             // remove from AvailableBooks
             AvailableBooks.del(copy);
             // API call
-            rest.createBookRequest(copy)
+            rest.createBookRequest(bookrequest)
             .catch(function(res) {
               // if error, roll back local operation
               AvailableBooks.add(copy);
@@ -37,7 +37,7 @@ module.exports = function(friendingLibrary) {
             // remove from OutgoingBookRequests
             OutgoingBookRequests.del(bookrequest);
             // API call
-            rest.cancelBookRequest(bookrequest.copy.copyid)
+            rest.cancelBookRequest(bookrequest)
             .catch(function(res) {
               // roll back
               OutgoingBookRequests.add(bookrequest);

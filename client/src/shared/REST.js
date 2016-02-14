@@ -89,10 +89,13 @@ module.exports = function(friendingLibrary) {
           });
         },
 
-        createBookRequest: function(copy) {
+        createBookRequest: function(bookrequest) {
           return APICall({
             method: "POST", url: "/api/trans/request",
-            data: { copyid: copy.copyid }
+            data: {
+              copyid       : bookrequest.copy.copyid,
+              request_date : bookrequest.request_date
+            }
           });
         },
 
@@ -114,14 +117,15 @@ module.exports = function(friendingLibrary) {
         },
 
         checkoutBook: function(borrowing) {
-          var copyid = borrowing.copy.copyid;
-          var requesterid = borrowing.borrower.uid;
-          // var checkoutdate = borrowing.checkoutdate;
-          // var duedate = borrowing.duedate;
           return APICall({
             method: "POST",
             url: "/api/trans/checkout",
-            data: { copyid: copyid, requesterid: requesterid }
+            data: {
+              copyid        : borrowing.copy.copyid,
+              requesterid   : borrowing.borrower.uid,
+              checkout_date : borrowing.checkout_date,
+              // due_date      : borrowing.due_date
+            }
           });
         },
 

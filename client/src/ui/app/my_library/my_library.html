@@ -52,7 +52,7 @@
         <li>by {{borrowing.copy.book.authors.join(", ")}}</li>
         <li>{{borrcopy.book.categories.join(", ")}}</li>
         <li>Borrower: {{borrowing.borrower.display_name}}</li>
-        <li>Checked Out: {{borrowing.checkout_date}}</li>
+        <li>Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
       </ul>
       <button data-ng-click="checkinBook(borrowing)">Check In</button>
     </li>
@@ -73,7 +73,7 @@
         <li>by {{borrowing.copy.book.authors.join(", ")}}</li>
         <li>{{borrcopy.book.categories.join(", ")}}</li>
         <li>Owner: {{borrowing.copy.owner.display_name}}</li>
-        <li>Checked Out: {{borrowing.checkout_date}}</li>
+        <li>Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
       </ul>
     </li>
   </ul>

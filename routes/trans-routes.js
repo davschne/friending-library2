@@ -2,7 +2,11 @@ module.exports = function(router, db, handle) {
 
   router.post("/request", function(req, res) {
     console.log("Received POST request at api/trans/request");
-    db.createBookRequest(req.user.uid, req.body.copyid)
+    db.createBookRequest(
+      req.user.uid,
+      req.body.copyid,
+      req.body.request_date
+    )
     .then(function(db_res) {
       res.json({ message: "Book requested" });
     })
@@ -43,7 +47,11 @@ module.exports = function(router, db, handle) {
 
   router.post("/checkout", function(req, res) {
     console.log("Received POST request at /api/trans/checkout");
-    db.checkoutBook(req.body.requesterid, req.body.copyid)
+    db.checkoutBook(
+      req.body.requesterid,
+      req.body.copyid,
+      req.body.checkout_date
+    )
     .then(function(db_res) {
       res.json({ message: "Book checked out" });
     })

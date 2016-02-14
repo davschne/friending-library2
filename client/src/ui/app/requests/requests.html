@@ -12,8 +12,9 @@
         <li>by {{bookrequest.copy.book.authors.join(", ")}}</li>
         <li>{{bookrequest.copy.book.categories.join(", ")}}</li>
         <li>Owner: {{bookrequest.copy.owner.display_name}}</li>
+        <li>Requested: {{bookrequest.request_date | date : "short"}}</li>
       </ul>
-      <button data-ng-click="cancelBookRequest(bookrequest)">Undo</button>
+      <button data-ng-click="cancelBookRequest(bookrequest)">Cancel</button>
     </li>
   </ul>
 </section>
@@ -32,6 +33,7 @@
         <li>by {{bookrequest.copy.book.authors.join(", ")}}</li>
         <li>{{bookrequest.copy.book.categories.join(", ")}}</li>
         <li>Requester: {{bookrequest.requester.display_name}}</li>
+        <li>Requested: {{bookrequest.request_date | date : "short"}}</li>
       </ul>
       <button data-ng-click="checkoutBook(bookrequest)">Check Out</button>
       <button data-ng-click="denyBookRequest(bookrequest)">Deny</button>
