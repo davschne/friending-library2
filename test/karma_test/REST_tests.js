@@ -233,11 +233,19 @@ describe("REST.js", function() {
   });
 
   describe("#createBookRequest", function() {
-    it("should make a POST request at /api/trans/request that includes an access token and the copyid and then call the callback function with the response object", function() {
+    it("should make a POST request at /api/trans/request that includes an access token (in headers) and the copyid and request date (in the body) and then call the callback function with the response object", function() {
       var copyid = 13;
+      var bookrequest = {
+        copy: testData.books[0],
+        request_date: new Date()
+      };
+      var requestBody = {
+        copyid: bookrequest.copy.copyid,
+        request_date: bookrequest.request_date
+      }
       var response = { message: "Book requested" };
-      $httpBackend.expect("POST", "/api/trans/request", { copyid: copyid }, checkToken).respond(200, response);
-      rest.createBookRequest({ copyid: copyid }).then(callback);
+      $httpBackend.expect("POST", "/api/trans/request", requestBody, checkToken).respond(200, response);
+      rest.createBookRequest(bookrequest).then(callback);
       $httpBackend.flush();
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
@@ -320,22 +328,6 @@ describe("REST.js", function() {
       expect(callback).toHaveBeenCalled();
       expect(callback.calls.count()).toEqual(1);
       expect(callback.calls.argsFor(0)).toEqual([response]);
-    });
-  });
-
-  // TODO : This method may be moved to a different service
-
-  xdescribe("#queryGoogleBooks", function() {
-    it("should make a GET request to the Google Books API, querying by ISBN, and then call the callback function with the response object", function() {
-      var book = util.rand(testData.books);
-      var ISBN = book.ISBN[13] || book.ISBN[10];
-      $httpBackend.expect("GET", "https://www.googleapis.com/books/v1/volumes?q=isbn:" + ISBN + "&key=AIzaSyCDBfooq1pwrKzZzyUiBTa-cXHA25E63M0")
-      .respond(200, book);
-      rest.queryGoogleBooks(ISBN, callback);
-      $httpBackend.flush();
-      expect(callback).toHaveBeenCalled();
-      expect(callback.calls.count()).toEqual(1);
-      expect(callback.calls.argsFor(0)).toEqual([null, book]);
     });
   });
 });
