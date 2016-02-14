@@ -2,7 +2,7 @@
 
 module.exports = function(friendingLibrary) {
 
-  friendingLibrary.factory("GoogleBooks", ["$http", function($http) {
+  friendingLibrary.factory("GoogleBooks", ["$http", "$q", function($http, $q) {
 
     var getBook = function(querystring) {
 
@@ -41,8 +41,12 @@ module.exports = function(friendingLibrary) {
 
       return $http({ method: "GET", url: url })
       .then(function(res) {
-        // for now, for simplicity, just return the first item
-        return formatBookObject(res.data.items[0]);
+        // if successful, there should only be one item
+        if (res.data.totalItems == 1) {
+          return formatBookObject(res.data.items[0]);
+        }
+        // otherwise delegate error handling to caller
+        return $q.reject(res.data);
       });
     };
 
