@@ -186,9 +186,39 @@ describe("Transact.js", function() {
 
   describe("#deleteCopy", function() {
 
-    it("should remove the copy from OwnBooks and post the operation to the REST service");
+    beforeEach(function() {
+      this.copy = {
+        book: util.rand(testData.books),
+        copyid: 15
+      };
+    });
 
-    it("on server error: should undo the client-side data model operations, adding the copy back to OwnBooks");
+    it("should remove the copy from OwnBooks and post the operation to the REST service", function() {
+
+      spyOn(OwnBooks, "del");
+      spyOn(REST, "deleteCopy").and.callThrough();
+
+      Transact.deleteCopy(this.copy);
+
+      expect(OwnBooks.del).toHaveBeenCalled();
+      expect(OwnBooks.del.calls.argsFor(0)).toEqual([this.copy]);
+      expect(REST.deleteCopy).toHaveBeenCalled();
+      expect(REST.deleteCopy.calls.argsFor(0)).toEqual([this.copy]);
+    });
+
+    it("on server error: should undo the client-side data model operations, adding the copy back to OwnBooks", function() {
+
+      spyOn(OwnBooks, "add");
+      spyOn(REST, "deleteCopy").and.callFake(rejectPromise);
+
+      Transact.deleteCopy(this.copy);
+
+      // process async callbacks
+      $rootScope.$apply();
+
+      expect(OwnBooks.add).toHaveBeenCalled();
+      expect(OwnBooks.add.calls.argsFor(0)).toEqual([this.copy]);
+    });
   });
 
   describe("#denyBookRequest", function() {
