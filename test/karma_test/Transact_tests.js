@@ -146,14 +146,15 @@ describe("Transact.js", function() {
       spyOn(OwnBooks, "add").and.callFake(function(_copy_) {
         this.copy = _copy_;
       }.bind(this));
+    });
+
+    it("should add a copy to OwnBooks, post the operation to the REST service, and asynchronously set the property 'copyid' on the copy in OwnBooks once the server response comes back", function() {
+
       spyOn(REST, "createCopy").and.callFake(function() {
         var deferred = $q.defer();
         deferred.resolve({ copyid: this.copyid });
         return deferred.promise;
       }.bind(this));
-    });
-
-    it("should add a copy to OwnBooks, post the operation to the REST service, and asynchronously set the property 'copyid' on the copy in OwnBooks once the server response comes back", function() {
 
       Transact.createCopy(this.book);
 
@@ -168,7 +169,19 @@ describe("Transact.js", function() {
       expect(this.copy.copyid).toEqual(this.copyid);
     });
 
-    it("on server error: should undo the client-side data model operations, remove the copy from OwnBooks");
+    it("on server error: should undo the client-side data model operations, remove the copy from OwnBooks", function() {
+
+      spyOn(OwnBooks, "del");
+      spyOn(REST, "createCopy").and.callFake(rejectPromise);
+
+      Transact.createCopy(this.book);
+
+      // process async callbacks
+      $rootScope.$apply();
+
+      expect(OwnBooks.del).toHaveBeenCalled();
+      expect(OwnBooks.del.calls.argsFor(0)).toEqual([this.copy]);
+    });
   });
 
   describe("#deleteCopy", function() {
