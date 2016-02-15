@@ -298,7 +298,26 @@ describe("Transact.js", function() {
       expect(REST.checkoutBook.calls.argsFor(0)).toEqual([this.borrowing]);
     });
 
-    it("on server error: should undo the client-side data model operations, removing the borrowing record from Lent, adding the request back to IncomingBookRequests, and adding the book back to OwnBooks");
+    it("on server error: should undo the client-side data model operations, removing the borrowing record from Lent, adding the request back to IncomingBookRequests, and adding the book back to OwnBooks", function() {
+
+      spyOn(Lent, "del");
+      spyOn(IncomingBookRequests, "add");
+      spyOn(OwnBooks, "add");
+
+      spyOn(REST, "checkoutBook").and.callFake(rejectPromise);
+
+      Transact.checkoutBook(this.bookrequest);
+
+      // process async callbacks
+      $rootScope.$apply();
+
+      expect(Lent.del).toHaveBeenCalled();
+      expect(Lent.del.calls.argsFor(0)).toEqual([this.borrowing]);
+      expect(IncomingBookRequests.add).toHaveBeenCalled();
+      expect(IncomingBookRequests.add.calls.argsFor(0)).toEqual([this.bookrequest]);
+      expect(OwnBooks.add).toHaveBeenCalled();
+      expect(OwnBooks.add.calls.argsFor(0)).toEqual([this.bookrequest.copy]);
+    });
   });
 
   describe("#checkinBook", function() {
