@@ -11,3 +11,4 @@ require(__dirname + "/Token_tests.js");
 require(__dirname + "/LoginLogout_tests.js");
 require(__dirname + "/AvailableBooks_tests.js");
 require(__dirname + "/GoogleBooks_tests.js");
+require(__dirname + "/Transact_tests.js");

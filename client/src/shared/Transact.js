@@ -79,6 +79,7 @@ module.exports = function(friendingLibrary) {
 
           denyBookRequest: function(bookrequest) {
 
+            // REMOVED: changed OwnBooks conventions to include requested books
             // add to OwnBooks
             // OwnBooks.add(bookrequest.copy);
 
@@ -120,7 +121,6 @@ module.exports = function(friendingLibrary) {
           checkinBook: function(borrowing) {
             // add to OwnBooks
             OwnBooks.add(borrowing.copy);
-
             // remove from Lent
             Lent.del(borrowing);
             // API call
