@@ -118,7 +118,23 @@ describe("Transact.js", function() {
       expect(REST.cancelBookRequest.calls.argsFor(0)).toEqual([this.bookrequest]);
     });
 
-    it("on server error: should undo the client-side data model operations, adding the request back to OutgoingBookRequests and removing the the book from AvailableBooks");
+    it("on server error: should undo the client-side data model operations, adding the request back to OutgoingBookRequests and removing the book from AvailableBooks", function() {
+
+      spyOn(OutgoingBookRequests, "add");
+      spyOn(AvailableBooks, "del");
+
+      spyOn(REST, "cancelBookRequest").and.callFake(rejectPromise);
+
+      Transact.cancelBookRequest(this.bookrequest);
+
+      // process async callbacks
+      $rootScope.$apply();
+
+      expect(AvailableBooks.del).toHaveBeenCalled();
+      expect(AvailableBooks.del.calls.argsFor(0)).toEqual([this.copy]);
+      expect(OutgoingBookRequests.add).toHaveBeenCalled();
+      expect(OutgoingBookRequests.add.calls.argsFor(0)).toEqual([this.bookrequest]);
+    });
   });
 
   describe("#createCopy", function() {
