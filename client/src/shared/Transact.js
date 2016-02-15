@@ -23,7 +23,7 @@ module.exports = function(friendingLibrary) {
             // remove from AvailableBooks
             AvailableBooks.del(copy);
             // API call
-            rest.createBookRequest(bookrequest)
+            return rest.createBookRequest(bookrequest)
             .catch(function(res) {
               // if error, roll back local operation
               AvailableBooks.add(copy);
@@ -37,7 +37,7 @@ module.exports = function(friendingLibrary) {
             // remove from OutgoingBookRequests
             OutgoingBookRequests.del(bookrequest);
             // API call
-            rest.cancelBookRequest(bookrequest)
+            return rest.cancelBookRequest(bookrequest)
             .catch(function(res) {
               // roll back
               OutgoingBookRequests.add(bookrequest);
@@ -56,7 +56,7 @@ module.exports = function(friendingLibrary) {
             // make an HTTP call to:
             // -update backend data model
             // -get a copyid in the response
-            rest.createCopy(book)
+            return rest.createCopy(book)
             .then(function(data) {
               copy.copyid = data.copyid;
             })
@@ -70,7 +70,7 @@ module.exports = function(friendingLibrary) {
             // remove from OwnBooks
             OwnBooks.del(copy);
             // API call
-            rest.deleteCopy(copy)
+            return rest.deleteCopy(copy)
             .catch(function(res) {
               // roll back
               OwnBooks.add(copy);
@@ -86,7 +86,7 @@ module.exports = function(friendingLibrary) {
             // remove from IncomingBookRequests
             IncomingBookRequests.del(bookrequest);
             // API call
-            rest.denyBookRequest(bookrequest)
+            return rest.denyBookRequest(bookrequest)
             .catch(function(res) {
               // roll back
               IncomingBookRequests.add(bookrequest);
@@ -109,7 +109,7 @@ module.exports = function(friendingLibrary) {
             // remove from OwnBooks
             OwnBooks.del(bookrequest.copy);
             // API call
-            rest.checkoutBook(borrowing)
+            return rest.checkoutBook(borrowing)
             .catch(function(res) {
               // roll back
               OwnBooks.add(bookrequest.copy);
@@ -124,7 +124,7 @@ module.exports = function(friendingLibrary) {
             // remove from Lent
             Lent.del(borrowing);
             // API call
-            rest.checkinBook(borrowing)
+            return rest.checkinBook(borrowing)
             .catch(function(res) {
               // roll back
               Lent.add(borrowing);

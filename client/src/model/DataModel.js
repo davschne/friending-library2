@@ -11,7 +11,7 @@ module.exports = function(getItemsFromBackend) {
   };
 
   // on loading the service, populate the items array
-  refresh();
+  // refresh();
 
   return {
     getAll: function() {
