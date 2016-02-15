@@ -143,6 +143,7 @@ describe("Transact.js", function() {
       this.book = util.rand(testData.books);
       this.copy; // to store the object passed to OwnBooks.add
       this.copyid = 14;
+      // when called, save a reference to the created copy
       spyOn(OwnBooks, "add").and.callFake(function(_copy_) {
         this.copy = _copy_;
       }.bind(this));
@@ -223,19 +224,88 @@ describe("Transact.js", function() {
 
   describe("#denyBookRequest", function() {
 
-    it("should remove the book request from IncomingBookRequests and post the operation to the REST service");
+    beforeEach(function() {
+      this.bookrequest = {
+        copy: {
+          copyid: 16,
+          book: util.rand(testData.books)
+        },
+        requester: util.rand(testData.users),
+        request_date: new Date()
+      };
+    });
 
-    it("on server error: should undo the client-side data model operations, adding the request back to IncomingBookRequests");
+    it("should remove the book request from IncomingBookRequests and post the operation to the REST service", function() {
+
+      spyOn(IncomingBookRequests, "del");
+      spyOn(REST, "denyBookRequest").and.callThrough();
+
+      Transact.denyBookRequest(this.bookrequest);
+
+      expect(IncomingBookRequests.del).toHaveBeenCalled();
+      expect(IncomingBookRequests.del.calls.argsFor(0)).toEqual([this.bookrequest]);
+      expect(REST.denyBookRequest).toHaveBeenCalled();
+      expect(REST.denyBookRequest.calls.argsFor(0)).toEqual([this.bookrequest]);
+    });
+
+    it("on server error: should undo the client-side data model operations, adding the request back to IncomingBookRequests", function() {
+
+      spyOn(IncomingBookRequests, "add");
+      spyOn(REST, "denyBookRequest").and.callFake(rejectPromise);
+
+      Transact.denyBookRequest(this.bookrequest);
+
+      // process async callbacks
+      $rootScope.$apply();
+
+      expect(IncomingBookRequests.add).toHaveBeenCalled();
+      expect(IncomingBookRequests.add.calls.argsFor(0)).toEqual([this.bookrequest]);
+    });
   });
 
   describe("#checkoutBook", function() {
 
-    it("should add a borrowing record to Lent, remove the corresponding request from IncomingBookRequests, remove the corresponding book from OwnBooks, and post the operation to the REST service");
+    beforeEach(function() {
+      this.bookrequest = {
+        copy: {
+          copyid: 17,
+          book: util.rand(testData.books)
+        },
+        requester: util.rand(testData.users),
+        request_date: new Date()
+      };
+      // when called, save a reference to the created borrowing record
+      spyOn(Lent, "add").and.callFake(function(borrowing) {
+        this.borrowing = borrowing;
+      }.bind(this));
+    });
+
+    it("should add a borrowing record to Lent, remove the corresponding request from IncomingBookRequests, remove the corresponding book from OwnBooks, and post the operation to the REST service", function() {
+
+      spyOn(IncomingBookRequests, "del");
+      spyOn(OwnBooks, "del");
+      spyOn(REST, "checkoutBook").and.callThrough();
+
+      Transact.checkoutBook(this.bookrequest);
+
+      expect(Lent.add).toHaveBeenCalled();
+      expect(Lent.add.calls.argsFor(0)).toEqual([this.borrowing]);
+      expect(IncomingBookRequests.del).toHaveBeenCalled();
+      expect(IncomingBookRequests.del.calls.argsFor(0)).toEqual([this.bookrequest]);
+      expect(OwnBooks.del).toHaveBeenCalled();
+      expect(OwnBooks.del.calls.argsFor(0)).toEqual([this.bookrequest.copy]);
+      expect(REST.checkoutBook).toHaveBeenCalled();
+      expect(REST.checkoutBook.calls.argsFor(0)).toEqual([this.borrowing]);
+    });
 
     it("on server error: should undo the client-side data model operations, removing the borrowing record from Lent, adding the request back to IncomingBookRequests, and adding the book back to OwnBooks");
   });
 
   describe("#checkinBook", function() {
+
+    beforeEach(function() {
+
+    });
 
     it("should remove the borrowing record from Lent, add the book to OwnBooks, and post the operation to the REST service");
 
