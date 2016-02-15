@@ -323,11 +323,47 @@ describe("Transact.js", function() {
   describe("#checkinBook", function() {
 
     beforeEach(function() {
-
+      this.borrowing = {
+        copy: {
+          copyid: 18,
+          book: util.rand(testData.books)
+        },
+        borrower: util.rand(testData.users),
+        checkout_date: new Date()
+      };
     });
 
-    it("should remove the borrowing record from Lent, add the book to OwnBooks, and post the operation to the REST service");
+    it("should remove the borrowing record from Lent, add the book to OwnBooks, and post the operation to the REST service", function() {
 
-    it("on server error: should undo the client-side data model operations, adding the borrowing record back to Lent and removing the book from OwnBooks");
+      spyOn(Lent, "del");
+      spyOn(OwnBooks, "add");
+      spyOn(REST, "checkinBook").and.callThrough();
+
+      Transact.checkinBook(this.borrowing);
+
+      expect(Lent.del).toHaveBeenCalled();
+      expect(Lent.del.calls.argsFor(0)).toEqual([this.borrowing]);
+      expect(OwnBooks.add).toHaveBeenCalled();
+      expect(OwnBooks.add.calls.argsFor(0)).toEqual([this.borrowing.copy]);
+      expect(REST.checkinBook).toHaveBeenCalled();
+      expect(REST.checkinBook.calls.argsFor(0)).toEqual([this.borrowing]);
+    });
+
+    it("on server error: should undo the client-side data model operations, adding the borrowing record back to Lent and removing the book from OwnBooks", function() {
+
+      spyOn(Lent, "add");
+      spyOn(OwnBooks, "del");
+      spyOn(REST, "checkinBook").and.callFake(rejectPromise);
+
+      Transact.checkinBook(this.borrowing);
+
+      // process async callbacks
+      $rootScope.$apply();
+
+      expect(Lent.add).toHaveBeenCalled();
+      expect(Lent.add.calls.argsFor(0)).toEqual([this.borrowing]);
+      expect(OwnBooks.del).toHaveBeenCalled();
+      expect(OwnBooks.del.calls.argsFor(0)).toEqual([this.borrowing.copy]);
+    });
   });
 });
