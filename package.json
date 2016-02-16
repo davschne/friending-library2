@@ -41,7 +41,7 @@
     "karma-phantomjs-launcher": "^0.2.3",
     "mocha": "^2.2.5",
     "node-libs-browser": "^0.5.2",
-    "phantomjs": "^2.1.2",
+    "phantomjs-prebuilt": "^2.1.2",
     "webpack": "^1.10.5"
   },
   "dependencies": {
@@ -52,6 +52,6 @@
     "passport": "^0.2.2",
     "passport-facebook": "^2.0.0",
     "passport-http-bearer": "^1.0.1",
-    "pg-promise": "^3.0.6"
+    "pg-promise": "^3.1.7"
   }
 }
