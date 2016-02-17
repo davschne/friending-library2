@@ -30,7 +30,7 @@ var booksRouter = express.Router();
 var transRouter = express.Router();
 
 require("./routes/root-routes")(rootRouter, redis, handle, authenticate);
-require("./routes/auth-routes")(authRouter, db, redis, handle, passport);
+require("./routes/auth-routes")(authRouter, db, redis, handle, passport, config);
 require("./routes/self-routes")(selfRouter, db, redis, handle);
 require("./routes/books-routes")(booksRouter, db, handle);
 require("./routes/trans-routes")(transRouter, db, handle);

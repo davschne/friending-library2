@@ -1,16 +1,12 @@
-var FB_ID     = process.env.FB_ID;
-var FB_SECRET = process.env.FB_SECRET;
-var APP_URL   = process.env.APP_URL || "http://localhost:3000";
-
 var FacebookStrategy = require("passport-facebook").Strategy;
 
-module.exports = function(router, db, redis, handle, passport) {
+module.exports = function(router, db, redis, handle, passport, config) {
 
   passport.use(new FacebookStrategy(
     {
-      clientID:     FB_ID,
-      clientSecret: FB_SECRET,
-      callbackURL:  APP_URL + "/auth/facebook/callback",
+      clientID:     config.facebook.id,
+      clientSecret: config.facebook.secret,
+      callbackURL:  config.app-url + "/auth/facebook/callback",
       enableProof:  false
     },
     function(access_token, refreshToken, profile, done) {

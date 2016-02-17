@@ -1,4 +1,5 @@
 module.exports = {
+  "app-url" : process.env.APP_URL || "http://localhost:3000",
   "redis": {
     "test": {
       "URI": process.env.REDIS_TEST_URI
@@ -32,5 +33,9 @@ module.exports = {
       "database": process.env.PG_ADMIN_DB   || "template1",
     },
     "template": process.env.PG_TEMPLATE || "template1"
+  },
+  "facebook": {
+    "id"     : process.env.FB_ID,
+    "secret" : process.env.FB_SECRET
   }
 }
