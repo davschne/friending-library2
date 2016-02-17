@@ -6,7 +6,7 @@ module.exports = function(router, db, redis, handle, passport, config) {
     {
       clientID:     config.facebook.id,
       clientSecret: config.facebook.secret,
-      callbackURL:  config.app-url + "/auth/facebook/callback",
+      callbackURL:  config.app_url + "/auth/facebook/callback",
       enableProof:  false
     },
     function(access_token, refreshToken, profile, done) {

@@ -1,5 +1,5 @@
 module.exports = {
-  "app-url" : process.env.APP_URL || "http://localhost:3000",
+  "app_url" : process.env.APP_URL || "http://localhost:3000",
   "redis": {
     "test": {
       "URI": process.env.REDIS_TEST_URI
