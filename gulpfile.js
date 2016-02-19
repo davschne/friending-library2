@@ -6,6 +6,7 @@ var sass        = require("gulp-sass");
 var webpack     = require("gulp-webpack");
 var uglify      = require("gulp-uglify");
 var minifyCSS   = require("gulp-minify-css");
+var svgmin      = require("gulp-svgmin");
 var minifyHTML  = require("gulp-minify-html");
 var mocha       = require("gulp-mocha");
 var KarmaServer = require("karma").Server;
@@ -19,6 +20,11 @@ gulp.task("sass", function() {
     .pipe(gulp.dest("./client/build/css/"));
 });
 
+gulp.task("svgmin", function() {
+  gulp.src("./client/src/images/**/*.svg")
+    .pipe(svgmin())
+    .pipe(gulp.dest("./client/build/images/"));
+});
 
 gulp.task("webpack:dev", function() {
   return gulp.src("./client/src/client.js")
@@ -54,9 +60,9 @@ gulp.task("copy-html", function() {
 
 gulp.task("copy", function() {
   return gulp.src([
+    "./client/src/**/*.css", // style sheets
     "./client/src/**/*.otf",
     "./client/src/**/*.ttf",
-    "./client/src/**/*.svg",
     "./client/src/**/*.png"])
     .pipe(gulp.dest("./client/build/"));
 });
@@ -127,7 +133,7 @@ gulp.task("start", function() {
 
 gulp.task("test", ["server-test", "client-test"]);
 
-gulp.task("compile", ["clean", "sass", "copy-html", "copy", "webpack:dev"]);
+gulp.task("compile", ["clean", /* "sass",*/ "svgmin", "copy-html", "copy", "webpack:dev"]);
 
 gulp.task("build", ["test", "compile"]);
 
