@@ -16,25 +16,28 @@
 –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <body data-ng-app="friendingLibrary" data-ng-controller="rootController">
 
-  <header>
-    <a href="/">
-      <img src="images/book.svg" alt="logo">
-      <h1>Friending Library</h1>
+  <header class="header" role="banner">
+    <a href="/" class="header__link">
+      <img class="header__logo" src="images/book.svg" alt="logo">
+      <h1 class="header__title">friending library</h1>
     </a>
   </header>
 
   <main role="main" data-ui-view></main>
 
-  <footer role="contentinfo">
-    <p>Copyright &copy; 2016 Friending Library</p>
-    <a href="https://github.com/davschne/friending-library2"><p>source code</p></a>
-    <p>David Schneider, Colin Coltrera, Philip Hirt, and Brandon LaFave</p>
+  <footer class="footer" role="contentinfo">
+    <p class="footer__copyright">Copyright &copy; 2016 Friending Library</p>
+    <a class="footer__link"
+      href="https://github.com/davschne/friending-library2">
+      source code</a>
+    <p class="footer__authors">
+      David Schneider, Colin Coltrera, Philip Hirt, and Brandon LaFave</p>
   </footer>
 
 </body>
 
 <!-- JAVASCRIPT
 –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<script src="bundle.js"</script>
+<script src="bundle.js"></script>
 
 </html>

@@ -1,9 +1,12 @@
 <section class="form">
-  <h1 class="form__module__header">Add A Book</h1>
-  <form data-ng-submit="getBookRecordByISBN(isbn)">
-    <p class="form__module__p">Enter ISBN:</p>
-    <input type="text" data-ng-model="isbn" required></input>
-    <button type="submit">Find Book</button>
+  <form class="form--add-book" data-ng-submit="getBookRecordByISBN(isbn)">
+    <h1 class="form__title">Add A Book</h1>
+    <p class="form__label form__label--ISBN">
+      Enter ISBN:</p>
+    <input class="form__text-field form__text-field--ISBN"
+      type="text" data-ng-model="isbn" required></input>
+    <button class="form__button form__button--submit" type="submit">
+      Find Book</button>
   </form>
 </section>
 
@@ -11,69 +14,69 @@
   <p class="error__message__p">Sorry, we could not find that book. Please verify that the ISBN is correct.</p>
 </section> -->
 
-<section class="list" data-ng-if="queryResult">
-  <img data-ng-src="{{queryResult.imagelink}}"/>
-  <ul>
-    <li><strong>{{queryResult.title}}</strong></li>
-    <li ng-if="queryResult.subtitle">{{queryResult.subtitle}}</li>
-    <li>by {{queryResult.authors.join(", ")}}</li>
-    <li>{{queryResult.categories.join(", ")}}</li>
+<section class="record record--query-result" data-ng-if="queryResult">
+  <img class="record__image" data-ng-src="{{queryResult.imagelink}}"/>
+  <ul class="record__summary">
+    <li class="record__title">{{queryResult.title}}</li>
+    <li class="record__subtitle" ng-if="queryResult.subtitle">{{queryResult.subtitle}}</li>
+    <li class="record__authors">by {{queryResult.authors.join(", ")}}</li>
+    <li class="record__categories">{{queryResult.categories.join(", ")}}</li>
   </ul>
-  <button data-ng-click="createCopy(queryResult)">Add Book</button>
-  <button data-ng-click="cancelAdd()">Cancel</button>
+  <button class="record__button record__button_add" data-ng-click="createCopy(queryResult)">Add Book</button>
+  <button class="record__button record__button_cancel" data-ng-click="cancelAdd()">Cancel</button>
 </section>
 
-<section class="book__list">
-  <h1 class="book__list__header">Books I Own</h1>
-  <h2 class="book__list__none" data-ng-if="(ownBooks.length == 0)">No books registered</h2>
-  <ul class="list">
-    <li class="list__item" data-ng-repeat="copy in ownBooks">
-      <img data-ng-src="{{copy.book.imagelink}}">
-      <ul>
-        <li><strong>{{copy.book.title}}</strong></li>
-        <li ng-if="copy.book.subtitle">{{copy.book.subtitle}}</li>
-        <li>by {{copy.book.authors.join(", ")}}</li>
-        <li>{{copy.book.categories.join(", ")}}</li>
+<section class="records">
+  <h1 class="records__title">Books I Own</h1>
+  <ul class="records__list">
+    <li class="record record--none" data-ng-if="(ownBooks.length == 0)">No books registered</li>
+    <li class="record" data-ng-repeat="copy in ownBooks">
+      <img class="record__image" data-ng-src="{{copy.book.imagelink}}">
+      <ul class="record__summary">
+        <li class="record__title">{{copy.book.title}}</li>
+        <li class="record__subtitle" ng-if="copy.book.subtitle">{{copy.book.subtitle}}</li>
+        <li class="record__authors">by {{copy.book.authors.join(", ")}}</li>
+        <li class="record__categories">{{copy.book.categories.join(", ")}}</li>
       </ul>
-      <button data-ng-click="deleteCopy(copy)">Remove</button>
+      <button class="record__button record__button_delete" data-ng-click="deleteCopy(copy)">Remove</button>
     </li>
   </ul>
 </section>
 
-<section class="book__list">
-  <h1 class="book__list__header">Books Lent</h1>
-  <h2 class="book__list__none" data-ng-if="(lent.length == 0)">Not lending any books</h2>
-  <ul class="list">
-    <li class="list__item" data-ng-repeat="borrowing in lent">
-      <img data-ng-src="{{borrowing.copy.book.imagelink}}"/>
-      <ul>
-        <li><strong>{{borrowing.copy.book.title}}</strong></li>
-        <li ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
-        <li>by {{borrowing.copy.book.authors.join(", ")}}</li>
-        <li>{{borrcopy.book.categories.join(", ")}}</li>
-        <li>Borrower: {{borrowing.borrower.display_name}}</li>
-        <li>Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
+<section class="records">
+  <h1 class="records__title">Books Lent</h1>
+  <ul class="records__list">
+    <li class="record record--none" data-ng-if="(lent.length == 0)">Not lending any books</li>
+    <li class="record" data-ng-repeat="borrowing in lent">
+      <img class="record__image" data-ng-src="{{borrowing.copy.book.imagelink}}"/>
+      <ul class="record__summary">
+        <li class="record__title">{{borrowing.copy.book.title}}</li>
+        <li class="record__subtitle" ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
+        <li class="record__authors">by {{borrowing.copy.book.authors.join(", ")}}</li>
+        <li class="record__categories">{{borrcopy.book.categories.join(", ")}}</li>
+        <li class="record__borrower">Borrower: {{borrowing.borrower.display_name}}</li>
+        <li class="record__checkout-date">Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
       </ul>
-      <button data-ng-click="checkinBook(borrowing)">Check In</button>
+      <button class="record__button record__button_checkin" data-ng-click="checkinBook(borrowing)">Check In</button>
     </li>
   </ul>
 </section>
 
-<section class="book__list">
-  <h1 class="book__list__header">Currently Borrowing</h1>
-  <h2 class="book__list__none" data-ng-if="(borrowed.length == 0)">
-    Not borrowing any books
-  </h2>
-  <ul class="list">
-    <li class="list__item" data-ng-repeat="borrowing in borrowed">
-      <img data-ng-src="{{borrowing.copy.book.imagelink}}">
-      <ul>
-        <li><strong>{{borrowing.copy.book.title}}</strong></li>
-        <li ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
-        <li>by {{borrowing.copy.book.authors.join(", ")}}</li>
-        <li>{{borrcopy.book.categories.join(", ")}}</li>
-        <li>Owner: {{borrowing.copy.owner.display_name}}</li>
-        <li>Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
+<section class="records">
+  <h1 class="records__title">Currently Borrowing</h1>
+  <ul class="records__list">
+    <li class="record record--none" data-ng-if="(borrowed.length == 0)">
+      Not borrowing any books
+    </li>
+    <li class="record" data-ng-repeat="borrowing in borrowed">
+      <img class="record__image" data-ng-src="{{borrowing.copy.book.imagelink}}">
+      <ul class="record__summary">
+        <li class="record__title">{{borrowing.copy.book.title}}</li>
+        <li class="record__subtitle" ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
+        <li class="record__authors">by {{borrowing.copy.book.authors.join(", ")}}</li>
+        <li class="record__categories">{{borrcopy.book.categories.join(", ")}}</li>
+        <li class="record__owner">Owner: {{borrowing.copy.owner.display_name}}</li>
+        <li class="record__checkout-date">Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
       </ul>
     </li>
   </ul>
