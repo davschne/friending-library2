@@ -4,3 +4,4 @@ credentials.sh
 dump.rdb
 test/karma_test/test_bundle.js
 client/build
+client/src/sass_old

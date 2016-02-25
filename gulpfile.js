@@ -14,10 +14,10 @@ var KarmaServer = require("karma").Server;
 var exec = require("child_process").exec;
 
 gulp.task("sass", function() {
-  gulp.src("./client/src/sass/**/*.scss")
+  gulp.src("./client/src/sass/application.scss")
     .pipe(sass.sync().on("error", sass.logError))
     .pipe(minifyCSS({compaibility: "ie8"}))
-    .pipe(gulp.dest("./client/build/css/"));
+    .pipe(gulp.dest("./client/build/"));
 });
 
 gulp.task("svgmin", function() {
@@ -60,7 +60,7 @@ gulp.task("copy-html", function() {
 
 gulp.task("copy", function() {
   return gulp.src([
-    "./client/src/**/*.css", // style sheets
+    // "./client/src/**/*.css", // style sheets
     "./client/src/**/*.otf",
     "./client/src/**/*.ttf",
     "./client/src/**/*.png"])
@@ -133,7 +133,7 @@ gulp.task("start", function() {
 
 gulp.task("test", ["server-test", "client-test"]);
 
-gulp.task("compile", ["clean", /* "sass",*/ "svgmin", "copy-html", "copy", "webpack:dev"]);
+gulp.task("compile", ["clean", "sass", "svgmin", "copy-html", "copy", "webpack:dev"]);
 
 gulp.task("build", ["test", "compile"]);
 
