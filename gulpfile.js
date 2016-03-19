@@ -69,7 +69,7 @@ gulp.task("copy", function() {
 
 gulp.task("clean", function() {
   del.sync(["./client/build/**", "!client/build"]);
-})
+});
 
 gulp.task("server-test", function() {
   return gulp.src([

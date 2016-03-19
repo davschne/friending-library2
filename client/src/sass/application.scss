@@ -2,16 +2,27 @@
 
 $color-green: #13D18F !default;
 $color-facebook-blue: rgba(59, 89, 153, 1.0) !default;
+$text-shadow: 0.1em 0.1em 0.2em black;
 
 img, embed, object, video {
   max-width: 100%;
+}
+
+body {
+  font-family: Courier, monospace;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 // HEADER MODULE
 
 .header {
   background-color: $color-green;
-  font-size: 1.5rem;
+  border: 0.2em solid #FFF;
+  border-top-left-radius: 0.7em;
+  border-top-right-radius: 0.7em;
 }
 
 .header__link {
@@ -22,15 +33,62 @@ img, embed, object, video {
 }
 
 .header__logo {
+  font-size: 1.5em;
   width : 1.2em;
   height: 1.2em;
   margin: 0.2em;
 }
 
 .header__title {
-  font-size: 1em;
+  font-size: 1.5em;
   color: #FFFFFF;
+  text-shadow: $text-shadow;
   margin: auto 0 auto 0.2em;
+}
+
+// MAIN MODULE
+
+.main {
+  background-color: $color-green;
+  font-size: 1rem;
+  padding: 0.5em;
+  border-left: 0.2em solid #FFF;
+  border-right: 0.2em solid #FFF;
+  // overflow: auto;
+  flex: 1; // fill available space if content is sparse
+}
+
+// FOOTER MODULE
+
+.footer {
+  background-color: $color-green;
+  padding: 0.5em;
+  border: 0.2em solid #FFFFFF;
+  border-bottom-left-radius: 0.7em;
+  border-bottom-right-radius: 0.7em;
+  text-align: center;
+}
+
+.footer__copyright, .footer__link, .footer__authors {
+  font-size: 0.7em;
+  line-height: 1.5em;
+  text-shadow: $text-shadow;
+  color: #FFFFFF;
+}
+
+// PUBLIC
+
+.public {
+  font-size: 1rem;
+  line-height: 1.5em;
+  text-shadow: $text-shadow;
+  color: #FFFFFF;
+}
+
+.public__title {
+  font-size: 1.2em;
+  line-height: 2em;
+  text-align: center;
 }
 
 // LOGIN MODULE
@@ -43,11 +101,14 @@ img, embed, object, video {
 }
 
 .login__label {
-  margin: 0 auto 0 auto;
+  // margin: 0 auto 0 auto;
+  text-align: center;
 }
 
 .login__button {
   display: block;
+  text-align: center;
+  text-shadow: none;
 }
 
 .login__button--facebook {
