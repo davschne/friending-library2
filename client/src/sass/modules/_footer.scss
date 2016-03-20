@@ -1,0 +1,17 @@
+// FOOTER MODULE
+
+.footer {
+  background-color: $color-green;
+  padding: 0.5em;
+  border: 0.2em solid #FFFFFF;
+  border-bottom-left-radius: 0.7em;
+  border-bottom-right-radius: 0.7em;
+  text-align: center;
+}
+
+.footer__copyright, .footer__link, .footer__authors {
+  font-size: 0.7em;
+  line-height: 1.5em;
+  text-shadow: $text-shadow;
+  color: #FFFFFF;
+}
