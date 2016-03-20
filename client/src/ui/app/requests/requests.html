@@ -6,22 +6,26 @@
     <li class="record" data-ng-repeat="bookrequest in outgoingBookRequests">
       <img class="record__image"
         data-ng-src="{{bookrequest.copy.book.imagelink}}">
-      <ul class="record__summary">
-        <li class="record__title">
-          {{bookrequest.copy.book.title}}</li>
-        <li class="record__subtitle" ng-if="bookrequest.copy.book.subtitle">
-          {{bookrequest.copy.book.subtitle}}</li>
-        <li class="record__authors">
-          by {{bookrequest.copy.book.authors.join(", ")}}</li>
-        <li class="record__categories">
-          {{bookrequest.copy.book.categories.join(", ")}}</li>
-        <li class="record__owner">
-          Owner: {{bookrequest.copy.owner.display_name}}</li>
-        <li class="record__request-date">
-          Requested: {{bookrequest.request_date | date : "short"}}</li>
-      </ul>
-      <button class="record__button record__button--cancel"
-        data-ng-click="cancelBookRequest(bookrequest)">Cancel</button>
+      <div class="record__container">
+        <ul class="record__summary">
+          <li class="record__title">
+            {{bookrequest.copy.book.title}}</li>
+          <li class="record__subtitle" ng-if="bookrequest.copy.book.subtitle">
+            {{bookrequest.copy.book.subtitle}}</li>
+          <li class="record__authors">
+            by {{bookrequest.copy.book.authors.join(", ")}}</li>
+          <li class="record__categories">
+            {{bookrequest.copy.book.categories.join(", ")}}</li>
+          <li class="record__owner">
+            Owner: {{bookrequest.copy.owner.display_name}}</li>
+          <li class="record__request-date">
+            Requested: {{bookrequest.request_date | date : "short"}}</li>
+        </ul>
+        <div class="record__button-container">
+          <button class="record__button record__button--cancel"
+            data-ng-click="cancelBookRequest(bookrequest)">cancel</button>
+        </div>
+      </div>
     </li>
   </ul>
 </section>
@@ -34,23 +38,27 @@
     <li class="record" data-ng-repeat="bookrequest in incomingBookRequests">
       <img class="record__image"
         data-ng-src="{{bookrequest.copy.book.imagelink}}">
-      <ul class="record__summary">
-        <li class="record__title">{{bookrequest.copy.book.title}}</li>
-        <li class="record__subtitle" ng-if="bookrequest.copy.book.subtitle">
-          {{bookrequest.copy.book.subtitle}}</li>
-        <li class="record__authors">
-          by {{bookrequest.copy.book.authors.join(", ")}}</li>
-        <li class="record__categories">
-          {{bookrequest.copy.book.categories.join(", ")}}</li>
-        <li class="record__requester">
-          Requester: {{bookrequest.requester.display_name}}</li>
-        <li class="record__request-date">
-          Requested: {{bookrequest.request_date | date : "short"}}</li>
-      </ul>
-      <button class="record__button record__button--checkout"
-        data-ng-click="checkoutBook(bookrequest)">Check Out</button>
-      <button class="record__button record__button--deny"
-        data-ng-click="denyBookRequest(bookrequest)">Deny</button>
+      <div class="record__container">
+        <ul class="record__summary">
+          <li class="record__title">{{bookrequest.copy.book.title}}</li>
+          <li class="record__subtitle" ng-if="bookrequest.copy.book.subtitle">
+            {{bookrequest.copy.book.subtitle}}</li>
+          <li class="record__authors">
+            by {{bookrequest.copy.book.authors.join(", ")}}</li>
+          <li class="record__categories">
+            {{bookrequest.copy.book.categories.join(", ")}}</li>
+          <li class="record__requester">
+            Requester: {{bookrequest.requester.display_name}}</li>
+          <li class="record__request-date">
+            Requested: {{bookrequest.request_date | date : "short"}}</li>
+        </ul>
+        <div class="record__button-container">
+          <button class="record__button record__button--checkout"
+            data-ng-click="checkoutBook(bookrequest)">check out</button>
+          <button class="record__button record__button--deny"
+            data-ng-click="denyBookRequest(bookrequest)">deny</button>
+        </div>
+      </div>
     </li>
   </ul>
 </section>

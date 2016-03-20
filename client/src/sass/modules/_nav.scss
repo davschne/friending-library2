@@ -1,21 +1,10 @@
 .nav {
-  font-size: 0.8rem;
+  font-size: 1rem;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
 }
 
 .nav__link {
-  width: 12em;
-  border: 0.2em solid #FFF;
-  border-radius: 0.3em;
-  text-align: center;
-  padding: 0.5em;
-  margin: 0.2em;
-  cursor: pointer;
-  color: #FFF;
-  text-shadow: $text-shadow;
-  &:hover {
-    background-color: $color-green-dark;
-  }
+  @include button();
 }

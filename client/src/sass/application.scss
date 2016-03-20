@@ -6,6 +6,23 @@ $color-blue: #2C99D4 !default;
 $color-facebook-blue: rgba(59, 89, 153, 1.0) !default;
 $text-shadow: 0.1em 0.1em 0.2em black;
 
+@mixin button() {
+  font-size: 0.8rem;
+  width: 12em;
+  border: 2px solid #FFF;
+  border-radius: 5px;
+  text-align: center;
+  padding: 0.5em;
+  margin: 0.2em;
+  cursor: pointer;
+  text-shadow: $text-shadow;
+  color: #FFF;
+  background-color: $color-green;
+  &:hover {
+    background-color: $color-green-dark;
+  }
+}
+
 img, embed, object, video {
   max-width: 100%;
 }
@@ -24,3 +41,5 @@ body {
 @import 'modules/public';
 @import 'modules/login';
 @import 'modules/nav';
+@import 'modules/records';
+@import 'modules/record';

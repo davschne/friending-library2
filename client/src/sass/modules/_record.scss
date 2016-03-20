@@ -1,0 +1,55 @@
+// RECORD MODULE
+
+.record {
+  font-size: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border: 2px solid #FFF;
+  border-radius: 5px;
+  padding: 0.5em;
+  margin: 0.2em 0 0.2em 0;
+  // alter this with media queries
+  width: 100%;
+}
+
+.record--none {
+  border: none;
+}
+
+.record__image {}
+
+.record__container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.record__summary {
+  flex: 1;
+  color: #FFF;
+  text-shadow: $text-shadow;
+  padding: 0.5em;
+}
+
+.record__title {}
+
+.record__subtitle {}
+
+.record__authors {}
+
+.record__categories {}
+
+.record__owner {}
+
+.record__button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.record__button {
+
+  @include button();
+}
