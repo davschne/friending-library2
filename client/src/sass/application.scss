@@ -1,14 +1,15 @@
 @import 'reset';
 
 $color-green: #13D18F !default;
+$color-green-light: #2CDEA0 !default;
 $color-green-dark: #14B57D !default;
 $color-blue: #2C99D4 !default;
 $color-facebook-blue: rgba(59, 89, 153, 1.0) !default;
 $text-shadow: 0.1em 0.1em 0.2em black;
 
-@mixin button() {
-  font-size: 0.8rem;
-  width: 12em;
+@mixin button($font-size, $width) {
+  font-size: $font-size;
+  width: $width;
   border: 2px solid #FFF;
   border-radius: 5px;
   text-align: center;
@@ -17,7 +18,7 @@ $text-shadow: 0.1em 0.1em 0.2em black;
   cursor: pointer;
   text-shadow: $text-shadow;
   color: #FFF;
-  background-color: $color-green;
+  background-color: $color-green-light;
   &:hover {
     background-color: $color-green-dark;
   }

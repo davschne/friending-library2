@@ -4,8 +4,9 @@
     <li class="record record--none"
       data-ng-if="(outgoingBookRequests.length == 0)">No books requested</li>
     <li class="record" data-ng-repeat="bookrequest in outgoingBookRequests">
-      <img class="record__image"
-        data-ng-src="{{bookrequest.copy.book.imagelink}}">
+      <div class="record__image-container">
+        <img class="record__image" data-ng-src="{{bookrequest.copy.book.imagelink}}">
+      </div>
       <div class="record__container">
         <ul class="record__summary">
           <li class="record__title">
@@ -15,7 +16,7 @@
           <li class="record__authors">
             by {{bookrequest.copy.book.authors.join(", ")}}</li>
           <li class="record__categories">
-            {{bookrequest.copy.book.categories.join(", ")}}</li>
+            Categories: {{bookrequest.copy.book.categories.join(", ")}}</li>
           <li class="record__owner">
             Owner: {{bookrequest.copy.owner.display_name}}</li>
           <li class="record__request-date">
@@ -36,8 +37,9 @@
     <li class="record record--none"
       data-ng-if="(incomingBookRequests.length == 0)">No books requested</li>
     <li class="record" data-ng-repeat="bookrequest in incomingBookRequests">
-      <img class="record__image"
-        data-ng-src="{{bookrequest.copy.book.imagelink}}">
+      <div class="record__image-container">
+        <img class="record__image" data-ng-src="{{bookrequest.copy.book.imagelink}}">
+      </div>
       <div class="record__container">
         <ul class="record__summary">
           <li class="record__title">{{bookrequest.copy.book.title}}</li>
@@ -46,7 +48,7 @@
           <li class="record__authors">
             by {{bookrequest.copy.book.authors.join(", ")}}</li>
           <li class="record__categories">
-            {{bookrequest.copy.book.categories.join(", ")}}</li>
+            Categories: {{bookrequest.copy.book.categories.join(", ")}}</li>
           <li class="record__requester">
             Requester: {{bookrequest.requester.display_name}}</li>
           <li class="record__request-date">

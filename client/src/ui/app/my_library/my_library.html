@@ -15,13 +15,15 @@
 </section> -->
 
 <section class="record record--query-result" data-ng-if="queryResult">
-  <img class="record__image" data-ng-src="{{queryResult.imagelink}}"/>
+  <div class="record__image-container">
+    <img class="record__image" data-ng-src="{{queryResult.imagelink}}"/>
+  </div>
   <div class="record__container">
     <ul class="record__summary">
       <li class="record__title">{{queryResult.title}}</li>
       <li class="record__subtitle" ng-if="queryResult.subtitle">{{queryResult.subtitle}}</li>
       <li class="record__authors">by {{queryResult.authors.join(", ")}}</li>
-      <li class="record__categories">{{queryResult.categories.join(", ")}}</li>
+      <li class="record__categories">Categories: {{queryResult.categories.join(", ")}}</li>
     </ul>
     <div class="record__button-container">
       <button class="record__button record__button_add" data-ng-click="createCopy(queryResult)">add book</button>
@@ -35,13 +37,15 @@
   <ul class="records__list">
     <li class="record record--none" data-ng-if="(ownBooks.length == 0)">No books registered</li>
     <li class="record" data-ng-repeat="copy in ownBooks">
-      <img class="record__image" data-ng-src="{{copy.book.imagelink}}">
+      <div class="record__image-container">
+        <img class="record__image" data-ng-src="{{copy.book.imagelink}}">
+      </div>
       <div class="record__container">
         <ul class="record__summary">
           <li class="record__title">{{copy.book.title}}</li>
           <li class="record__subtitle" ng-if="copy.book.subtitle">{{copy.book.subtitle}}</li>
           <li class="record__authors">by {{copy.book.authors.join(", ")}}</li>
-          <li class="record__categories">{{copy.book.categories.join(", ")}}</li>
+          <li class="record__categories">Categories: {{copy.book.categories.join(", ")}}</li>
         </ul>
         <div class="record__button-container">
           <button class="record__button record__button_delete" data-ng-click="deleteCopy(copy)">remove</button>
@@ -56,13 +60,15 @@
   <ul class="records__list">
     <li class="record record--none" data-ng-if="(lent.length == 0)">Not lending any books</li>
     <li class="record" data-ng-repeat="borrowing in lent">
-      <img class="record__image" data-ng-src="{{borrowing.copy.book.imagelink}}"/>
+      <div class="record__image-container">
+        <img class="record__image" data-ng-src="{{borrowing.copy.book.imagelink}}"/>
+      </div>
       <div class="record__container">
         <ul class="record__summary">
           <li class="record__title">{{borrowing.copy.book.title}}</li>
           <li class="record__subtitle" ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
           <li class="record__authors">by {{borrowing.copy.book.authors.join(", ")}}</li>
-          <li class="record__categories">{{borrcopy.book.categories.join(", ")}}</li>
+          <li class="record__categories">Categories: {{borrcopy.book.categories.join(", ")}}</li>
           <li class="record__borrower">Borrower: {{borrowing.borrower.display_name}}</li>
           <li class="record__checkout-date">Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
         </ul>
@@ -81,13 +87,15 @@
       Not borrowing any books
     </li>
     <li class="record" data-ng-repeat="borrowing in borrowed">
-      <img class="record__image" data-ng-src="{{borrowing.copy.book.imagelink}}">
+      <div class="record__image-container">
+        <img class="record__image" data-ng-src="{{borrowing.copy.book.imagelink}}">
+      </div>
       <div class="record__container">
         <ul class="record__summary">
           <li class="record__title">{{borrowing.copy.book.title}}</li>
           <li class="record__subtitle" ng-if="borrowing.copy.book.subtitle">{{borrowing.copy.book.subtitle}}</li>
           <li class="record__authors">by {{borrowing.copy.book.authors.join(", ")}}</li>
-          <li class="record__categories">{{borrcopy.book.categories.join(", ")}}</li>
+          <li class="record__categories">Categories: {{borrcopy.book.categories.join(", ")}}</li>
           <li class="record__owner">Owner: {{borrowing.copy.owner.display_name}}</li>
           <li class="record__checkout-date">Checked Out: {{borrowing.checkout_date | date : "short"}}</li>
         </ul>

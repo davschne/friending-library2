@@ -3,13 +3,16 @@
   <ul class="records__list">
     <li class="record record--none" data-ng-if="(availableBooks.length == 0)">No books available to borrow</li>
     <li class="record" data-ng-repeat="copy in availableBooks">
-      <img class="record__image" data-ng-src="{{copy.book.imagelink}}">
+      <div class="record__image-container">
+        <img class="record__image" alt="{{copy.book.title}} cover image" data-ng-src="{{copy.book.imagelink}}">
+      </div>
       <div class="record__container">
         <ul class="record__summary">
           <li class="record__title">{{copy.book.title}}</li>
           <li class="record__subtitle" ng-if="copy.book.subtitle">{{copy.book.subtitle}}</li>
+          <hr class="record__hr">
           <li class="record__authors">by {{copy.book.authors.join(", ")}}</li>
-          <li class="record__categories">{{copy.book.categories.join(", ")}}</li>
+          <li class="record__categories">Categories: {{copy.book.categories.join(", ")}}</li>
           <li class="record__owner">Owner: {{copy.owner.display_name}}</li>
         </ul>
         <div class="record__button-container">

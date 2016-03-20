@@ -6,5 +6,5 @@
 }
 
 .nav__link {
-  @include button();
+  @include button(0.8em, 8em);
 }
