@@ -1,6 +1,8 @@
 @import 'reset';
 
 $color-green: #13D18F !default;
+$color-green-dark: #14B57D !default;
+$color-blue: #2C99D4 !default;
 $color-facebook-blue: rgba(59, 89, 153, 1.0) !default;
 $text-shadow: 0.1em 0.1em 0.2em black;
 
@@ -21,3 +23,4 @@ body {
 @import 'modules/footer';
 @import 'modules/public';
 @import 'modules/login';
+@import 'modules/nav';
