@@ -3,12 +3,8 @@
 .record {
   font-size: 1rem;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  // align-content: stretch;
-  // align-items: stretch;
-  border: 2px solid #FFF;
-  border-radius: 5px;
+  flex-direction: column;
+  @include border-rounded(#FFF);
   padding: 0.5em;
   margin: 0.2em 0 0.2em 0;
   color: #FFF;
@@ -18,33 +14,40 @@
 }
 
 .record--none {
-  // border: none;
   text-align: center;
   justify-content: center;
 }
 
+.record__display-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #FFF;
+}
+
 .record__image-container {
-  height: 160px;
   width: 100px;
-  // align-self: stretch;
-}
-
-.record__image {
-  // height: 100%;
-  // width: 100%;
-  margin: auto;
-}
-
-.record__container {
-  flex: 1;
+  padding: 4px;
+  background-color: $color-green-dark;
+  @include border-rounded(#FFF);
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
+
+.record__button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding-top: 5px;
+}
+
+.record__image {}
 
 .record__summary {
   flex: 1;
-  // color: #FFF;
-  padding: 0.5em;
+  padding: 0 5px;
 }
 
 .record__title, .record__subtitle, .record__authors, .record__categories, .record__owner, .record__borrower, .record__checkout-date, .record__request-date {
@@ -89,13 +92,6 @@
   font-size: 0.9em;
 }
 
-.record__button-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
-}
-
 .record__button {
-  @include button(0.8em, 10em);
+  @include button(0.8em, 9em);
 }

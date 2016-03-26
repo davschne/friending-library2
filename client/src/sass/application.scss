@@ -7,14 +7,19 @@ $color-blue: #2C99D4 !default;
 $color-facebook-blue: rgba(59, 89, 153, 1.0) !default;
 $text-shadow: 0.1em 0.1em 0.2em black;
 
+@mixin border-rounded($color) {
+  border: 2px solid $color;
+  border-radius: 5px;
+}
+
 @mixin button($font-size, $width) {
   font-size: $font-size;
   width: $width;
   border: 2px solid #FFF;
   border-radius: 5px;
   text-align: center;
-  padding: 0.5em;
-  margin: 0.2em;
+  padding: 0.3em;
+  margin: 1px;
   cursor: pointer;
   text-shadow: $text-shadow;
   color: #FFF;
@@ -44,3 +49,4 @@ body {
 @import 'modules/nav';
 @import 'modules/records';
 @import 'modules/record';
+@import 'modules/form';

@@ -4,15 +4,16 @@
     <li class="record record--none"
       data-ng-if="(outgoingBookRequests.length == 0)">No books requested</li>
     <li class="record" data-ng-repeat="bookrequest in outgoingBookRequests">
-      <div class="record__image-container">
-        <img class="record__image" data-ng-src="{{bookrequest.copy.book.imagelink}}">
-      </div>
-      <div class="record__container">
+      <div class="record__display-container">
+        <div class="record__image-container">
+          <img class="record__image" data-ng-src="{{bookrequest.copy.book.imagelink}}">
+        </div>
         <ul class="record__summary">
           <li class="record__title">
             {{bookrequest.copy.book.title}}</li>
           <li class="record__subtitle" ng-if="bookrequest.copy.book.subtitle">
             {{bookrequest.copy.book.subtitle}}</li>
+          <hr class="record__hr">
           <li class="record__authors">
             by {{bookrequest.copy.book.authors.join(", ")}}</li>
           <li class="record__categories">
@@ -22,10 +23,10 @@
           <li class="record__request-date">
             Requested: {{bookrequest.request_date | date : "short"}}</li>
         </ul>
-        <div class="record__button-container">
-          <button class="record__button record__button--cancel"
-            data-ng-click="cancelBookRequest(bookrequest)">cancel</button>
-        </div>
+      </div>
+      <div class="record__button-container">
+        <button class="record__button record__button--cancel"
+          data-ng-click="cancelBookRequest(bookrequest)">cancel</button>
       </div>
     </li>
   </ul>
@@ -37,14 +38,15 @@
     <li class="record record--none"
       data-ng-if="(incomingBookRequests.length == 0)">No books requested</li>
     <li class="record" data-ng-repeat="bookrequest in incomingBookRequests">
-      <div class="record__image-container">
-        <img class="record__image" data-ng-src="{{bookrequest.copy.book.imagelink}}">
-      </div>
-      <div class="record__container">
+      <div class="record__display-container">
+        <div class="record__image-container">
+          <img class="record__image" data-ng-src="{{bookrequest.copy.book.imagelink}}">
+        </div>
         <ul class="record__summary">
           <li class="record__title">{{bookrequest.copy.book.title}}</li>
           <li class="record__subtitle" ng-if="bookrequest.copy.book.subtitle">
             {{bookrequest.copy.book.subtitle}}</li>
+          <hr class="record__hr">
           <li class="record__authors">
             by {{bookrequest.copy.book.authors.join(", ")}}</li>
           <li class="record__categories">
@@ -54,12 +56,12 @@
           <li class="record__request-date">
             Requested: {{bookrequest.request_date | date : "short"}}</li>
         </ul>
-        <div class="record__button-container">
-          <button class="record__button record__button--checkout"
-            data-ng-click="checkoutBook(bookrequest)">check out</button>
-          <button class="record__button record__button--deny"
-            data-ng-click="denyBookRequest(bookrequest)">deny</button>
-        </div>
+      </div>
+      <div class="record__button-container">
+        <button class="record__button record__button--checkout"
+          data-ng-click="checkoutBook(bookrequest)">check out</button>
+        <button class="record__button record__button--deny"
+          data-ng-click="denyBookRequest(bookrequest)">deny</button>
       </div>
     </li>
   </ul>

@@ -1,0 +1,44 @@
+// FORM MODULE
+
+.form {
+  font-size: 1rem;
+  padding: 0.5em 0 0.5em 0;
+  color: #FFF;
+  text-shadow: $text-shadow;
+}
+
+.form__title {
+  font-size: 1.5em;
+  text-align: center;
+  text-shadow: $text-shadow;
+  padding: 0.5em 0 0.5em 0;
+  color: #FFF;
+}
+
+.form__body {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.form__element {
+  padding: 0 10px 0 10px;
+}
+
+.form__button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.form__label {
+  padding-bottom: 0.5em;
+}
+
+.form__text-field {
+  width: 10em;
+}
+
+.form__button {
+  @include button(0.8em, 8em);
+}
