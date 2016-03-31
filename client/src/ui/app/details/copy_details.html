@@ -1,0 +1,56 @@
+<section class="details">
+  <img class="details__image" alt="{{r.book.title}} cover image" data-ng-src="{{r.book.imagelink}}">
+  <table class="details__table">
+    <tr class="details__row">
+      <td class="details__key">title:</td>
+      <td class="details__val">{{r.book.title}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">subtitle:</td>
+      <td class="details__val">{{r.book.subtitle}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">authors:</td>
+      <td class="details__val">{{r.book.authors.join(", ")}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">categories:</td>
+      <td class="details__val">{{r.book.categories.join(", ")}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">publisher:</td>
+      <td class="details__val">{{r.book.publisher}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">date of publication:</td>
+      <td class="details__val">{{r.book.publisheddate}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">description:</td>
+      <td class="details__val">{{r.book.description}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">pages:</td>
+      <td class="details__val">{{r.book.pagecount}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">language:</td>
+      <td class="details__val">{{r.book.language}}</td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">volume link:</td>
+      <td class="details__val">
+        <a href="{{r.book.volumelink}}">{{r.book.volumelink}}</a>
+      </td>
+    </tr>
+    <tr class="details__row">
+      <td class="details__key">copy ID:</td>
+      <td class="details__val">{{r.copyid}}</td>
+    </tr>
+    <tr data-ng-if="r.owner" class="details__row">
+      <td class="details__key">owner:</td>
+      <td class="details__val">{{r.owner.display_name}}</td>
+    </tr>
+  </table>
+  <button class="details__button" data-ng-click="hide()">hide details</button>
+</section>

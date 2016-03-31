@@ -7,11 +7,12 @@ require("angular-ui-router");
 
 // paths to templates (relative to bundle.js)
 var templates = {
-  public     : "ui/public/public.html",
-  app        : "ui/app/app.html",
-  find_books : "ui/app/find_books/find_books.html",
-  my_library : "ui/app/my_library/my_library.html",
-  requests   : "ui/app/requests/requests.html"
+  public      : "ui/public/public.html",
+  app         : "ui/app/app.html",
+  find_books  : "ui/app/find_books/find_books.html",
+  my_library  : "ui/app/my_library/my_library.html",
+  requests    : "ui/app/requests/requests.html",
+  copy_details: "ui/app/details/copy_details.html"
 };
 
 // create module
@@ -37,6 +38,7 @@ require("./ui/app/app.js")(friendingLibrary);
 require("./ui/app/find_books/find_books.js")(friendingLibrary);
 require("./ui/app/my_library/my_library.js")(friendingLibrary);
 require("./ui/app/requests/requests.js")(friendingLibrary);
+require("./ui/app/details/details.js")(friendingLibrary);
 
 // load UI routing
 require("./ui/ui-router.js")(friendingLibrary, templates);

@@ -19,6 +19,11 @@ module.exports = function(friendingLibrary, templates) {
       controller: "findBooksController",
       templateUrl: templates.find_books
     })
+    .state("app.find_books.copy_details", {
+      controller: "detailsController",
+      templateUrl: templates.copy_details,
+      params: { record: null }
+    })
     .state("app.my_library", {
       controller: "myLibraryController",
       templateUrl: templates.my_library

@@ -17,16 +17,14 @@
         </ul>
       </div>
       <div class="record__button-container">
-        <!-- <button data-ng-click="toggleDescription(1, book)">Show Details</button> -->
-
+        <button class="record__button" data-ng-click="showDetails(copy)">
+          show details</a>
         <button class="record__button record__button--request"
           data-ng-click="requestBook(copy)">request book</button>
-
-        <!-- <section class="description" data-ng-if="book.showDescription">
-        <h2 class="description__header">Description:</h2>
-        <p class="description__p">{{copy.book.description}}</p>
-        <button data-ng-click="toggleDescription(2, book)">Hide</button> -->
       </div>
     </li>
   </ul>
 </section>
+
+<!-- MODAL THAT SHOWS RECORD DETAILS -->
+<div data-ui-view></div>

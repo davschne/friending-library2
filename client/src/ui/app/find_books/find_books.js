@@ -3,8 +3,8 @@
 module.exports = function(friendingLibrary) {
 
   friendingLibrary.controller(
-    "findBooksController", ["$scope", "Transact", "AvailableBooks",
-    function($scope, Transact, AvailableBooks) {
+    "findBooksController", ["$scope", "$state", "Transact", "AvailableBooks",
+    function($scope, $state, Transact, AvailableBooks) {
 
       // in this view, a user can:
       // - view books available to request
@@ -14,13 +14,10 @@ module.exports = function(friendingLibrary) {
 
       $scope.requestBook = Transact.requestBook;
 
-      // $scope.toggleDescription = function(choice, bookObj) {
-      //   if(choice === 1) {
-      //     bookObj.showDescription = true;
-      //   } else {
-      //     bookObj.showDescription = false;
-      //   }
-      // };
+      // show record details in a modal:
+      $scope.showDetails = function(record) {
+        $state.go("app.find_books.copy_details", { record: record });
+      };
     }]
   );
 };
