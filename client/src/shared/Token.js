@@ -10,12 +10,12 @@ module.exports = function(friendingLibrary) {
 
       var get = function() {
 
-        if (!token) {
+        if (token == undefined) {
 
           // if private var undefined, check query string
           token = $location.search().access_token;
 
-          if (token) {
+          if (token != undefined) {
 
             // if it was in the query string, store it in a cookie
             $cookies.put("friendinglibrary.token", token);
