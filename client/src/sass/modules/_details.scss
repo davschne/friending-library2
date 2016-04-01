@@ -1,0 +1,72 @@
+// DETAILS MODULE
+
+.details {
+  font-size: 0.8rem;
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.details__content {
+  text-shadow: $text-shadow;
+  background-color: $color-green;
+  width: 90%;
+  margin: 10% auto 10% auto;
+  padding: 5px;
+  @include border-rounded(#FFF);
+}
+
+.details__heading {}
+
+.details__container--upper {
+  display: flex;
+  flex-direction: row;
+  wrap: wrap;
+}
+
+.details__container--image {
+  // flex-basis: content;
+  width: 30%;
+}
+
+.details__image {}
+
+.details__container--book-details {
+  width: 70%;
+}
+
+.details__sub-heading {
+  font-size: 1.5em;
+  text-decoration: underline;
+}
+
+.details__field {
+  padding-top: 0.5em;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.details__key {
+  color: #111;
+  flex-basis: content;
+  padding-right: 10px;
+}
+
+.details__val {
+  color: #FFF;
+  flex: content;
+}
+
+.details__container--description {}
+
+.details__container--button {}
+
+.details__button {
+  @include button(0.8rem, 8rem);
+}

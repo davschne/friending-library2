@@ -1,56 +1,75 @@
 <section class="details">
-  <img class="details__image" alt="{{r.book.title}} cover image" data-ng-src="{{r.book.imagelink}}">
-  <table class="details__table">
-    <tr class="details__row">
-      <td class="details__key">title:</td>
-      <td class="details__val">{{r.book.title}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">subtitle:</td>
-      <td class="details__val">{{r.book.subtitle}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">authors:</td>
-      <td class="details__val">{{r.book.authors.join(", ")}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">categories:</td>
-      <td class="details__val">{{r.book.categories.join(", ")}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">publisher:</td>
-      <td class="details__val">{{r.book.publisher}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">date of publication:</td>
-      <td class="details__val">{{r.book.publisheddate}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">description:</td>
-      <td class="details__val">{{r.book.description}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">pages:</td>
-      <td class="details__val">{{r.book.pagecount}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">language:</td>
-      <td class="details__val">{{r.book.language}}</td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">volume link:</td>
-      <td class="details__val">
-        <a href="{{r.book.volumelink}}">{{r.book.volumelink}}</a>
-      </td>
-    </tr>
-    <tr class="details__row">
-      <td class="details__key">copy ID:</td>
-      <td class="details__val">{{r.copyid}}</td>
-    </tr>
-    <tr data-ng-if="r.owner" class="details__row">
-      <td class="details__key">owner:</td>
-      <td class="details__val">{{r.owner.display_name}}</td>
-    </tr>
-  </table>
-  <button class="details__button" data-ng-click="hide()">hide details</button>
+  <div class="details__content">
+    <!-- <h2 class="details__heading">Details</h2> -->
+
+    <div class="details__container--upper">
+
+      <div class="details__container--image">
+        <img class="details__image" alt="{{r.book.title}} cover image" data-ng-src="{{r.book.imagelink}}">
+      </div>
+
+      <div class="details__container--book-details">
+        <h3 class="details__sub-heading">BOOK DETAILS</h3>
+        <p class="details__field">
+          <span class="details__key">title:</span>
+          <span class="details__val">{{r.book.title}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key" data-ng-if="r.book.subtitle">subtitle:</span>
+          <span class="details__val">{{r.book.subtitle}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key">authors:</span>
+          <span class="details__val">{{r.book.authors.join(", ")}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key">categories:</span>
+          <span class="details__val">{{r.book.categories.join(", ")}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key">publisher:</span>
+          <span class="details__val">{{r.book.publisher}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key">published:</span>
+          <span class="details__val">{{r.book.publisheddate}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key">pages:</span>
+          <span class="details__val">{{r.book.pagecount}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key">language:</span>
+          <span class="details__val">{{r.book.language}}</span>
+        </p>
+        <p class="details__field">
+          <span class="details__key">link:</span>
+          <span class="details__val">
+            <a href="{{r.book.volumelink}}">view on Google Books</a>
+          </span>
+        </p>
+      </div>
+
+    </div>
+
+    <div class="details__container--description">
+      <span class="details__key" data-ng-if="r.book.description">description:</span>
+      <span class="details__val">{{r.book.description}}</span>
+    </div>
+
+    <div class="details__container--copy-details">
+      <p class="details__field">
+        <span class="details__key">copy ID:</span>
+        <span class="details__val">{{r.copyid}}</span>
+      </p>
+      <p class="details__field">
+        <span class="details__key" data-ng-if="r.owner">owner:</span>
+        <span class="details__val">{{r.owner.display_name}}</span>
+      </p>
+    </div>
+
+    <div class="details__container--button">
+      <button class="details__button" data-ng-click="hide()">hide details</button>
+    </div>
+  </div>
 </section>
